@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ÅÏÇÑÉ ÇáÃãä — äÙÇã ÅÏÇÑÉ ÇáÕæÇãÚ</title>
+<title>Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø£Ù…Ù† â€” Ù†Ø¸Ø§Ù… Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙˆØ§Ù…Ø¹</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -15,13 +15,13 @@
   <main class="main-content">
     <header class="top-header">
       <div>
-        <div class="header-title">ÅÏÇÑÉ ÇáÃãä æÇáÓáÇãÉ</div>
-        <div class="header-sub">ÊÓÌíá ÇáÍæÇÏË ÇáÃãäíÉ æãÊÇÈÚÊåÇ Úáì ãÓÊæì ÇáÌãåæÑíÉ</div>
+        <div class="header-title">Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø£Ù…Ù† ÙˆØ§Ù„Ø³Ù„Ø§Ù…Ø©</div>
+        <div class="header-sub">ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø­ÙˆØ§Ø¯Ø« Ø§Ù„Ø£Ù…Ù†ÙŠØ© ÙˆÙ…ØªØ§Ø¨Ø¹ØªÙ‡Ø§ Ø¹Ù„Ù‰ Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ø¬Ù…Ù‡ÙˆØ±ÙŠØ©</div>
       </div>
       <div class="header-actions">
         <div class="header-date" id="clockEl"></div>
         <button class="btn btn-danger" onclick="openIncident()">
-          <i class="fa-solid fa-triangle-exclamation"></i> ÊÓÌíá ÍÇÏËÉ ÌÏíÏÉ
+          <i class="fa-solid fa-triangle-exclamation"></i> ØªØ³Ø¬ÙŠÙ„ Ø­Ø§Ø¯Ø«Ø© Ø¬Ø¯ÙŠØ¯Ø©
         </button>
       </div>
     </header>
@@ -32,51 +32,51 @@
       <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px">
         <div class="stat-card">
           <div class="stat-icon ic-red"><i class="fa-solid fa-circle-exclamation"></i></div>
-          <div class="stat-body"><div class="stat-value" id="openCnt">0</div><div class="stat-label">ÍæÇÏË ãİÊæÍÉ</div></div>
+          <div class="stat-body"><div class="stat-value" id="openCnt">0</div><div class="stat-label">Ø­ÙˆØ§Ø¯Ø« Ù…ÙØªÙˆØ­Ø©</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon ic-amber"><i class="fa-solid fa-magnifying-glass"></i></div>
-          <div class="stat-body"><div class="stat-value" id="invCnt">0</div><div class="stat-label">ŞíÏ ÇáÊÍŞíŞ</div></div>
+          <div class="stat-body"><div class="stat-value" id="invCnt">0</div><div class="stat-label">Ù‚ÙŠØ¯ Ø§Ù„ØªØ­Ù‚ÙŠÙ‚</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon ic-green"><i class="fa-solid fa-circle-check"></i></div>
-          <div class="stat-body"><div class="stat-value" id="resCnt">0</div><div class="stat-label">ãÍáæáÉ</div></div>
+          <div class="stat-body"><div class="stat-value" id="resCnt">0</div><div class="stat-label">Ù…Ø­Ù„ÙˆÙ„Ø©</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon ic-red"><i class="fa-solid fa-fire"></i></div>
-          <div class="stat-body"><div class="stat-value" id="critCnt">0</div><div class="stat-label">ÍÑÌÉ</div></div>
+          <div class="stat-body"><div class="stat-value" id="critCnt">0</div><div class="stat-label">Ø­Ø±Ø¬Ø©</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon ic-blue"><i class="fa-solid fa-shield-halved"></i></div>
-          <div class="stat-body"><div class="stat-value">7</div><div class="stat-label">ÅÌãÇáí ÇáÍæÇÏË</div></div>
+          <div class="stat-body"><div class="stat-value">7</div><div class="stat-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø­ÙˆØ§Ø¯Ø«</div></div>
         </div>
       </div>
 
       <!-- Filters -->
       <div class="filters-bar">
         <div class="search-box">
-          <input type="text" id="secSearch" placeholder="ÇÈÍË İí ÇáÍæÇÏË..." oninput="filterSec()">
+          <input type="text" id="secSearch" placeholder="Ø§Ø¨Ø­Ø« ÙÙŠ Ø§Ù„Ø­ÙˆØ§Ø¯Ø«..." oninput="filterSec()">
           <i class="fa-solid fa-search search-icon"></i>
         </div>
         <select class="filter-select" id="sevFilter" onchange="filterSec()">
-          <option value="">ßá ÇáÃæáæíÇÊ</option>
-          <option value="critical">ÍÑÌÉ</option>
-          <option value="high">ÚÇáíÉ</option>
-          <option value="medium">ãÊæÓØÉ</option>
-          <option value="low">ãäÎİÖÉ</option>
+          <option value="">ÙƒÙ„ Ø§Ù„Ø£ÙˆÙ„ÙˆÙŠØ§Øª</option>
+          <option value="critical">Ø­Ø±Ø¬Ø©</option>
+          <option value="high">Ø¹Ø§Ù„ÙŠØ©</option>
+          <option value="medium">Ù…ØªÙˆØ³Ø·Ø©</option>
+          <option value="low">Ù…Ù†Ø®ÙØ¶Ø©</option>
         </select>
         <select class="filter-select" id="stFilter" onchange="filterSec()">
-          <option value="">ßá ÇáÍÇáÇÊ</option>
-          <option value="open">ãİÊæÍÉ</option>
-          <option value="investigating">ŞíÏ ÇáÊÍŞíŞ</option>
-          <option value="resolved">ãÍáæáÉ</option>
+          <option value="">ÙƒÙ„ Ø§Ù„Ø­Ø§Ù„Ø§Øª</option>
+          <option value="open">Ù…ÙØªÙˆØ­Ø©</option>
+          <option value="investigating">Ù‚ÙŠØ¯ Ø§Ù„ØªØ­Ù‚ÙŠÙ‚</option>
+          <option value="resolved">Ù…Ø­Ù„ÙˆÙ„Ø©</option>
         </select>
       </div>
 
       <!-- Alerts panel for open incidents -->
       <div class="chart-card mb-24" id="openAlerts">
         <div class="card-header">
-          <div class="card-title"><i class="fa-solid fa-bell text-danger pulse"></i> ÍæÇÏË ÊÍÊÇÌ ãÊÇÈÚÉ İæÑíÉ</div>
+          <div class="card-title"><i class="fa-solid fa-bell text-danger pulse"></i> Ø­ÙˆØ§Ø¯Ø« ØªØ­ØªØ§Ø¬ Ù…ØªØ§Ø¨Ø¹Ø© ÙÙˆØ±ÙŠØ©</div>
         </div>
         <div class="alert-list" id="urgentList"></div>
       </div>
@@ -84,23 +84,23 @@
       <!-- Table -->
       <div class="table-card">
         <div class="table-header">
-          <div class="card-title">ÓÌá ÌãíÚ ÇáÍæÇÏË ÇáÃãäíÉ</div>
-          <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> ØÈÇÚÉ</button>
+          <div class="card-title">Ø³Ø¬Ù„ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­ÙˆØ§Ø¯Ø« Ø§Ù„Ø£Ù…Ù†ÙŠØ©</div>
+          <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> Ø·Ø¨Ø§Ø¹Ø©</button>
         </div>
         <div style="overflow-x:auto">
           <table class="data-table">
             <thead>
               <tr>
-                <th>ÑŞã ÇáÍÇÏËÉ</th>
-                <th>ÇáÕæãÚÉ</th>
-                <th>äæÚ ÇáÍÇÏËÉ</th>
-                <th>ÇáæÕİ</th>
-                <th>ÇáÎØæÑÉ</th>
-                <th>ÇáÍÇáÉ</th>
-                <th>ÇáãÈáøÛ</th>
-                <th>ÇáÍÇÑÓ</th>
-                <th>ÇáÊÇÑíÎ</th>
-                <th>ÅÌÑÇÁ</th>
+                <th>Ø±Ù‚Ù… Ø§Ù„Ø­Ø§Ø¯Ø«Ø©</th>
+                <th>Ø§Ù„ØµÙˆÙ…Ø¹Ø©</th>
+                <th>Ù†ÙˆØ¹ Ø§Ù„Ø­Ø§Ø¯Ø«Ø©</th>
+                <th>Ø§Ù„ÙˆØµÙ</th>
+                <th>Ø§Ù„Ø®Ø·ÙˆØ±Ø©</th>
+                <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                <th>Ø§Ù„Ù…Ø¨Ù„Ù‘Øº</th>
+                <th>Ø§Ù„Ø­Ø§Ø±Ø³</th>
+                <th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
+                <th>Ø¥Ø¬Ø±Ø§Ø¡</th>
               </tr>
             </thead>
             <tbody id="secBody"></tbody>
@@ -116,48 +116,48 @@
 <div class="modal-overlay hidden" id="incidentModal">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-title"><i class="fa-solid fa-triangle-exclamation text-danger"></i> ÊÓÌíá ÍÇÏËÉ ÃãäíÉ ÌÏíÏÉ</div>
+      <div class="modal-title"><i class="fa-solid fa-triangle-exclamation text-danger"></i> ØªØ³Ø¬ÙŠÙ„ Ø­Ø§Ø¯Ø«Ø© Ø£Ù…Ù†ÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©</div>
       <button class="modal-close" onclick="closeIncident()"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
         <!-- Silo selection removed, using user.silo_id -->
         <div class="form-group-inner">
-          <label>äæÚ ÇáÍÇÏËÉ *</label>
+          <label>Ù†ÙˆØ¹ Ø§Ù„Ø­Ø§Ø¯Ø«Ø© *</label>
           <select class="form-control" id="inc_type">
-            <option>ãÍÇæáÉ ÏÎæá ÛíÑ ãÕÑÍ</option>
-            <option>ÓÑŞÉ</option>
-            <option>ÍÑíŞ ÕÛíÑ</option>
-            <option>ÍÇÏË Úãá</option>
-            <option>Êáİ İí ÇáÓíÇÌ</option>
-            <option>ÚØá İí ßÇãíÑÇÊ ÇáãÑÇŞÈÉ</option>
-            <option>ÊäÈíå ãäÙæãÉ ÇáÅäĞÇÑ</option>
-            <option>ÃÎÑì</option>
+            <option>Ù…Ø­Ø§ÙˆÙ„Ø© Ø¯Ø®ÙˆÙ„ ØºÙŠØ± Ù…ØµØ±Ø­</option>
+            <option>Ø³Ø±Ù‚Ø©</option>
+            <option>Ø­Ø±ÙŠÙ‚ ØµØºÙŠØ±</option>
+            <option>Ø­Ø§Ø¯Ø« Ø¹Ù…Ù„</option>
+            <option>ØªÙ„Ù ÙÙŠ Ø§Ù„Ø³ÙŠØ§Ø¬</option>
+            <option>Ø¹Ø·Ù„ ÙÙŠ ÙƒØ§Ù…ÙŠØ±Ø§Øª Ø§Ù„Ù…Ø±Ø§Ù‚Ø¨Ø©</option>
+            <option>ØªÙ†Ø¨ÙŠÙ‡ Ù…Ù†Ø¸ÙˆÙ…Ø© Ø§Ù„Ø¥Ù†Ø°Ø§Ø±</option>
+            <option>Ø£Ø®Ø±Ù‰</option>
           </select>
         </div>
         <div class="form-group-inner" style="grid-column:1/-1">
-          <label>æÕİ ÊİÕíáí ááÍÇÏËÉ *</label>
-          <textarea class="form-control" id="inc_desc" rows="3" placeholder="ÇßÊÈ ÊİÇÕíá ÇáÍÇÏËÉ ÈæÖæÍ..." style="resize:vertical"></textarea>
+          <label>ÙˆØµÙ ØªÙØµÙŠÙ„ÙŠ Ù„Ù„Ø­Ø§Ø¯Ø«Ø© *</label>
+          <textarea class="form-control" id="inc_desc" rows="3" placeholder="Ø§ÙƒØªØ¨ ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø­Ø§Ø¯Ø«Ø© Ø¨ÙˆØ¶ÙˆØ­..." style="resize:vertical"></textarea>
         </div>
         <div class="form-group-inner">
-          <label>ÏÑÌÉ ÇáÎØæÑÉ</label>
+          <label>Ø¯Ø±Ø¬Ø© Ø§Ù„Ø®Ø·ÙˆØ±Ø©</label>
           <select class="form-control" id="inc_sev">
-            <option value="low">ãäÎİÖÉ</option>
-            <option value="medium">ãÊæÓØÉ</option>
-            <option value="high">ÚÇáíÉ</option>
-            <option value="critical">ÍÑÌÉ — ÅÈáÇÛ İæÑí</option>
+            <option value="low">Ù…Ù†Ø®ÙØ¶Ø©</option>
+            <option value="medium">Ù…ØªÙˆØ³Ø·Ø©</option>
+            <option value="high">Ø¹Ø§Ù„ÙŠØ©</option>
+            <option value="critical">Ø­Ø±Ø¬Ø© â€” Ø¥Ø¨Ù„Ø§Øº ÙÙˆØ±ÙŠ</option>
           </select>
         </div>
         <div class="form-group-inner">
-          <label>ÇÓã ÇáÍÇÑÓ</label>
-          <input type="text" class="form-control" id="inc_guard" placeholder="ÇÓã ÍÇÑÓ ÇáÃãä">
+          <label>Ø§Ø³Ù… Ø§Ù„Ø­Ø§Ø±Ø³</label>
+          <input type="text" class="form-control" id="inc_guard" placeholder="Ø§Ø³Ù… Ø­Ø§Ø±Ø³ Ø§Ù„Ø£Ù…Ù†">
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeIncident()">ÅáÛÇÁ</button>
+      <button class="btn btn-outline" onclick="closeIncident()">Ø¥Ù„ØºØ§Ø¡</button>
       <button class="btn btn-danger" onclick="saveIncident()">
-        <i class="fa-solid fa-triangle-exclamation"></i> ÊÓÌíá ÇáÍÇÏËÉ æÅÑÓÇá ÊäÈíå
+        <i class="fa-solid fa-triangle-exclamation"></i> ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø­Ø§Ø¯Ø«Ø© ÙˆØ¥Ø±Ø³Ø§Ù„ ØªÙ†Ø¨ÙŠÙ‡
       </button>
     </div>
   </div>
@@ -190,14 +190,14 @@ function renderUrgent() {
   if (!urgent.length) {
     ul.innerHTML = `<div style="text-align:center;padding:20px;color:var(--success)">
       <i class="fa-solid fa-shield-check" style="font-size:1.5rem;margin-bottom:8px;display:block"></i>
-      áÇ ÊæÌÏ ÍæÇÏË ãİÊæÍÉ — ÇáæÖÚ ÇáÃãäí ãÓÊŞÑ</div>`;
+      Ù„Ø§ ØªÙˆØ¬Ø¯ Ø­ÙˆØ§Ø¯Ø« Ù…ÙØªÙˆØ­Ø© â€” Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø£Ù…Ù†ÙŠ Ù…Ø³ØªÙ‚Ø±</div>`;
     return;
   }
   ul.innerHTML = urgent.map(i => `
     <div class="alert-item ${i.severity}">
       <div class="alert-icon"><i class="fa-solid fa-shield-exclamation"></i></div>
       <div style="flex:1">
-        <div class="alert-title">${i.type} — ${siloName(i.silo_id)}</div>
+        <div class="alert-title">${i.type} â€” ${siloName(i.silo_id)}</div>
         <div class="alert-desc">${i.desc}</div>
         <div class="alert-time"><i class="fa-regular fa-clock"></i> ${i.date}</div>
       </div>
@@ -225,8 +225,8 @@ function renderTable(list) {
         <td>
           ${i.status !== 'resolved' ? `
           <button class="btn btn-success btn-xs" onclick="resolve('${i.id}')">
-            <i class="fa-solid fa-check"></i> ÅÛáÇŞ
-          </button>` : '<span style="color:var(--success);font-size:0.75rem">? ãÍáæáÉ</span>'}
+            <i class="fa-solid fa-check"></i> Ø¥ØºÙ„Ø§Ù‚
+          </button>` : '<span style="color:var(--success);font-size:0.75rem">âœ“ Ù…Ø­Ù„ÙˆÙ„Ø©</span>'}
         </td>
       </tr>`;
   });
@@ -246,7 +246,7 @@ renderTable(incidents);
 
 function resolve(id) {
   const i = incidents.find(x=>x.id===id);
-  if (i) { i.status = 'resolved'; filterSec(); renderUrgent(); updateStats(); showToast('Êã ÅÛáÇŞ ÇáÍÇÏËÉ ÈäÌÇÍ', 'success'); }
+  if (i) { i.status = 'resolved'; filterSec(); renderUrgent(); updateStats(); showToast('ØªÙ… Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ø­Ø§Ø¯Ø«Ø© Ø¨Ù†Ø¬Ø§Ø­', 'success'); }
 }
 
 // Modal (silo options removed)
@@ -256,7 +256,7 @@ function closeIncident() { document.getElementById('incidentModal').classList.ad
 
 function saveIncident() {
   const desc = document.getElementById('inc_desc').value.trim();
-  if (!desc) { showToast('íÑÌì ãáÁ ÇáÍŞæá ÇáãØáæÈÉ', 'error'); return; }
+  if (!desc) { showToast('ÙŠØ±Ø¬Ù‰ Ù…Ù„Ø¡ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©', 'error'); return; }
   const newInc = {
     id:       'SEC-' + String(Math.floor(Math.random()*1000)).padStart(3,'0'),
     silo_id:  user.silo_id,
@@ -265,14 +265,14 @@ function saveIncident() {
     desc,
     severity: document.getElementById('inc_sev').value,
     status:   'open',
-    reporter: Auth.current()?.name || 'ãæÙİ',
-    guard:    document.getElementById('inc_guard').value || '—',
+    reporter: Auth.current()?.name || 'Ù…ÙˆØ¸Ù',
+    guard:    document.getElementById('inc_guard').value || 'â€”',
   };
   incidents.unshift(newInc);
   filterSec(); renderUrgent(); updateStats();
   closeIncident();
   const sev = newInc.severity;
-  showToast(`? Êã ÊÓÌíá ÇáÍÇÏËÉ ${newInc.id} æÅÑÓÇá ÊäÈíå ááÅÏÇÑÉ ÇáÚÇãÉ`, sev==='critical'||sev==='high'?'error':'warning');
+  showToast(`âœ“ ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø­Ø§Ø¯Ø«Ø© ${newInc.id} ÙˆØ¥Ø±Ø³Ø§Ù„ ØªÙ†Ø¨ÙŠÙ‡ Ù„Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ø§Ù…Ø©`, sev==='critical'||sev==='high'?'error':'warning');
 }
 </script>
 </body>
