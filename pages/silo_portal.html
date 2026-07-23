@@ -112,7 +112,7 @@
 <body class="portal-page">
 
 <div class="image-map-container">
-  <img src="../img/portal_bg.png" alt="Portal Background" class="bg-image">
+  <img src="../img/portal_bg.jpg" alt="Portal Background" class="bg-image">
   
   <!-- Clickable Overlay Areas -->
   <div class="click-area area-finance" onclick="openAuth('finance', 'الشئون المالية', 'fa-money-bill-wave', '#10b981')" title="الشئون المالية"></div>
@@ -140,8 +140,8 @@
   </div>
 </div>
 
-<script src="../js/data.js?v=17"></script>
-<script src="../js/app.js?v=17"></script>
+<script src="../js/data.js?v=18"></script>
+<script src="../js/app.js?v=18"></script>
 <script>
   const currentUser = Auth.current();
   if (!currentUser || currentUser.role !== 'silo') {
@@ -190,11 +190,11 @@
       const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
       
       if (deptUser) {
-        if (selectedRole === 'scale') window.location.href = 'reception.html?v=17';
-        else if (selectedRole === 'security') window.location.href = 'security.html?v=17';
-        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=17';
-        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=17';
-        else window.location.href = 'dashboard.html?v=17';
+        if (selectedRole === 'scale') window.location.href = 'reception.html?v=18';
+        else if (selectedRole === 'security') window.location.href = 'security.html?v=18';
+        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=18';
+        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=18';
+        else window.location.href = 'dashboard.html?v=18';
       } else {
         document.getElementById('modalError').style.display = 'block';
         btn.innerHTML = 'تأكيد الدخول';
