@@ -115,12 +115,12 @@
   // Auto-redirect if already logged in
   if (Auth.current()) {
     const r = Auth.current().role;
-    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=13';
-    else if (r === 'scale') window.location.href = 'pages/reception.html?v=13';
-    else if (r === 'security') window.location.href = 'pages/security.html?v=13';
-    else if (r === 'finance') window.location.href = 'pages/finance.html?v=13';
-    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=13';
-    else window.location.href = 'pages/dashboard.html?v=13';
+    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=14';
+    else if (r === 'scale') window.location.href = 'pages/reception.html?v=14';
+    else if (r === 'security') window.location.href = 'pages/security.html?v=14';
+    else if (r === 'finance') window.location.href = 'pages/finance.html?v=14';
+    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=14';
+    else window.location.href = 'pages/dashboard.html?v=14';
   }
 
   function fillCreds(username) {
@@ -147,12 +147,12 @@
         const user = Auth.login(u, p);
         if (user) {
           const r = user.role;
-          if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=13';
-          else if (r === 'scale') window.location.href = 'pages/reception.html?v=13';
-          else if (r === 'security') window.location.href = 'pages/security.html?v=13';
-          else if (r === 'finance') window.location.href = 'pages/finance.html?v=13';
-          else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=13';
-          else window.location.href = 'pages/dashboard.html?v=13';
+          if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=14';
+          else if (r === 'scale') window.location.href = 'pages/reception.html?v=14';
+          else if (r === 'security') window.location.href = 'pages/security.html?v=14';
+          else if (r === 'finance') window.location.href = 'pages/finance.html?v=14';
+          else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=14';
+          else window.location.href = 'pages/dashboard.html?v=14';
         } else {
         document.getElementById('loginError').style.display = 'flex';
         btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';

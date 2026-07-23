@@ -206,11 +206,67 @@
   }
   .close-modal:hover { color: #fff; }
 
+
+  /* Golden Wheat Decorations */
+  .decor-wheat {
+    position: absolute;
+    color: #eab308;
+    font-size: 8rem;
+    filter: drop-shadow(0 0 15px rgba(234,179,8,0.5)) drop-shadow(2px 4px 6px rgba(0,0,0,0.8));
+    opacity: 0.85;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .decor-wheat.top-left { top: -40px; left: -40px; transform: rotate(-45deg); font-size: 10rem; }
+  .decor-wheat.top-right { top: -40px; right: -40px; transform: rotate(45deg) scaleX(-1); font-size: 10rem; }
+  .decor-wheat.bottom-left { bottom: -40px; left: -40px; transform: rotate(-135deg) scaleX(-1); font-size: 10rem; }
+  .decor-wheat.bottom-right { bottom: -40px; right: 25%; transform: rotate(145deg); font-size: 8rem; }
+  
+  .glow-speck {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: #fef08a;
+    border-radius: 50%;
+    box-shadow: 0 0 15px 5px rgba(234,179,8,0.7);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .glow-speck.s1 { top: 20%; left: 15%; }
+  .glow-speck.s2 { top: 30%; right: 20%; width: 4px; height: 4px; box-shadow: 0 0 10px 4px rgba(234,179,8,0.6); }
+  .glow-speck.s3 { bottom: 25%; left: 35%; }
+  .glow-speck.s4 { bottom: 15%; right: 10%; }
+  
+  .accent-wheat {
+    position: absolute;
+    color: #eab308;
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 8px rgba(234,179,8,0.6)) drop-shadow(1px 2px 3px rgba(0,0,0,0.8));
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .accent-wheat.left { left: 15px; transform: translateY(-50%) rotate(-30deg); }
+  .accent-wheat.right { right: 15px; transform: translateY(-50%) rotate(30deg) scaleX(-1); }
+  
+  .portal-icon { position: relative; z-index: 2; }
+
 </style>
 </head>
 <body class="portal-page">
 
 <div class="portal-container">
+
+  <!-- Golden Wheat Decorations -->
+  <i class="fa-solid fa-wheat-awn decor-wheat top-left"></i>
+  <i class="fa-solid fa-wheat-awn decor-wheat top-right"></i>
+  <i class="fa-solid fa-wheat-awn decor-wheat bottom-left"></i>
+  <i class="fa-solid fa-wheat-awn decor-wheat bottom-right"></i>
+  <div class="glow-speck s1"></div>
+  <div class="glow-speck s2"></div>
+  <div class="glow-speck s3"></div>
+  <div class="glow-speck s4"></div>
+
   <div class="portal-header">
     <h1 id="siloNameDisplay">بوابة الصومعة الداخلية</h1>
     <p>يرجى اختيار الإدارة الخاصة بك للدخول إلى مساحة العمل</p>
@@ -219,6 +275,10 @@
   <div class="portal-grid">
     <div class="portal-card" style="--color:#8b5cf6; --color-rgb:139,92,246" onclick="openAuth('manager', 'مدير الموقع', 'fa-user-tie', '#8b5cf6')">
       <div class="portal-card-inner">
+
+        <i class="fa-solid fa-wheat-awn accent-wheat left"></i>
+        <i class="fa-solid fa-wheat-awn accent-wheat right"></i>
+
         <i class="fa-solid fa-user-tie portal-icon"></i>
       <h3>مدير الموقع</h3>
       </div>
@@ -226,6 +286,10 @@
     
     <div class="portal-card" style="--color:#3b82f6; --color-rgb:59,130,246" onclick="openAuth('scale', 'إدارة الاستلام والتخزين', 'fa-scale-balanced', '#3b82f6')">
       <div class="portal-card-inner">
+
+        <i class="fa-solid fa-wheat-awn accent-wheat left"></i>
+        <i class="fa-solid fa-wheat-awn accent-wheat right"></i>
+
         <i class="fa-solid fa-scale-balanced portal-icon"></i>
       <h3>إدارة الاستلام والتخزين</h3>
       </div>
@@ -233,6 +297,10 @@
 
     <div class="portal-card" style="--color:#ef4444; --color-rgb:239,68,68" onclick="openAuth('security', 'إدارة الأمن', 'fa-shield-halved', '#ef4444')">
       <div class="portal-card-inner">
+
+        <i class="fa-solid fa-wheat-awn accent-wheat left"></i>
+        <i class="fa-solid fa-wheat-awn accent-wheat right"></i>
+
         <i class="fa-solid fa-shield-halved portal-icon"></i>
       <h3>إدارة الأمن</h3>
       </div>
@@ -240,6 +308,10 @@
 
     <div class="portal-card" style="--color:#10b981; --color-rgb:16,185,129" onclick="openAuth('finance', 'الشئون المالية', 'fa-money-bill-wave', '#10b981')">
       <div class="portal-card-inner">
+
+        <i class="fa-solid fa-wheat-awn accent-wheat left"></i>
+        <i class="fa-solid fa-wheat-awn accent-wheat right"></i>
+
         <i class="fa-solid fa-money-bill-wave portal-icon"></i>
       <h3>الشئون المالية</h3>
       </div>
@@ -247,6 +319,10 @@
 
     <div class="portal-card" style="--color:#f59e0b; --color-rgb:245,158,11" onclick="openAuth('maintenance', 'الصيانة', 'fa-wrench', '#f59e0b')">
       <div class="portal-card-inner">
+
+        <i class="fa-solid fa-wheat-awn accent-wheat left"></i>
+        <i class="fa-solid fa-wheat-awn accent-wheat right"></i>
+
         <i class="fa-solid fa-wrench portal-icon"></i>
       <h3>الصيانة</h3>
       </div>
@@ -316,11 +392,11 @@
       const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
       
       if (deptUser) {
-        if (selectedRole === 'scale') window.location.href = 'reception.html?v=13';
-        else if (selectedRole === 'security') window.location.href = 'security.html?v=13';
-        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=13';
-        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=13';
-        else window.location.href = 'dashboard.html?v=13';
+        if (selectedRole === 'scale') window.location.href = 'reception.html?v=14';
+        else if (selectedRole === 'security') window.location.href = 'security.html?v=14';
+        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=14';
+        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=14';
+        else window.location.href = 'dashboard.html?v=14';
       } else {
         document.getElementById('modalError').style.display = 'block';
         btn.innerHTML = 'تأكيد الدخول';
