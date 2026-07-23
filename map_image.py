@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+import re
+
+html_content = \"\"\"<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„ØµÙˆÙ…Ø¹Ø© Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠØ© â€” Ù†Ø¸Ø§Ù… Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙˆØ§Ù…Ø¹</title>
+<title>ÈæÇÈÉ ÅÏÇÑÉ ÇáÕæãÚÉ - ÇáÔÑßÉ ÇáÞÇÈÖÉ</title>
 <link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesom  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
   
   body.portal-page {
     background: #0f1623;
@@ -39,7 +43,7 @@
   }
   
   .click-area:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.3);
     transform: scale(1.02);
   }
@@ -55,7 +59,7 @@
   /* Bottom Row */
   .area-maintenance { top: 66%; left: 69%; width: 16.5%; height: 23%; }
 
-  /* Auth Modal */
+  /* Auth Modal (kept exactly the same styling as before) */
   .auth-modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(10,13,20,0.85); backdrop-filter: blur(10px);
@@ -105,8 +109,7 @@
     position: absolute; top: 20px; right: 20px; color: #94a3b8;
     background: none; border: none; font-size: 1.5rem; cursor: pointer; transition: color 0.3s;
   }
-  .close-modal:hover { color: #fff; }t: 70%; width: 100px; height: 100px; }
-
+  .close-modal:hover { color: #fff; }
 </style>
 </head>
 <body class="portal-page">
@@ -115,11 +118,11 @@
   <img src="../img/portal_bg.png" alt="Portal Background" class="bg-image">
   
   <!-- Clickable Overlay Areas -->
-  <div class="click-area area-finance" onclick="openAuth('finance', 'Ø§Ù„Ø´Ø¦ÙˆÙ† Ø§Ù„Ù…Ø§Ù„ÙŠØ©', 'fa-money-bill-wave', '#10b981')" title="Ø§Ù„Ø´Ø¦ÙˆÙ† Ø§Ù„Ù…Ø§Ù„ÙŠØ©"></div>
-  <div class="click-area area-security" onclick="openAuth('security', 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø£Ù…Ù†', 'fa-shield-halved', '#ef4444')" title="Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø£Ù…Ù†"></div>
-  <div class="click-area area-reception" onclick="openAuth('scale', 'Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… ÙˆØ§Ù„ØªØ®Ø²ÙŠÙ†', 'fa-scale-balanced', '#3b82f6')" title="Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù… ÙˆØ§Ù„ØªØ®Ø²ÙŠÙ†"></div>
-  <div class="click-area area-manager" onclick="openAuth('manager', 'Ù…Ø¯ÙŠØ± Ø§Ù„Ù…ÙˆÙ‚Ø¹', 'fa-user-tie', '#8b5cf6')" title="Ù…Ø¯ÙŠØ± Ø§Ù„Ù…ÙˆÙ‚Ø¹"></div>
-  <div class="click-area area-maintenance" onclick="openAuth('maintenance', 'Ø§Ù„ØµÙŠØ§Ù†Ø©', 'fa-wrench', '#f59e0b')" title="Ø§Ù„ØµÙŠØ§Ù†Ø©"></div>
+  <div class="click-area area-finance" onclick="openAuth('finance', 'ÇáÔÆæä ÇáãÇáíÉ', 'fa-money-bill-wave', '#10b981')" title="ÇáÔÆæä ÇáãÇáíÉ"></div>
+  <div class="click-area area-security" onclick="openAuth('security', 'ÅÏÇÑÉ ÇáÃãä', 'fa-shield-halved', '#ef4444')" title="ÅÏÇÑÉ ÇáÃãä"></div>
+  <div class="click-area area-reception" onclick="openAuth('scale', 'ÅÏÇÑÉ ÇáÇÓÊáÇã æÇáÊÎÒíä', 'fa-scale-balanced', '#3b82f6')" title="ÅÏÇÑÉ ÇáÇÓÊáÇã æÇáÊÎÒíä"></div>
+  <div class="click-area area-manager" onclick="openAuth('manager', 'ãÏíÑ ÇáãæÞÚ', 'fa-user-tie', '#8b5cf6')" title="ãÏíÑ ÇáãæÞÚ"></div>
+  <div class="click-area area-maintenance" onclick="openAuth('maintenance', 'ÇáÕíÇäÉ', 'fa-wrench', '#f59e0b')" title="ÇáÕíÇäÉ"></div>
 </div>
 
 <!-- Auth Modal -->
@@ -128,20 +131,20 @@
     <button class="close-modal" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button>
     <div class="auth-modal-header">
       <div class="auth-modal-icon" id="modalIcon"><i class="fa-solid fa-lock"></i></div>
-      <h2 id="modalTitle">ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¯Ø®ÙˆÙ„</h2>
+      <h2 id="modalTitle">ÊÃßíÏ ÇáÏÎæá</h2>
     </div>
     <form onsubmit="handleDeptLogin(event)">
       <div class="auth-form-group">
-        <input type="password" id="deptPassword" class="auth-input" placeholder="ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±" required autofocus autocomplete="off">
+        <input type="password" id="deptPassword" class="auth-input" placeholder="ßáãÉ ÇáãÑæÑ" required autofocus autocomplete="off">
       </div>
-      <button type="submit" class="auth-btn" id="modalBtn">ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¯Ø®ÙˆÙ„</button>
-      <div class="auth-error" id="modalError">ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©</div>
+      <button type="submit" class="auth-btn" id="modalBtn">ÊÃßíÏ ÇáÏÎæá</button>
+      <div class="auth-error" id="modalError">ßáãÉ ÇáãÑæÑ ÛíÑ ÕÍíÍÉ</div>
     </form>
   </div>
 </div>
 
-<script src="../js/data.js?v=17"></script>
-<script src="../js/app.js?v=17"></script>
+<script src="../js/data.js?v=15"></script>
+<script src="../js/app.js?v=15"></script>
 <script>
   const currentUser = Auth.current();
   if (!currentUser || currentUser.role !== 'silo') {
@@ -154,7 +157,7 @@
     selectedRole = role;
     
     document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalIcon').innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+    document.getElementById('modalIcon').innerHTML = <i class="fa-solid \"></i>;
     document.getElementById('modalContent').style.setProperty('--color', color);
     
     // Extract RGB for drop shadows
@@ -162,7 +165,7 @@
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
-    document.getElementById('modalContent').style.setProperty('--color-rgb', `${r},${g},${b}`);
+    document.getElementById('modalContent').style.setProperty('--color-rgb', \,\,\);
     
     document.getElementById('modalBtn').style.background = color;
     
@@ -182,7 +185,7 @@
     const btn = document.getElementById('modalBtn');
     const pwd = document.getElementById('deptPassword').value;
     
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù‚Ù‚...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ÌÇÑí ÇáÊÍÞÞ...';
     btn.disabled = true;
 
     setTimeout(() => {
@@ -190,14 +193,14 @@
       const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
       
       if (deptUser) {
-        if (selectedRole === 'scale') window.location.href = 'reception.html?v=17';
-        else if (selectedRole === 'security') window.location.href = 'security.html?v=17';
-        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=17';
-        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=17';
-        else window.location.href = 'dashboard.html?v=17';
+        if (selectedRole === 'scale') window.location.href = 'reception.html?v=15';
+        else if (selectedRole === 'security') window.location.href = 'security.html?v=15';
+        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=15';
+        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=15';
+        else window.location.href = 'dashboard.html?v=15';
       } else {
         document.getElementById('modalError').style.display = 'block';
-        btn.innerHTML = 'ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¯Ø®ÙˆÙ„';
+        btn.innerHTML = 'ÊÃßíÏ ÇáÏÎæá';
         btn.disabled = false;
       }
     }, 600);
@@ -205,3 +208,9 @@
 </script>
 </body>
 </html>
+\"\"\"
+
+with open('pages/silo_portal.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print('Done')
