@@ -4,10 +4,20 @@
 
 // ── Auth ────────────────────────────────────────────────────
 const Auth = {
-  login(username, password) {
-    const user = USERS.find(u => u.username === username && u.password === password);
+  loginByRole(role, siloId, password) {
+    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+
+    let user;
+    if (role === 'general_admin') {
+      user = usersToLoad.find(u => u.role === 'general_admin' && u.password === password);
+    } else {
+      user = usersToLoad.find(u => u.role === role && u.silo_id === siloId && u.password === password);
+    }
+
     if (user) {
       localStorage.setItem('silo_user', JSON.stringify(user));
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth_changed'));
       return user;
     }
     return null;
@@ -31,6 +41,11 @@ const Auth = {
   roleLabel(role) {
     const map = {
       general_admin: 'الإدارة العامة',
+      manager: 'مدير الموقع',
+      scale: 'إدارة الميزان',
+      security: 'إدارة الأمن',
+      finance: 'الشؤون المالية',
+      maintenance: 'الصيانة',
       silo: 'فرع صومعة',
     };
     return map[role] || role;
@@ -43,6 +58,7 @@ function buildSidebar(activePage) {
   if (!user) return;
 
   const isGeneral = user.role === 'general_admin';
+  const role = user.role;
 
   let navItems = [];
   
@@ -52,12 +68,28 @@ function buildSidebar(activePage) {
       { label:'مراقبة الصوامع',      icon:'fa-building-wheat', page:'silos' },
       { label:'التقارير المجمعة',    icon:'fa-chart-bar',      page:'reports' },
     ];
-  } else {
+  } else if (role === 'manager') {
     navItems = [
       { label:'لوحة التحكم',             icon:'fa-gauge',           page:'dashboard' },
       { label:'الاستلام والتخزين',       icon:'fa-scale-balanced',  page:'reception' },
       { label:'إدارة الأمن',             icon:'fa-shield-halved',   page:'security' },
       { label:'الشئون المالية والإدارية', icon:'fa-money-bill-wave', page:'finance' },
+      { label:'الصيانة',                 icon:'fa-wrench',          page:'maintenance' },
+    ];
+  } else if (role === 'scale') {
+    navItems = [
+      { label:'الاستلام والتخزين',       icon:'fa-scale-balanced',  page:'reception' },
+    ];
+  } else if (role === 'security') {
+    navItems = [
+      { label:'إدارة الأمن',             icon:'fa-shield-halved',   page:'security' },
+    ];
+  } else if (role === 'finance') {
+    navItems = [
+      { label:'الشئون المالية والإدارية', icon:'fa-money-bill-wave', page:'finance' },
+    ];
+  } else if (role === 'maintenance') {
+    navItems = [
       { label:'الصيانة',                 icon:'fa-wrench',          page:'maintenance' },
     ];
   }

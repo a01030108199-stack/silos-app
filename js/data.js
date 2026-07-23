@@ -94,11 +94,14 @@ for (const s of SILO_DATA) {
     total_local: totalLocal, total_imported: totalImported
   });
 
-  USERS.push({
-    id: siloIdCounter + 1, name: 'صومعة ' + s.name, role: 'silo',
-    username: s.name === 'قصر الباسل' ? 'qasr' : `user${siloIdCounter}`,
-    password: '123', silo_id: siloIdCounter
-  });
+  let baseId = siloIdCounter * 10;
+  USERS.push(
+    { id: baseId + 1, name: `مدير صومعة ${s.name}`, role: 'manager', username: `mgr_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
+    { id: baseId + 2, name: `إدارة الميزان - صومعة ${s.name}`, role: 'scale', username: `scale_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
+    { id: baseId + 3, name: `إدارة الأمن - صومعة ${s.name}`, role: 'security', username: `sec_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
+    { id: baseId + 4, name: `الشئون المالية - صومعة ${s.name}`, role: 'finance', username: `fin_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
+    { id: baseId + 5, name: `الصيانة - صومعة ${s.name}`, role: 'maintenance', username: `maint_${siloIdCounter}`, password: '123', silo_id: siloIdCounter }
+  );
 
   siloIdCounter++;
 }
