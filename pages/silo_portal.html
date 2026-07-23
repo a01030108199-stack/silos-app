@@ -110,23 +110,22 @@
   .close-modal:hover { color: #fff; }
   .dynamic-silo-name {
     position: absolute;
-    top: 9%;
-    left: 35%;
-    right: 35%;
-    height: 11%;
+    top: 8%; /* Move it slightly up */
+    left: 36%;
+    right: 36%;
+    height: 7%; /* Much smaller height to only cover the top word */
     display: flex;
     align-items: center;
     justify-content: center;
     
-    /* Use a solid color that matches the wall, with soft edges to blend perfectly */
+    /* Solid patch exactly over the old text, no shadow bleeding */
     background: #111a28; 
-    box-shadow: 0 0 25px 20px #111a28;
-    border-radius: 10px;
+    border-radius: 8px;
     
     color: #ffffff;
-    font-size: clamp(1.5rem, 2.2vw, 2.5rem);
+    font-size: clamp(1.4rem, 2vw, 2.2rem); /* Even smaller to fit nicely */
     font-weight: 800;
-    text-shadow: 0px 4px 15px rgba(0,0,0,0.8), 0 2px 2px rgba(0,0,0,1);
+    text-shadow: 0px 4px 10px rgba(0,0,0,0.8);
     z-index: 10;
     letter-spacing: 1px;
   }
