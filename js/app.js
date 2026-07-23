@@ -4,6 +4,17 @@
 
 // ── Auth ────────────────────────────────────────────────────
 const Auth = {
+  login(username, password) {
+    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+    
+    const user = usersToLoad.find(u => u.username === username && u.password === password);
+    if (user) {
+      localStorage.setItem('silo_user', JSON.stringify(user));
+      return user;
+    }
+    return null;
+  },
   loginByRole(role, siloId, password) {
     const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
     const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة الصومعة الداخلية — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  .portal-page {
+    background: #0f172a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .portal-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .portal-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .portal-header h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin: 10px 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .portal-header p {
+    color: #94a3b8;
+    font-size: 1.2rem;
+  }
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 20px;
+  }
+  .portal-card {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .portal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, transparent, var(--color), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .portal-card:hover {
+    transform: translateY(-10px);
+    background: rgba(30, 41, 59, 0.95);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .portal-card:hover::before {
+    opacity: 1;
+  }
+  .portal-icon {
+    font-size: 3.5rem;
+    color: var(--color);
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+  }
+  .portal-card:hover .portal-icon {
+    transform: scale(1.1);
+  }
+  .portal-card h3 {
+    color: #f8fafc;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  /* Auth Modal */
+  .auth-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .auth-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .auth-modal {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    transform: scale(0.9);
+    transition: transform 0.3s;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  }
+  .auth-modal-overlay.active .auth-modal {
+    transform: scale(1);
+  }
+  .auth-modal-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .auth-modal-icon {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 15px;
+    color: var(--color);
+  }
+  .auth-modal h2 {
+    color: #fff; margin: 0; font-size: 1.5rem;
+  }
+  .auth-form-group {
+    margin-bottom: 25px;
+  }
+  .auth-input {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 15px;
+    color: #fff;
+    font-size: 1.1rem;
+    text-align: center;
+    letter-spacing: 5px;
+    transition: all 0.3s;
+  }
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--color);
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 0 4px rgba(var(--color-rgb), 0.1);
+  }
+  .auth-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: var(--color);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .auth-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+  }
+  .auth-error {
+    color: #ef4444;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .close-modal {
+    position: absolute;
+    top: 15px; right: 15px;
+    color: #94a3b8;
+    background: none; border: none; font-size: 1.5rem;
+    cursor: pointer; transition: color 0.3s;
+  }
+  .close-modal:hover { color: #fff; }
+</style>
+</head>
+<body class="portal-page">
+
+<div class="portal-container">
+  <div class="portal-header">
+    <h1 id="siloNameDisplay">بوابة الصومعة الداخلية</h1>
+    <p>يرجى اختيار الإدارة الخاصة بك للدخول إلى مساحة العمل</p>
+  </div>
+
+  <div class="portal-grid">
+    <div class="portal-card" style="--color:#8b5cf6; --color-rgb:139,92,246" onclick="openAuth('manager', 'مدير الموقع', 'fa-user-tie', '#8b5cf6')">
+      <i class="fa-solid fa-user-tie portal-icon"></i>
+      <h3>مدير الموقع</h3>
+    </div>
+    
+    <div class="portal-card" style="--color:#3b82f6; --color-rgb:59,130,246" onclick="openAuth('scale', 'إدارة الميزان', 'fa-scale-balanced', '#3b82f6')">
+      <i class="fa-solid fa-scale-balanced portal-icon"></i>
+      <h3>إدارة الميزان</h3>
+    </div>
+
+    <div class="portal-card" style="--color:#ef4444; --color-rgb:239,68,68" onclick="openAuth('security', 'إدارة الأمن', 'fa-shield-halved', '#ef4444')">
+      <i class="fa-solid fa-shield-halved portal-icon"></i>
+      <h3>إدارة الأمن</h3>
+    </div>
+
+    <div class="portal-card" style="--color:#10b981; --color-rgb:16,185,129" onclick="openAuth('finance', 'الشئون المالية', 'fa-money-bill-wave', '#10b981')">
+      <i class="fa-solid fa-money-bill-wave portal-icon"></i>
+      <h3>الشئون المالية</h3>
+    </div>
+
+    <div class="portal-card" style="--color:#f59e0b; --color-rgb:245,158,11" onclick="openAuth('maintenance', 'الصيانة', 'fa-wrench', '#f59e0b')">
+      <i class="fa-solid fa-wrench portal-icon"></i>
+      <h3>الصيانة</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="auth-modal-overlay" id="authModal">
+  <div class="auth-modal" id="modalContent">
+    <button class="close-modal" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="auth-modal-header">
+      <div class="auth-modal-icon" id="modalIcon"><i class="fa-solid fa-lock"></i></div>
+      <h2 id="modalTitle">تسجيل الدخول</h2>
+    </div>
+    <form onsubmit="handleDeptLogin(event)">
+      <div class="auth-form-group">
+        <input type="password" id="deptPassword" class="auth-input" placeholder="كلمة المرور" required autofocus autocomplete="off">
+      </div>
+      <button type="submit" class="auth-btn" id="modalBtn">تأكيد الدخول</button>
+      <div class="auth-error" id="modalError">كلمة المرور غير صحيحة</div>
+    </form>
+  </div>
+</div>
+
+<script src="../js/data.js?v=10"></script>
+<script src="../js/app.js?v=10"></script>
+<script>
+  const currentUser = Auth.current();
+  if (!currentUser || currentUser.role !== 'silo') {
+    window.location.href = '../index.html';
+  } else {
+    document.getElementById('siloNameDisplay').textContent = currentUser.name;
+  }
+
+  let selectedRole = '';
+
+  function openAuth(role, title, iconClass, color) {
+    selectedRole = role;
+    
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalIcon').innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+    document.getElementById('modalContent').style.setProperty('--color', color);
+    document.getElementById('modalBtn').style.background = color;
+    
+    document.getElementById('deptPassword').value = '123'; // Auto-fill for demo
+    document.getElementById('modalError').style.display = 'none';
+    
+    document.getElementById('authModal').classList.add('active');
+    setTimeout(() => document.getElementById('deptPassword').focus(), 100);
+  }
+
+  function closeAuth() {
+    document.getElementById('authModal').classList.remove('active');
+  }
+
+  function handleDeptLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('modalBtn');
+    const pwd = document.getElementById('deptPassword').value;
+    
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جار التحقق...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      const siloId = currentUser.silo_id;
+      const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
+      
+      if (deptUser) {
+        if (selectedRole === 'scale') window.location.href = 'scale.html';
+        else if (selectedRole === 'security') window.location.href = 'security.html';
+        else if (selectedRole === 'finance') window.location.href = 'finance.html';
+        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html';
+        else window.location.href = 'dashboard.html';
+      } else {
+        document.getElementById('modalError').style.display = 'block';
+        btn.innerHTML = 'تأكيد الدخول';
+        btn.disabled = false;
+      }
+    }, 600);
+  }
+</script>
+</body>
+</html>

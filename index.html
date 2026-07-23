@@ -49,31 +49,26 @@
     <div class="login-subtitle">سجّل الدخول للوصول إلى لوحة التحكم</div>
 
     <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="form-group" id="siloGroup">
-        <label class="form-label">الفرع / الصومعة</label>
-        <select id="siloSelect" class="form-input" onchange="toggleDept(this.value)" style="color:var(--text-primary);background:var(--bg-dark)" required>
+      <div class="form-group">
+        <label class="form-label">الفرع / الجهة</label>
+        <select id="roleSelect" class="form-input" onchange="fillCreds(this.value)" style="color:var(--text-primary);background:var(--bg-dark)">
           <option value="" style="color:#000;background:#fff">— اختر الفرع —</option>
-          <option value="general_admin" style="color:#000;background:#fff; font-weight:bold;">الإدارة العامة</option>
           <!-- Options will be populated dynamically by JS -->
         </select>
       </div>
 
-      <div class="form-group" id="deptGroup">
-        <label class="form-label">القسم / الإدارة</label>
-        <select id="deptSelect" class="form-input" style="color:var(--text-primary);background:var(--bg-dark)">
-          <option value="" style="color:#000;background:#fff">— اختر الإدارة —</option>
-          <option value="manager" style="color:#000;background:#fff">مدير الموقع</option>
-          <option value="scale" style="color:#000;background:#fff">إدارة الميزان</option>
-          <option value="security" style="color:#000;background:#fff">إدارة الأمن</option>
-          <option value="finance" style="color:#000;background:#fff">الشئون المالية</option>
-          <option value="maintenance" style="color:#000;background:#fff">الصيانة</option>
-        </select>
+      <div class="form-group">
+        <label class="form-label">اسم المستخدم</label>
+        <div class="form-input-icon">
+          <input type="text" id="username" class="form-input" placeholder="أدخل اسم المستخدم" required>
+          <i class="fa-solid fa-user icon"></i>
+        </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">كلمة المرور</label>
         <div class="form-input-icon">
-          <input type="password" id="password" class="form-input" placeholder="كلمة المرور الافتراضية (123)" required>
+          <input type="password" id="password" class="form-input" placeholder="أدخل كلمة المرور" required>
           <i class="fa-solid fa-lock icon"></i>
         </div>
       </div>
@@ -86,52 +81,58 @@
 
     <div class="login-error" id="loginError">
       <i class="fa-solid fa-circle-xmark"></i>
-      بيانات الدخول أو القسم غير صحيحة
+      بيانات الدخول غير صحيحة، يرجى المحاولة مجدداً
     </div>
 
     <div class="demo-creds">
-      <p><i class="fa-solid fa-circle-info"></i> كلمات المرور الافتراضية لجميع الأقسام هي: <span>123</span></p>
+      <p><i class="fa-solid fa-circle-info"></i> كلمات المرور الافتراضية للجميع هي: <span>123</span></p>
+      <div class="cred-list" style="max-height: 80px; overflow-y: auto;">
+        <div class="cred-item">الإدارة العامة: <span>admin</span></div>
+        <div class="cred-item">قصر الباسل: <span>qasr</span></div>
+        <div class="cred-item">باقي الصوامع: <span>user[رقم]</span></div>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
+<script src="js/data.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
 <script>
-  // Populate silos dropdown dynamically
-  const select = document.getElementById('siloSelect');
-  const storedSilos = JSON.parse(localStorage.getItem('SILOS') || '[]');
-  const silosToLoad = storedSilos.length > 0 ? storedSilos : (typeof SILOS !== 'undefined' ? SILOS : []);
+  // Populate users dropdown dynamically
+  const select = document.getElementById('roleSelect');
+  const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+  const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
   
-  silosToLoad.forEach(s => {
+  usersToLoad.filter(u => u.role === 'silo' || u.role === 'general_admin').forEach(u => {
     const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.name;
+    opt.value = u.username;
+    opt.textContent = u.name;
     opt.style.color = '#000';
     opt.style.background = '#fff';
     select.appendChild(opt);
   });
 
-  function toggleDept(val) {
-    const deptSelect = document.getElementById('deptSelect');
-    if (val === 'general_admin') {
-      deptSelect.value = '';
-      deptSelect.disabled = true;
-      document.getElementById('password').value = '123'; // auto fill for testing
-    } else {
-      deptSelect.disabled = false;
-      document.getElementById('password').value = '123'; // auto fill for testing
-    }
-  }
-
   // Auto-redirect if already logged in
   if (Auth.current()) {
     const r = Auth.current().role;
-    if (r === 'scale') window.location.href = 'pages/scale.html';
+    if (r === 'silo') window.location.href = 'pages/silo_portal.html';
+    else if (r === 'scale') window.location.href = 'pages/scale.html';
     else if (r === 'security') window.location.href = 'pages/security.html';
     else if (r === 'finance') window.location.href = 'pages/finance.html';
     else if (r === 'maintenance') window.location.href = 'pages/maintenance.html';
     else window.location.href = 'pages/dashboard.html';
+  }
+
+  function fillCreds(username) {
+    if (!username) return;
+    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+    
+    const selectedUser = usersToLoad.find(u => u.username === username);
+    if (selectedUser) {
+      document.getElementById('username').value = selectedUser.username;
+      document.getElementById('password').value = selectedUser.password;
+    }
   }
 
   function handleLogin(e) {
@@ -141,26 +142,15 @@
     btn.disabled = true;
 
     setTimeout(() => {
-      const siloVal = document.getElementById('siloSelect').value;
-      const deptVal = document.getElementById('deptSelect').value;
+      const u = document.getElementById('username').value.trim();
       const p = document.getElementById('password').value;
-      
-      let role = siloVal === 'general_admin' ? 'general_admin' : deptVal;
-      let siloId = siloVal === 'general_admin' ? null : parseInt(siloVal);
-
-      if (siloVal !== 'general_admin' && !deptVal) {
-        document.getElementById('loginError').style.display = 'flex';
-        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';
-        btn.disabled = false;
-        return;
-      }
-
-      const user = Auth.loginByRole(role, siloId, p);
+      const user = Auth.login(u, p);
       if (user) {
-        if (role === 'scale') window.location.href = 'pages/scale.html';
-        else if (role === 'security') window.location.href = 'pages/security.html';
-        else if (role === 'finance') window.location.href = 'pages/finance.html';
-        else if (role === 'maintenance') window.location.href = 'pages/maintenance.html';
+        if (user.role === 'silo') window.location.href = 'pages/silo_portal.html';
+        else if (user.role === 'scale') window.location.href = 'pages/scale.html';
+        else if (user.role === 'security') window.location.href = 'pages/security.html';
+        else if (user.role === 'finance') window.location.href = 'pages/finance.html';
+        else if (user.role === 'maintenance') window.location.href = 'pages/maintenance.html';
         else window.location.href = 'pages/dashboard.html';
       } else {
         document.getElementById('loginError').style.display = 'flex';

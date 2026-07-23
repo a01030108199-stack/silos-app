@@ -3,7 +3,7 @@
 // الشركة المصرية القابضة للصوامع والتخزين (48 صومعة)
 // ============================================================
 
-const DB_VERSION = '48_SILOS_V9';
+const DB_VERSION = '48_SILOS_V10';
 
 
 
@@ -96,6 +96,7 @@ for (const s of SILO_DATA) {
 
   let baseId = siloIdCounter * 10;
   USERS.push(
+    { id: siloIdCounter + 1, name: 'صومعة ' + s.name, role: 'silo', username: s.name === 'قصر الباسل' ? 'qasr' : `user${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
     { id: baseId + 1, name: `مدير صومعة ${s.name}`, role: 'manager', username: `mgr_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
     { id: baseId + 2, name: `إدارة الميزان - صومعة ${s.name}`, role: 'scale', username: `scale_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
     { id: baseId + 3, name: `إدارة الأمن - صومعة ${s.name}`, role: 'security', username: `sec_${siloIdCounter}`, password: '123', silo_id: siloIdCounter },
