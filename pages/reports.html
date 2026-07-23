@@ -1,0 +1,315 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقارير — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  /* Compact KPI cards for reports page */
+  .stats-grid .stat-card { padding: 12px 14px; gap: 10px; }
+  .stats-grid .stat-icon { width: 36px; height: 36px; font-size: 0.95rem; flex-shrink: 0; }
+  .stats-grid .stat-value { font-size: 1.2rem; }
+  .stats-grid .stat-label { font-size: 0.72rem; }
+  .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">التقارير والإحصائيات</div>
+        <div class="header-sub">تقارير شاملة — قابلة للطباعة</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-primary" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> طباعة التقرير
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Report Header (printable) -->
+      <div class="form-card mb-24" style="background:linear-gradient(135deg,rgba(26,110,245,0.08),rgba(245,166,35,0.05));border-color:rgba(26,110,245,0.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:1.3rem;font-weight:900">📊 التقرير الشهري الموحد</div>
+            <div style="font-size:0.85rem;color:var(--text-sec);margin-top:4px">يوليو 2024 — الشركة المصرية القابضة للصوامع والتخزين</div>
+          </div>
+          <div style="text-align:left">
+            <div style="font-size:0.78rem;color:var(--text-sec)" id="rptDate"></div>
+            <div style="font-size:0.78rem;color:var(--text-sec)">مُعدّ بواسطة: <span id="rptUser"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs حسب البيانات الحقيقية -->
+      <div class="stats-grid" style="margin-bottom:24px" id="kpiGrid"></div>
+
+      <!-- Charts Grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        <div class="chart-card">
+          <div class="card-header">
+            <div class="card-title">المخزون التراكمي — شهر يوليو 2026</div>
+          </div>
+          <div style="position:relative;height:240px;width:100%">
+            <canvas id="stockLineChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <div class="card-title">توزيع المخزون (محلي + مستورد + ذرة)</div>
+          </div>
+          <div style="position:relative;height:200px;width:100%">
+            <canvas id="grainBarChart"></canvas>
+          </div>
+          <div id="grainBarLegend" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- Stock by Silo Table -->
+      <div class="table-card mb-24">
+        <div class="table-header">
+          <div class="card-title">تقرير المخزون لكل الصوامع</div>
+          <div style="font-size:0.78rem;color:var(--text-sec)" id="tblDate"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الصومعة</th>
+                <th>المحافظة</th>
+                <th>المنطقة</th>
+                <th>الطاقة (طن)</th>
+                <th>المخزون (طن)</th>
+                <th>نسبة الامتلاء</th>
+                <th style="color:#fde047">محلي 23.5</th>
+                <th style="color:#fbbf24">محلي 23</th>
+                <th style="color:#f59e0b">محلي 22.5</th>
+                <th style="color:#60a5fa">مستورد</th>
+                <th style="color:#22c55e">ذرة</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="stockBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Summary by Region -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">ملخص المخزون حسب المنطقة</div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>المنطقة</th>
+              <th>عدد الصوامع</th>
+              <th>الطاقة الإجمالية</th>
+              <th>المخزون الحالي</th>
+              <th>نسبة الامتلاء</th>
+              <th style="color:#fde047">قمح محلي</th>
+              <th style="color:#60a5fa">قمح مستورد</th>
+              <th style="color:#22c55e">ذرة</th>
+            </tr>
+          </thead>
+          <tbody id="regionBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+buildSidebar('reports');
+initClock(document.getElementById('clockEl'));
+document.getElementById('rptDate').textContent = todayDate();
+document.getElementById('rptUser').textContent = user?.name || '';
+document.getElementById('tblDate').textContent = todayDate();
+
+// === KPI حسب بيانات حقيقية ===
+const totalCap  = SILOS.reduce((a,s)=>a+s.cap,0);
+const totalStk  = SILOS.reduce((a,s)=>a+s.stock,0);
+const totalLocal   = SILOS.reduce((a,s)=>a+(s.total_local||0),0);
+const totalImported= SILOS.reduce((a,s)=>a+(s.total_imported||0),0);
+const totalCorn = SILOS.reduce((a,s)=>a+(s.corn||0),0);
+const avgPct = pct(totalStk, totalCap);
+const kpiGrid = document.getElementById('kpiGrid');
+[
+  { icon:'fa-warehouse',  cls:'ic-gold',   label:'إجمالي المخزون',             val: (totalStk/1000).toFixed(0)+'K طن' },
+  { icon:'fa-gauge',      cls:'ic-blue',   label:'متوسط نسبة الامتلاء',       val: avgPct+'%' },
+  { icon:'fa-wheat-awn',  cls:'ic-amber',  label:'قمح محلي (مجموع)',        val: (totalLocal/1000).toFixed(0)+'K طن' },
+  { icon:'fa-ship',       cls:'ic-blue',   label:'قمح مستورد (مجموع)',       val: (totalImported/1000).toFixed(0)+'K طن' },
+  { icon:'fa-seedling',   cls:'ic-green',  label:'ذرة',                          val: (totalCorn/1000).toFixed(0)+'K طن' },
+  { icon:'fa-building',   cls:'ic-cyan',   label:'عدد الصوامع النشطة',       val: SILOS.length+' صومعة' },
+].forEach(k => {
+  kpiGrid.innerHTML += `<div class="stat-card">
+    <div class="stat-icon ${k.cls}"><i class="fa-solid ${k.icon}"></i></div>
+    <div class="stat-body">
+      <div class="stat-value" style="font-size:1.1rem">${k.val}</div>
+      <div class="stat-label">${k.label}</div>
+    </div></div>`;
+});
+
+// === رسم خطي: مخزون يوليو ===
+const days = Array.from({length:18},(_,i)=>`${i+1} يوليو`);
+// توليد بيانات تدريجية من بداية شهر 7
+const startStk = totalStk * 0.75;
+const stockLine = Array.from({length:18},(_,i) => Math.floor(startStk + (totalStk-startStk)*(i/17) + (Math.sin(i)*totalStk*0.01)));
+new Chart(document.getElementById('stockLineChart'),{
+  type:'line',
+  data:{
+    labels:days,
+    datasets:[{
+      label:'المخزون (طن)',
+      data:stockLine,
+      borderColor:'#1a6ef5',
+      backgroundColor:'rgba(26,110,245,0.08)',
+      fill:true, tension:0.4,
+      pointBackgroundColor:'#1a6ef5', pointRadius:3,
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#7a8ba8',font:{family:'Cairo'}}}},
+    scales:{
+      x:{grid:{color:'#1a2d50'},ticks:{color:'#7a8ba8',font:{family:'Cairo',size:10},maxRotation:45}},
+      y:{grid:{color:'#1a2d50'},ticks:{color:'#7a8ba8',font:{family:'Cairo'},callback:v=>(v/1000).toFixed(0)+'K'}}
+    }
+  }
+});
+
+// === رسم بياني: توزيع المخزون ===
+const loc235 = SILOS.reduce((a,s)=>a+(s.local_235||0),0);
+const loc230 = SILOS.reduce((a,s)=>a+(s.local_230||0),0);
+const loc225 = SILOS.reduce((a,s)=>a+(s.local_225||0),0);
+const impRus = SILOS.reduce((a,s)=>a+(s.imp_russia||0),0);
+const impUkr = SILOS.reduce((a,s)=>a+(s.imp_ukraine||0),0);
+const impFra = SILOS.reduce((a,s)=>a+(s.imp_france||0),0);
+const impUsa = SILOS.reduce((a,s)=>a+(s.imp_usa||0),0);
+const impAus = SILOS.reduce((a,s)=>a+(s.imp_australia||0),0);
+const impRom = SILOS.reduce((a,s)=>a+(s.imp_romania||0),0);
+
+const barLabels = ['محلي 23.5','محلي 23','محلي 22.5','روسي','أوكراني','فرنسي','أمريكي','أسترالي','روماني','ذرة'];
+const barData  = [loc235,loc230,loc225,impRus,impUkr,impFra,impUsa,impAus,impRom,totalCorn];
+const barColors= ['#fde047','#fbbf24','#f59e0b','#3b82f6','#60a5fa','#818cf8','#1d4ed8','#2563eb','#6366f1','#22c55e'];
+
+new Chart(document.getElementById('grainBarChart'),{
+  type:'bar',
+  data:{
+    labels:barLabels,
+    datasets:[{ label:'المخزون (طن)', data:barData, backgroundColor:barColors, borderRadius:5 }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:'transparent'},ticks:{color:'#7a8ba8',font:{family:'Cairo',size:9},maxRotation:35}},
+      y:{grid:{color:'#1a2d50'},ticks:{color:'#7a8ba8',font:{family:'Cairo'},callback:v=>(v/1000).toFixed(0)+'K طن'}}
+    }
+  }
+});
+
+// أضف ليجند الرسم البياني
+const bl = document.getElementById('grainBarLegend');
+barLabels.forEach((l,i) => {
+  bl.innerHTML += `<span style="font-size:0.72rem;color:#9aa;display:flex;align-items:center;gap:4px">
+    <span style="width:8px;height:8px;background:${barColors[i]};border-radius:2px;display:inline-block"></span>${l}
+  </span>`;
+});
+
+// === جدول الصوامع ===
+const stockBody = document.getElementById('stockBody');
+SILOS.forEach((s,i) => {
+  const p = pct(s.stock, s.cap);
+  const col = pctColor(p);
+  const region = REGIONS.find(r=>r.id===s.rid);
+  const impTotal = (s.imp_russia||0)+(s.imp_ukraine||0)+(s.imp_france||0)+(s.imp_usa||0)+(s.imp_australia||0)+(s.imp_romania||0);
+  stockBody.innerHTML += `
+    <tr>
+      <td class="text-muted">${i+1}</td>
+      <td style="font-weight:600;font-size:0.82rem">${s.name}</td>
+      <td style="font-size:0.78rem">${s.gov}</td>
+      <td style="font-size:0.75rem;color:${region?.color}">${region?.name||''}</td>
+      <td>${formatNum(s.cap)}</td>
+      <td class="fw-bold">${formatNum(s.stock)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-wrap" style="width:60px">
+            <div class="progress-bar ${col}" style="width:${p}%"></div>
+          </div>
+          <span style="font-weight:700;font-size:0.8rem;color:${col==='red'?'var(--danger)':col==='amber'?'var(--warning)':'var(--success)'}">${p}%</span>
+        </div>
+      </td>
+      <td style="color:#fde047">${formatNum(s.local_235||0)}</td>
+      <td style="color:#fbbf24">${formatNum(s.local_230||0)}</td>
+      <td style="color:#f59e0b">${formatNum(s.local_225||0)}</td>
+      <td style="color:#60a5fa">${formatNum(impTotal)}</td>
+      <td style="color:#22c55e">${formatNum(s.corn||0)}</td>
+      <td>${statusBadge(s.status)}</td>
+    </tr>`;
+});
+
+// صف الإجمالي
+stockBody.innerHTML += `
+  <tr style="background:rgba(26,110,245,0.08);font-weight:900">
+    <td colspan="4" style="color:var(--primary)">الإجمالي (48 صومعة)</td>
+    <td style="color:var(--primary)">${formatNum(totalCap)}</td>
+    <td style="color:var(--primary)">${formatNum(totalStk)}</td>
+    <td style="color:var(--primary)">${avgPct}%</td>
+    <td style="color:#fde047">${formatNum(loc235)}</td>
+    <td style="color:#fbbf24">${formatNum(loc230)}</td>
+    <td style="color:#f59e0b">${formatNum(loc225)}</td>
+    <td style="color:#60a5fa">${formatNum(totalImported)}</td>
+    <td style="color:#22c55e">${formatNum(totalCorn)}</td>
+    <td></td>
+  </tr>`;
+
+// === جدول المناطق ===
+const rBody = document.getElementById('regionBody');
+REGIONS.forEach(r => {
+  const silosInR = SILOS.filter(s=>s.rid===r.id);
+  const rCap   = silosInR.reduce((a,s)=>a+s.cap,0);
+  const rStk   = silosInR.reduce((a,s)=>a+s.stock,0);
+  const rLocal = silosInR.reduce((a,s)=>a+(s.total_local||0),0);
+  const rImp   = silosInR.reduce((a,s)=>a+(s.total_imported||0),0);
+  const rCorn  = silosInR.reduce((a,s)=>a+(s.corn||0),0);
+  const rPct   = pct(rStk,rCap);
+  const col    = pctColor(rPct);
+  rBody.innerHTML += `
+    <tr>
+      <td style="font-weight:700;color:${r.color}">${r.name}</td>
+      <td class="fw-bold">${silosInR.length}</td>
+      <td>${formatNum(rCap)}</td>
+      <td class="fw-bold">${formatNum(rStk)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-wrap" style="width:80px">
+            <div class="progress-bar ${col}" style="width:${rPct}%"></div>
+          </div>
+          <span style="font-weight:700;font-size:0.82rem">${rPct}%</span>
+        </div>
+      </td>
+      <td style="color:#fde047">${formatNum(rLocal)}</td>
+      <td style="color:#60a5fa">${formatNum(rImp)}</td>
+      <td style="color:#22c55e">${formatNum(rCorn)}</td>
+    </tr>`;
+});
+</script>
+</body>
+</html>
+

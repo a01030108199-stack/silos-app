@@ -1,0 +1,955 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>البيان اليومي للصومعة — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  .report-header {
+    background: linear-gradient(135deg, #1a237e, #283593);
+    padding: 20px 25px; border-radius: 12px; margin-bottom: 20px;
+    color: #fff; display: flex; align-items: center;
+    justify-content: space-between; gap: 15px; flex-wrap: wrap;
+  }
+  .report-header h2 { margin:0; font-size:1.4rem; font-weight:800; color:#fff; }
+  .report-header .sub { font-size:0.9rem; opacity:0.85; margin-top:4px; }
+  .section-title {
+    background: linear-gradient(90deg, var(--primary), transparent);
+    color: #fff; padding: 10px 18px; border-radius: 8px;
+    font-size: 1.05rem; font-weight: 700; margin: 20px 0 12px 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .report-table { width:100%; border-collapse:collapse; font-size:0.88rem; margin-bottom:10px; }
+  .report-table th {
+    background: rgba(255,255,255,0.08); color: var(--text-sec);
+    padding: 9px 8px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.08); font-weight:700; font-size:0.78rem; white-space:nowrap;
+  }
+  .report-table td {
+    padding: 6px 6px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.06); color: var(--text-main);
+  }
+  .report-table tr:hover td { background: rgba(255,255,255,0.04); }
+  .inp {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; border-radius: 5px; padding: 5px 6px;
+    width: 90px; text-align: center; font-size: 0.83rem;
+  }
+  .inp:focus { outline:none; border-color:var(--primary); background:rgba(99,102,241,0.15); }
+  .inp-sm { width:75px; }
+  .inp-md { width:110px; }
+  .inp-lg { width:130px; }
+  .inp option { background: #1e293b; color: #fff; }
+  .cell-num { font-weight:800; color:var(--primary-light); font-size:1rem; width:36px; }
+  .val-opening { color:#90caf9 !important; font-weight:bold; }
+  .val-incoming { color:#a5d6a7 !important; font-weight:bold; }
+  .val-outgoing { color:#ef9a9a !important; font-weight:bold; }
+  .val-closing  { color:#ffe082 !important; font-weight:bold; }
+  .over-capacity { color:#ff5252 !important; background:rgba(255,82,82,0.12) !important; }
+  .totals-row td { background:rgba(255,255,255,0.06); font-weight:800; font-size:0.93rem; }
+  .sub-header {
+    font-weight:700; padding:10px 14px; border-radius:7px 7px 0 0;
+    display:flex; align-items:center; gap:8px; font-size:0.95rem;
+  }
+  .sub-header-in  { background:rgba(165,214,167,0.1); color:#a5d6a7; border-bottom:1px solid rgba(165,214,167,0.2); }
+  .sub-header-out { background:rgba(239,154,154,0.1); color:#ef9a9a; border-bottom:1px solid rgba(239,154,154,0.2); }
+  .summary-cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 12px; margin: 16px 0;
+  }
+  .summary-card { background:rgba(255,255,255,0.05); border-radius:10px; padding:14px; text-align:center; border:1px solid rgba(255,255,255,0.08); }
+  .summary-card .sc-label { font-size:0.78rem; color:var(--text-sec); margin-bottom:6px; }
+  .summary-card .sc-val { font-size:1.4rem; font-weight:800; }
+  .date-nav { display:flex; align-items:center; gap:10px; }
+  .date-nav button { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:1rem; }
+  .date-nav button:hover { background:rgba(255,255,255,0.2); }
+  .date-nav input[type="date"] { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.25); color:#fff; border-radius:8px; padding:8px 12px; font-size:0.95rem; }
+  .del-btn { background:rgba(255,82,82,0.15); border:1px solid rgba(255,82,82,0.3); color:#ff5252; border-radius:6px; padding:4px 9px; cursor:pointer; }
+  .del-btn:hover { background:rgba(255,82,82,0.3); }
+  @media (max-width:900px) { .split-grid { grid-template-columns:1fr !important; } }
+  @media print {
+    .sidebar,.top-header,.btn,.date-nav button,.no-print { display:none !important; }
+    .main-content { margin:0 !important; padding:10px !important; }
+    body,.app-layout { background:#fff !important; color:#000 !important; }
+    .report-table th,.report-table td { border:1px solid #999 !important; color:#000 !important; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">البيان اليومي للصومعة</div>
+        <div class="header-sub" id="siloNameSub">بيان حركة القمح اليومي</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-outline btn-sm no-print" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة</button>
+        <button class="btn btn-primary btn-sm no-print" onclick="saveReport()"><i class="fa-solid fa-floppy-disk"></i> حفظ البيان</button>
+        <a href="reception.html" class="btn btn-outline btn-sm no-print"><i class="fa-solid fa-arrow-right"></i> عودة</a>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Date Navigator -->
+      <div class="report-header">
+        <div>
+          <h2><i class="fa-solid fa-newspaper"></i> البيان اليومي لحركة القمح</h2>
+          <div class="sub" id="reportTitle">جاري التحميل...</div>
+        </div>
+        <div class="date-nav no-print">
+          <button onclick="changeDay(-1)"><i class="fa-solid fa-chevron-right"></i></button>
+          <input type="date" id="reportDate" onchange="loadReport()">
+          <button onclick="changeDay(1)"><i class="fa-solid fa-chevron-left"></i></button>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="sc-label">إجمالي رصيد أول المدة</div>
+          <div class="sc-val val-opening" id="sum_opening">0</div>
+          <div style="font-size:0.75rem;color:var(--text-sec)">طن</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-label">إجمالي الوارد اليوم</div>
+          <div class="sc-val val-incoming" id="sum_incoming">0</div>
+          <div style="font-size:0.75rem;color:var(--text-sec)">طن</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-label">إجمالي المنصرف اليوم</div>
+          <div class="sc-val val-outgoing" id="sum_outgoing">0</div>
+          <div style="font-size:0.75rem;color:var(--text-sec)">طن</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-label">إجمالي رصيد آخر المدة</div>
+          <div class="sc-val val-closing" id="sum_closing">0</div>
+          <div style="font-size:0.75rem;color:var(--text-sec)">طن</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-label">الطاقة الكلية للصومعة</div>
+          <div class="sc-val" style="color:#ce93d8">64,800</div>
+          <div style="font-size:0.75rem;color:var(--text-sec)">طن (12 × 5,400)</div>
+        </div>
+      </div>
+
+      <!-- TABLE 1: CELLS -->
+      <div class="section-title"><i class="fa-solid fa-warehouse"></i> الجدول الأول: حركة الخلايا الـ 12 (طاقة كل خلية 5,400 طن)</div>
+      <div class="table-card" style="overflow-x:auto">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>الخلية</th>
+              <th>نوع الحبوب</th>
+              <th>منشأ القمح</th>
+              <th style="background-color: rgba(139, 92, 246, 0.15); color: #c4b5fd;">رصيد أول المدة (طن)</th>
+              <th>الوارد (طن)</th>
+              <th>المنصرف (طن)</th>
+              <th style="background-color: rgba(139, 92, 246, 0.15); color: #c4b5fd;">رصيد آخر المدة (طن)</th>
+              <th style="background-color: rgba(6, 182, 212, 0.15); color: #67e8f9;">الطاقة المتاحة (طن)</th>
+              <th style="background-color: rgba(245, 158, 11, 0.15); color: #fcd34d;">ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody id="cellsBody"></tbody>
+          <tfoot>
+            <tr class="totals-row">
+              <td colspan="3" style="font-weight:800">الإجمالي</td>
+              <td class="val-opening" id="tot_opening" style="background-color: rgba(139, 92, 246, 0.15); font-weight: bold; color: #c4b5fd;">0</td>
+              <td class="val-incoming" id="tot_incoming">0</td>
+              <td class="val-outgoing" id="tot_outgoing">0</td>
+              <td class="val-closing"  id="tot_closing" style="background-color: rgba(139, 92, 246, 0.15); font-weight: bold; color: #c4b5fd;">0</td>
+              <td id="tot_avail" style="background-color: rgba(6, 182, 212, 0.15); font-weight: bold; color: #67e8f9;">0</td>
+              <td style="background-color: rgba(245, 158, 11, 0.15);"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- TABLE 2: IMPORTED BY COUNTRY -->
+      <div class="section-title"><i class="fa-solid fa-ship"></i> الجدول الثاني: أرصدة القمح المستورد (حسب الدولة)</div>
+      <div class="table-card" style="overflow-x:auto">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>نوع القمح</th>
+              <th>رصيد أول المدة (طن)</th>
+              <th>الوارد (طن)</th>
+              <th>المنصرف (طن)</th>
+              <th>رصيد آخر المدة (طن)</th>
+            </tr>
+          </thead>
+          <tbody id="importBody"></tbody>
+          <tfoot>
+            <tr class="totals-row">
+              <td style="font-weight:800">الإجمالي المستورد</td>
+              <td class="val-opening" id="imp_tot_opening">0</td>
+              <td class="val-incoming" id="imp_tot_incoming">0</td>
+              <td class="val-outgoing" id="imp_tot_outgoing">0</td>
+              <td class="val-closing"  id="imp_tot_closing">0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- TABLE 3: LOCAL WHEAT SPLIT -->
+      <div class="section-title"><i class="fa-solid fa-wheat-awn"></i> الجدول الثالث: حركة القمح المحلي (وارد وصرف للمطاحن)</div>
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;" class="split-grid">
+
+        <!-- 3A: INCOMING -->
+        <div class="table-card" style="overflow-x:auto; min-width:320px">
+          <div class="sub-header sub-header-in"><i class="fa-solid fa-arrow-down"></i> وارد المحلي (حسب الدرجة)</div>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>الدرجة</th>
+                <th>رصيد أول المدة (طن)</th>
+                <th>الوارد (طن)</th>
+                <th>المنصرف (طن)</th>
+                <th>رصيد آخر المدة (طن)</th>
+              </tr>
+            </thead>
+            <tbody id="localInBody"></tbody>
+            <tfoot>
+              <tr class="totals-row">
+                <td style="font-weight:800">الإجمالي</td>
+                <td class="val-opening" id="lin_tot_open">0</td>
+                <td class="val-incoming" id="lin_tot_in">0</td>
+                <td class="val-outgoing" id="lin_tot_out">0</td>
+                <td class="val-closing"  id="lin_tot_close">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- 3B: DISPATCH -->
+        <div class="table-card" style="overflow-x:auto">
+          <div class="sub-header sub-header-out"><i class="fa-solid fa-arrow-up"></i> صرف المحلي للمطاحن</div>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>اسم المطحن</th>
+                <th>كمية الإذن (طن)</th>
+                <th>منصرف 23.5 (طن)</th>
+                <th>منصرف 23 (طن)</th>
+                <th>منصرف 22.5 (طن)</th>
+                <th>إجمالي الصرف (طن)</th>
+                <th>المتبقي من الإذن (طن)</th>
+                <th class="no-print">حذف</th>
+              </tr>
+            </thead>
+            <tbody id="localOutBody"></tbody>
+            <tfoot>
+              <tr class="totals-row">
+                <td colspan="2" style="font-weight:800">الإجمالي</td>
+                <td class="val-outgoing" id="lout_235">0</td>
+                <td class="val-outgoing" id="lout_230">0</td>
+                <td class="val-outgoing" id="lout_225">0</td>
+                <td class="val-outgoing" id="lout_total">0</td>
+                <td id="lout_rem" style="color:#ffe082;font-weight:800">0</td>
+                <td class="no-print"></td>
+              </tr>
+            </tfoot>
+          </table>
+          <div class="no-print" style="margin-top:12px">
+            <button class="btn btn-outline btn-sm" onclick="addLocalOut()">
+              <i class="fa-solid fa-plus"></i> إضافة سطر مطحن
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE 4: IMPORTED MILL DISPATCH -->
+      <div class="section-title"><i class="fa-solid fa-industry"></i> الجدول الرابع: صرف القمح المستورد للمطاحن</div>
+      <div class="table-card" style="overflow-x:auto">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المطحن</th>
+              <th>نوع القمح</th>
+              <th>كمية الإذن (طن)</th>
+              <th>رصيد أول المدة (طن)</th>
+              <th>المنصرف (طن)</th>
+              <th>رصيد آخر المدة (طن)</th>
+              <th>الكمية المتبقية (طن)</th>
+              <th class="no-print">حذف</th>
+            </tr>
+          </thead>
+          <tbody id="shipBody"></tbody>
+          <tfoot>
+            <tr class="totals-row">
+              <td colspan="3" style="font-weight:800">إجمالي صرف المستورد</td>
+              <td class="val-incoming" id="ship_tot_permit">0</td>
+              <td class="val-opening"  id="ship_tot_opening">0</td>
+              <td class="val-outgoing" id="ship_tot_disp">0</td>
+              <td class="val-closing"  id="ship_tot_close">0</td>
+              <td id="ship_tot_rem" style="color:#ffe082;font-weight:800">0</td>
+              <td class="no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="no-print" style="margin-top:12px">
+          <button class="btn btn-outline btn-sm" onclick="addShipRow()">
+            <i class="fa-solid fa-plus"></i> إضافة سطر مطحن
+          </button>
+        </div>
+      </div>
+
+    </div><!-- end page-content -->
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+// ─── Auth ─────────────────────────────────────────────────────
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+buildSidebar('daily_report');
+
+// Removed h_silo reference
+window.registeredShipsList = [];
+try {
+  const shipsStr = localStorage.getItem('REGISTERED_SHIPS');
+  if (shipsStr) {
+    const parsed = JSON.parse(shipsStr);
+    if (Array.isArray(parsed)) {
+      window.registeredShipsList = parsed.sort();
+    }
+  }
+} catch(e) {}
+
+// removed duplicate currentDate
+document.getElementById('siloNameSub').textContent = `صومعة ${user.name}`;
+
+// ─── Constants ────────────────────────────────────────────────
+const MAX_CELL_TONS    = 5400;  // الحد الأقصى المطلق — لا توجد سعة بعده
+
+const DANGER_CELL_TONS = 5000;  // بداية منطقة الخطورة (احمر)
+const IMPORT_COUNTRIES = ['روسيا','أوكرانيا','فرنسا','أمريكا','أستراليا','رومانيا','أخرى'];
+const LOCAL_GRADES = ['23.5','23','22.5'];
+
+// ─── Date Helpers ─────────────────────────────────────────────
+function todayStr() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+function addDays(d, n) { const x=new Date(d); x.setDate(x.getDate()+n); return x.toISOString().split('T')[0]; }
+function prevDay(d) { return addDays(d,-1); }
+function fmtDate(d) { return new Date(d).toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+
+// ─── Storage ──────────────────────────────────────────────────
+function stKey(d) { return `DAILY_REPORT_${user.silo_id}_${d}`; }
+function loadData(d) { return JSON.parse(localStorage.getItem(stKey(d))||'null'); }
+function saveData(d,v) { localStorage.setItem(stKey(d), JSON.stringify(v)); }
+
+function getLastAvailableData(dateStr) {
+  let limit = 30;
+  let d = prevDay(dateStr);
+  let foundData = null;
+  let foundDate = null;
+  
+  while (limit > 0) {
+    let prevData = loadData(d);
+    if (prevData) {
+      foundData = prevData;
+      foundDate = d;
+      break;
+    }
+    d = prevDay(d);
+    limit--;
+  }
+  
+  if (!foundData) return null;
+
+  const backupData = currentData;
+  const backupDate = currentDate;
+  
+  let simulatedData = JSON.parse(JSON.stringify(foundData));
+  
+  // Sync the foundDate itself (in case tickets were added after it was saved)
+  currentData = simulatedData;
+  currentDate = foundDate;
+  if (typeof syncWithTickets === 'function') {
+    syncWithTickets();
+    currentData.cells.forEach(c => { c.closing = c.opening + c.incoming - c.outgoing; });
+    if (currentData.ships) {
+      currentData.ships.forEach(s => {
+         s.closing = (s.opening || 0) - (s.dispatched || 0);
+         s.remaining = (s.permit || 0) - (s.dispatched || 0);
+      });
+    }
+  }
+  
+  // Replay tickets for all missing days up to prevDay(dateStr)
+  let loopDate = addDays(foundDate, 1);
+  const targetDate = prevDay(dateStr);
+  
+  while (loopDate <= targetDate) {
+    // Roll over balances to the next day
+    currentData.cells.forEach(c => {
+      c.opening = c.closing || 0;
+      c.incoming = 0;
+      c.outgoing = 0;
+    });
+    if (currentData.ships) {
+      currentData.ships.forEach(s => {
+        s.opening = s.closing || 0;
+        s.dispatched = 0;
+        s.permit = s.remaining || 0;
+      });
+    }
+    
+    currentDate = loopDate;
+    if (typeof syncWithTickets === 'function') {
+      syncWithTickets();
+      currentData.cells.forEach(c => { c.closing = c.opening + c.incoming - c.outgoing; });
+      if (currentData.ships) {
+        currentData.ships.forEach(s => {
+           s.closing = (s.opening || 0) - (s.dispatched || 0);
+           s.remaining = (s.permit || 0) - (s.dispatched || 0);
+        });
+      }
+    }
+    loopDate = addDays(loopDate, 1);
+  }
+  
+  const finalResult = currentData;
+  currentData = backupData;
+  currentDate = backupDate;
+  
+  return finalResult;
+}
+
+// ─── Build empty day ──────────────────────────────────────────
+function buildEmpty(dateStr) {
+  const prev = getLastAvailableData(dateStr);
+
+  // 12 cells
+  const cells = [];
+  for (let i=1; i<=12; i++) {
+    const p = prev ? (prev.cells[i-1]||{}) : {};
+    cells.push({ num:i, type:p.type||'فارغة', ship:p.ship||'', grade:p.grade||'', country:p.country||'', opening:p.closing||0, incoming:0, outgoing:0, closing:p.closing||0, notes:p.notes||'' });
+  }
+
+  // Local dispatch to mills
+  const localOut = prev ? (prev.localOut||[])
+    .filter(r => (r.permit||0) - (r.total||0) > 0)
+    .map(r=>({ name: r.name||'', permit: (r.permit||0) - (r.total||0), d235:0, d230:0, d225:0, total:0 })) : [];
+
+  // Imported mill dispatch
+  const ships = prev ? (prev.ships||[])
+    .filter(s => (s.permit||0) - (s.dispatched||0) > 0)
+    .map(s=>({
+      name: s.name||'', 
+      ship_name: s.ship_name||'',
+      dispatched:0, 
+      opening: s.closing||0, 
+      closing: s.closing||0, 
+      permit: (s.permit||0) - (s.dispatched||0),
+      remaining: (s.permit||0) - (s.dispatched||0)
+    })) : [];
+
+  return { date:dateStr, cells, localOut, ships };
+}
+
+// ─── State ────────────────────────────────────────────────────
+let currentData = null;
+let currentDate = '';
+
+// ─── Fmt ──────────────────────────────────────────────────────
+function fmt(n) {
+  if (n===null||n===undefined||isNaN(n)) return '0';
+  return Number(n).toLocaleString('en-US');
+}
+
+// ─── Input helpers ────────────────────────────────────────────
+function mkInp(type, val, cls, style, handler) {
+  const s = style||'';
+  return `<input type="${type}" value="${val||''}" placeholder="0" class="inp ${cls||''}" style="${s}" onchange="${handler}">`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABLE 1 — CELLS
+// ═══════════════════════════════════════════════════════════════
+function renderCells(data) {
+  const tbody = document.getElementById('cellsBody');
+  tbody.innerHTML = '';
+  let tO=0, tI=0, tOu=0, tC=0, tAv=0;
+
+  data.cells.forEach((c, i) => {
+    const closing = c.opening + c.incoming - c.outgoing;
+    data.cells[i].closing = closing;
+    const avail = MAX_CELL_TONS - closing;       // الفارغ حتى الحد الأقصى
+    const freeNormal = DANGER_CELL_TONS - closing; // الفارغ حتى الحد العادي
+    const isDanger = closing > DANGER_CELL_TONS && closing <= MAX_CELL_TONS;
+    const isOver   = closing > MAX_CELL_TONS;
+    tO+=c.opening; tI+=c.incoming; tOu+=c.outgoing; tC+=closing; tAv+=Math.max(0,avail);
+
+    const countryOptions = ['روسيا','أوكرانيا','فرنسا','أمريكا','أستراليا','رومانيا','أخرى']
+      .map(cn => `<option value="${cn}" ${c.country===cn?'selected':''}>${cn}</option>`).join('');
+    let detailHtml;
+    if (c.type === 'مستورد') {
+      detailHtml = `<select class="inp inp-sm" style="width:90px" onchange="updateCell(${i},'country',this.value)">
+        <option value="">-- دولة --</option>${countryOptions}</select>`;
+    } else if (c.type === 'محلي') {
+      detailHtml = `<span style="font-weight:bold;color:#fde047">محلي</span>`;
+    } else {
+      detailHtml = `<span style="color:var(--text-sec)">-</span>`;
+    }
+
+    // تحديد لون خلية الرصيد
+    let closingStyle = 'background-color: rgba(139, 92, 246, 0.1);';
+    let closingLabel = '';
+    const inDanger = closing > DANGER_CELL_TONS;
+
+    if (inDanger) {
+      closingStyle = 'background-color:rgba(255,82,82,0.2); border:1px solid #ff5252;';
+      closingLabel = '<br><span style="color:#ff5252;font-size:0.68rem">🔴 منطقة خطورة</span>';
+    }
+
+    // لون الطاقة المتاحة
+    let availColor = '#a5d6a7';  // أخضر عادي
+    let availText = `${fmt(Math.max(0,avail))} طن متاح`;
+    if (inDanger) {
+      availColor = '#ff5252'; 
+      availText = `<span dir="ltr">${fmt(freeNormal)}</span> طن (خطر)`; 
+    }
+
+    tbody.innerHTML += `
+      <tr>
+        <td class="cell-num">${c.num}</td>
+        <td><span style="font-weight:bold">${c.type || 'فارغة'}</span></td>
+        <td>${detailHtml}</td>
+        <td style="background-color: rgba(139, 92, 246, 0.1);"><input type="number" class="inp" value="${c.opening||0}" placeholder="0" onchange="updateCell(${i},'opening',+this.value)"></td>
+        <td><span class="val-incoming">${fmt(c.incoming)}</span></td>
+        <td><span class="val-outgoing">${fmt(c.outgoing)}</span></td>
+        <td style="${closingStyle}"><input type="text" class="inp ${inDanger?'over-capacity':''}" value="${fmt(closing)}" readonly style="cursor:default;${inDanger?'color:#ff5252;font-weight:bold;':''}">${closingLabel}</td>
+        <td style="background-color: rgba(6, 182, 212, 0.1); color:${availColor}">${availText}</td>
+        <td style="background-color: rgba(245, 158, 11, 0.1);"><input type="text" class="inp" value="${c.notes||''}" placeholder="اكتب ملاحظة..." onchange="updateCell(${i},'notes',this.value)" style="background: rgba(0,0,0,0.2);"></td>
+      </tr>`;
+  });
+
+  document.getElementById('tot_opening').textContent = fmt(tO);
+  document.getElementById('tot_incoming').textContent = fmt(tI);
+  document.getElementById('tot_outgoing').textContent = fmt(tOu);
+  document.getElementById('tot_closing').textContent  = fmt(tC);
+  document.getElementById('tot_avail').textContent    = fmt(tAv);
+  document.getElementById('sum_opening').textContent  = fmt(tO);
+  document.getElementById('sum_incoming').textContent = fmt(tI);
+  document.getElementById('sum_outgoing').textContent = fmt(tOu);
+  document.getElementById('sum_closing').textContent  = fmt(tC);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABLE 2 — IMPORTED BY COUNTRY / SHIP (COMPUTED)
+// ═══════════════════════════════════════════════════════════════
+function renderImportedFromCells() {
+  const tbody = document.getElementById('importBody');
+  tbody.innerHTML = '';
+  
+  const countryMap = {};
+  currentData.cells.forEach(c => {
+    if (c.type === 'مستورد') {
+      const key = (c.country && c.country.trim()) ? c.country.trim() : 'غير محدد';
+      if (!countryMap[key]) countryMap[key] = { country: key, opening: 0, incoming: 0, outgoing: 0, closing: 0 };
+      countryMap[key].opening  += c.opening;
+      countryMap[key].incoming += c.incoming;
+      countryMap[key].outgoing += c.outgoing;
+      countryMap[key].closing  += c.closing;
+    }
+  });
+
+  const arr = Object.values(countryMap);
+  let tO=0, tI=0, tOu=0, tC=0;
+
+  if (arr.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-sec);padding:14px">لا يوجد قمح مستورد مسجل في الخلايا</td></tr>';
+  }
+
+  arr.forEach(r => {
+    tO+=r.opening; tI+=r.incoming; tOu+=r.outgoing; tC+=r.closing;
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-weight:700;color:#60a5fa">🏴 ${r.country}</td>
+        <td><span class="val-opening">${fmt(r.opening)}</span></td>
+        <td><span class="val-incoming">${fmt(r.incoming)}</span></td>
+        <td><span class="val-outgoing">${fmt(r.outgoing)}</span></td>
+        <td><span class="val-closing">${fmt(r.closing)}</span></td>
+      </tr>`;
+  });
+
+  document.getElementById('imp_tot_opening').textContent = fmt(tO);
+  document.getElementById('imp_tot_incoming').textContent= fmt(tI);
+  document.getElementById('imp_tot_outgoing').textContent= fmt(tOu);
+  document.getElementById('imp_tot_closing').textContent = fmt(tC);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABLE 3A — LOCAL INCOMING (COMPUTED)
+// ═══════════════════════════════════════════════════════════════
+function renderLocalInFromCells() {
+  const tbody = document.getElementById('localInBody');
+  tbody.innerHTML = '';
+  
+  const gMap = {
+    '23.5': { opening:0, incoming:0, outgoing:0, closing:0 },
+    '23': { opening:0, incoming:0, outgoing:0, closing:0 },
+    '22.5': { opening:0, incoming:0, outgoing:0, closing:0 }
+  };
+
+  currentData.cells.forEach(c => {
+    if (c.type === 'محلي' && c.grade && gMap[c.grade]) {
+      gMap[c.grade].opening += c.opening;
+      gMap[c.grade].incoming += c.incoming;
+      gMap[c.grade].outgoing += c.outgoing;
+      gMap[c.grade].closing += c.closing;
+    }
+  });
+
+  let tO=0, tI=0, tOu=0, tC=0;
+
+  LOCAL_GRADES.forEach(g => {
+    const r = gMap[g];
+    tO+=r.opening; tI+=r.incoming; tOu+=r.outgoing; tC+=r.closing;
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-weight:800;color:#ffe082">درجة ${g}</td>
+        <td><span class="val-opening">${fmt(r.opening)}</span></td>
+        <td><span class="val-incoming">${fmt(r.incoming)}</span></td>
+        <td><span class="val-outgoing">${fmt(r.outgoing)}</span></td>
+        <td><span class="val-closing">${fmt(r.closing)}</span></td>
+      </tr>`;
+  });
+
+  document.getElementById('lin_tot_open').textContent  = fmt(tO);
+  document.getElementById('lin_tot_in').textContent    = fmt(tI);
+  document.getElementById('lin_tot_out').textContent   = fmt(tOu);
+  document.getElementById('lin_tot_close').textContent = fmt(tC);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABLE 3B — LOCAL DISPATCH TO MILLS
+// ═══════════════════════════════════════════════════════════════
+function renderLocalOut(data) {
+  const tbody = document.getElementById('localOutBody');
+  tbody.innerHTML = '';
+  let t235=0, t230=0, t225=0, tTot=0, tRem=0;
+
+  if (!data.localOut || data.localOut.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-sec);padding:14px">
+      لا يوجد صرف مطاحن — اضغط <b>"إضافة سطر مطحن"</b> أدناه للبدء</td></tr>`;
+    ['lout_235','lout_230','lout_225','lout_total','lout_rem'].forEach(id=>
+      document.getElementById(id).textContent='0');
+    return;
+  }
+
+  data.localOut.forEach((r, i) => {
+    const total = (r.d235||0) + (r.d230||0) + (r.d225||0);
+    const rem   = (r.permit||0) - total;
+    data.localOut[i].total   = total;
+    data.localOut[i].remaining = rem;
+    t235+=r.d235||0; t230+=r.d230||0; t225+=r.d225||0; tTot+=total; tRem+=rem;
+
+    const inp = (field, v) =>
+      `<input type="number" class="inp inp-sm" value="${v||''}" placeholder="0" onchange="updateLocalOut(${i},'${field}',+this.value)">`;
+
+    tbody.innerHTML += `
+      <tr>
+        <td><input type="text" class="inp inp-md" value="${r.name||''}" placeholder="اسم المطحن" onchange="updateLocalOut(${i},'name',this.value)"></td>
+        <td><input type="number" class="inp" value="${r.permit||''}" placeholder="0" onchange="updateLocalOut(${i},'permit',+this.value)"></td>
+        <td class="val-outgoing">${fmt(r.d235)}</td>
+        <td class="val-outgoing">${fmt(r.d230)}</td>
+        <td class="val-outgoing">${fmt(r.d225)}</td>
+        <td class="val-outgoing" style="font-weight:800">${fmt(total)}</td>
+        <td style="color:${rem<0?'#ff5252':'#ffe082'};font-weight:700">${fmt(rem)}</td>
+        <td class="no-print"><button class="del-btn" onclick="deleteLocalOut(${i})" title="حذف"><i class="fa-solid fa-trash-can"></i></button></td>
+      </tr>`;
+  });
+
+  document.getElementById('lout_235').textContent   = fmt(t235);
+  document.getElementById('lout_230').textContent   = fmt(t230);
+  document.getElementById('lout_225').textContent   = fmt(t225);
+  document.getElementById('lout_total').textContent = fmt(tTot);
+  document.getElementById('lout_rem').textContent   = fmt(tRem);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABLE 4 — IMPORTED MILL DISPATCH
+// ═══════════════════════════════════════════════════════════════
+function renderShips(data) {
+  const tbody = document.getElementById('shipBody');
+  tbody.innerHTML = '';
+  let tPerm=0, tOpen=0, tDisp=0, tClose=0, tRem=0;
+
+  if (!data.ships || data.ships.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-sec);padding:14px">
+      لا يوجد صرف مستورد — اضغط <b>"إضافة سطر مطحن"</b> أدناه للبدء</td></tr>`;
+    ['ship_tot_permit','ship_tot_opening','ship_tot_disp','ship_tot_close','ship_tot_rem']
+      .forEach(id=>document.getElementById(id).textContent='0');
+    return;
+  }
+
+  data.ships.forEach((s, i) => {
+    const closing   = (s.opening||0) - (s.dispatched||0);
+    const remaining = (s.permit||0)  - (s.dispatched||0);
+    data.ships[i].closing   = closing;
+    data.ships[i].remaining = remaining;
+    tPerm+=s.permit||0; tOpen+=s.opening||0; tDisp+=s.dispatched||0; tClose+=closing; tRem+=remaining;
+
+    tbody.innerHTML += `
+      <tr>
+        <td class="cell-num">${i+1}</td>
+        <td><input type="text" class="inp inp-lg" value="${s.name||''}" placeholder="اسم المطحن" onchange="updateShip(${i},'name',this.value)"></td>
+        <td><input type="text" class="inp text-info fw-bold text-center" value="${s.ship_name||''}" placeholder="نوع القمح" onchange="updateShip(${i},'ship_name',this.value)"></td>
+        <td><input type="number" class="inp" value="${s.permit||''}" placeholder="0" onchange="updateShip(${i},'permit',+this.value)"></td>
+        <td><input type="number" class="inp" value="${s.opening||0}" placeholder="0" onchange="updateShip(${i},'opening',+this.value)"></td>
+        <td><span class="val-outgoing">${fmt(s.dispatched||0)}</span></td>
+        <td><span class="val-closing">${fmt(closing)}</span></td>
+        <td style="color:${remaining<0?'#ff5252':'#ffe082'};font-weight:700">${fmt(remaining)}</td>
+        <td class="no-print"><button class="del-btn" onclick="deleteShip(${i})" title="حذف"><i class="fa-solid fa-trash-can"></i></button></td>
+      </tr>`;
+  });
+
+  document.getElementById('ship_tot_permit').textContent  = fmt(tPerm);
+  document.getElementById('ship_tot_opening').textContent = fmt(tOpen);
+  document.getElementById('ship_tot_disp').textContent    = fmt(tDisp);
+  document.getElementById('ship_tot_close').textContent   = fmt(tClose);
+  document.getElementById('ship_tot_rem').textContent     = fmt(tRem);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UPDATE HELPERS
+// ═══════════════════════════════════════════════════════════════
+function updateCell(i, field, val) {
+  if (field === 'incoming' || field === 'outgoing' || field === 'opening') val = +val || 0;
+  currentData.cells[i][field] = val;
+  if (field === 'type') {
+    if (val !== 'مستورد') { currentData.cells[i].ship = ''; currentData.cells[i].country = ''; }
+    if (val !== 'محلي')   { currentData.cells[i].grade = ''; }
+  }
+  renderCells(currentData);
+  renderImportedFromCells();
+  renderLocalInFromCells();
+}
+function updateLocalOut(i, field, val) {
+  if (field === 'name') currentData.localOut[i][field] = val;
+  else currentData.localOut[i][field] = +val || 0;
+  renderLocalOut(currentData);
+}
+function updateShip(i, field, val) {
+  if (field === 'name' || field === 'ship_name') currentData.ships[i][field] = val;
+  else currentData.ships[i][field] = +val || 0;
+  renderShips(currentData);
+}
+
+// ─── Add rows ─────────────────────────────────────────────────
+function addLocalOut() {
+  currentData.localOut.push({ name:'', permit:0, d235:0, d230:0, d225:0, total:0, remaining:0 });
+  renderLocalOut(currentData);
+}
+function addShipRow() {
+  currentData.ships.push({ name:'', permit:0, opening:0, dispatched:0, closing:0, remaining:0 });
+  renderShips(currentData);
+}
+
+// ─── Delete rows ──────────────────────────────────────────────
+function deleteLocalOut(i) {
+  if (!confirm('هل تريد حذف هذا السطر نهائياً؟')) return;
+  currentData.localOut.splice(i,1);
+  renderLocalOut(currentData);
+  showToast('تم حذف السطر', 'success');
+}
+function deleteShip(i) {
+  if (!confirm('هل تريد حذف هذا السطر نهائياً؟')) return;
+  currentData.ships.splice(i,1);
+  renderShips(currentData);
+  showToast('تم حذف السطر', 'success');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD / SAVE
+// ═══════════════════════════════════════════════════════════════
+function loadReport() {
+  currentDate = document.getElementById('reportDate').value;
+  document.getElementById('reportTitle').textContent = `بيان يوم ${fmtDate(currentDate)}`;
+  let data = loadData(currentDate);
+  
+  if (!data) {
+    data = buildEmpty(currentDate);
+  } else {
+    // Auto-sync opening balances from previous day's closing (if previous day exists)
+    const prev = getLastAvailableData(currentDate);
+    if (prev) {
+      data.cells.forEach((c, i) => {
+        const p = prev.cells[i];
+        if (p) {
+          c.opening = p.closing || 0;
+          if (p.type !== 'فارغة') {
+            c.type = p.type;
+            c.ship = p.ship || '';
+            c.grade = p.grade || '';
+            c.country = p.country || '';
+          }
+        }
+      });
+      // Sync ships opening balances
+      if (data.ships && prev.ships) {
+        data.ships.forEach(s => {
+          const p = prev.ships.find(x => x.name === s.name && x.ship_name === s.ship_name);
+          if (p) {
+            s.opening = p.closing || 0;
+            // Also update permit remaining logically
+            s.permit = p.remaining || 0;
+          }
+        });
+      }
+    }
+  }
+  
+  currentData = data;
+  // NEW AUTOMATION: Sync with Weighbridge Tickets
+  syncWithTickets();
+
+  renderCells(currentData);
+  renderImportedFromCells();
+  renderLocalInFromCells();
+  renderLocalOut(currentData);
+  renderShips(currentData);
+}
+
+function parseTicketDate(ts) {
+  if (!ts) return '';
+  let d = ts.replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x));
+  d = d.replace(/[^\d\/\-\.\s:]/g, ''); // Strip ALL RTL marks (\u200F) and letters
+  let m = d.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,4})/);
+  if (!m) return '';
+  let p1 = m[1], p2 = m[2], p3 = m[3];
+  if (p1.length === 4) { // YYYY-MM-DD
+    return p1 + '-' + p2.padStart(2,'0') + '-' + p3.padStart(2,'0');
+  } else { // DD-MM-YYYY
+    return p3 + '-' + p2.padStart(2,'0') + '-' + p1.padStart(2,'0');
+  }
+  return '';
+}
+
+function syncWithTickets() {
+  const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+
+  // Reset all automated fields for today
+  currentData.cells.forEach(c => { c.incoming = 0; c.outgoing = 0; });
+  currentData.localOut.forEach(r => { r.d235 = 0; r.d230 = 0; r.d225 = 0; });
+  currentData.ships.forEach(s => { s.dispatched = 0; });
+
+  // Aggregate from tickets
+  tickets.forEach(t => {
+    if (t.silo_id !== user.silo_id) return;
+    if (t.status === 'pending') return;
+    
+    let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
+    if (tIsoDate !== currentDate) return;
+
+    let netTons = (t.net || 0) / 1000;
+    
+    // 1. Update Cells
+    if (t.cell) {
+      let cellIdx = parseInt(t.cell) - 1;
+      if (cellIdx >= 0 && cellIdx < 12) {
+        if (t.opType === 'وارد') {
+          currentData.cells[cellIdx].incoming += netTons;
+          currentData.cells[cellIdx].type = t.grainType;
+          if (t.grainType === 'مستورد') {
+            currentData.cells[cellIdx].ship = t.wheatType;
+            currentData.cells[cellIdx].grade = '';
+          } else if (t.grainType === 'محلي') {
+            currentData.cells[cellIdx].grade = t.grade;
+            currentData.cells[cellIdx].ship = '';
+          }
+        } else if (t.opType === 'صرف') {
+          currentData.cells[cellIdx].outgoing += netTons;
+          if (currentData.cells[cellIdx].type === 'فارغة') {
+            currentData.cells[cellIdx].type = t.grainType;
+            if (t.grainType === 'مستورد') {
+              currentData.cells[cellIdx].ship = t.wheatType;
+              currentData.cells[cellIdx].grade = '';
+            } else if (t.grainType === 'محلي') {
+              currentData.cells[cellIdx].grade = t.grade;
+              currentData.cells[cellIdx].ship = '';
+            }
+          }
+        }
+      }
+    }
+    
+    // 2. Update Local Dispatch to Mills
+    if (t.opType === 'صرف' && t.grainType === 'محلي' && t.destination) {
+      let destRow = currentData.localOut.find(r => r.name === t.destination);
+      if (!destRow) {
+        destRow = { name: t.destination, permit: 0, d235: 0, d230: 0, d225: 0, total: 0, remaining: 0 };
+        currentData.localOut.push(destRow);
+      }
+      if (t.grade === '23.5') destRow.d235 += netTons;
+      else if (t.grade === '23') destRow.d230 += netTons;
+      else if (t.grade === '22.5') destRow.d225 += netTons;
+    }
+    
+    // 3. Update Imported Dispatch to Mills
+    if (t.opType === 'صرف' && t.grainType === 'مستورد' && t.destination) {
+      let shipRow = currentData.ships.find(r => r.name === t.destination && r.ship_name === t.wheatType);
+      if (!shipRow) {
+        shipRow = { name: t.destination, ship_name: t.wheatType, permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0 };
+        currentData.ships.push(shipRow);
+      }
+      if (shipRow) {
+        shipRow.dispatched += netTons;
+      }
+    }
+  });
+}
+
+function saveReport() {
+  currentData.cells.forEach((c,i) => {
+    currentData.cells[i].closing = c.opening + c.incoming - c.outgoing;
+  });
+  (currentData.localOut||[]).forEach((r,i) => {
+    const t = (r.d235||0)+(r.d230||0)+(r.d225||0);
+    currentData.localOut[i].total     = t;
+    currentData.localOut[i].remaining = (r.permit||0) - t;
+  });
+  (currentData.ships||[]).forEach((s,i) => {
+    currentData.ships[i].closing   = (s.opening||0) - (s.dispatched||0);
+    currentData.ships[i].remaining = (s.permit||0)  - (s.dispatched||0);
+  });
+  saveData(currentDate, currentData);
+  showToast('تم حفظ البيان اليومي بنجاح ✅', 'success');
+}
+
+function changeDay(n) {
+  document.getElementById('reportDate').value = addDays(currentDate, n);
+  loadReport();
+}
+
+// ─── Init ──────────────────────────────────────────────────────
+document.getElementById('reportDate').value = todayStr();
+loadReport();
+
+window.addEventListener('focus', () => {
+  loadReport();
+});
+window.addEventListener('storage', (e) => {
+  if (e.key === 'WEIGHBRIDGE_TICKETS') loadReport();
+});
+</script>
+</body>
+</html>
+

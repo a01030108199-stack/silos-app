@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كشف تفصيلي بتوريدات القمح المحلى الوارد</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  @media print {
+    body { background: #fff !important; }
+    .no-print { display: none !important; }
+    .sidebar { display: none !important; }
+    .main-content { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    .print-area-wrapper { padding: 0 !important; }
+    .paper { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+  }
+
+  .print-area-wrapper {
+    background: #e5e7eb;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+  }
+  .paper {
+    background: #fff;
+    color: #000;
+    width: 1200px;
+    min-height: 800px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 20px;
+    position: relative;
+    font-family: Arial, sans-serif;
+  }
+
+  .paper-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .header-left, .header-right {
+    width: 25%;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .header-center {
+    width: 50%;
+    font-weight: bold;
+    font-size: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .table-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    background-color: #fce4d6;
+    padding: 5px;
+    border: 1px solid #000;
+  }
+
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 30px;
+  }
+  .report-table th, .report-table td {
+    border: 1px solid #000;
+    padding: 6px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .report-table th {
+    background-color: #fce4d6;
+  }
+  .col-name { background-color: #fff2cc; }
+  .col-code, .col-record { background-color: #fce4d6; }
+  .col-count { background-color: #f4cccc; }
+  .col-date { background-color: #fce4d6; }
+  .col-net { background-color: #fce4d6; }
+
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: flex-end;
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <header class="top-header no-print">
+      <div>
+        <div class="header-title">الماليات والتقارير</div>
+        <div class="header-sub">كشف تفصيلي بتوريدات القمح المحلى الوارد</div>
+      </div>
+      <div class="header-actions">
+        <a href="reception.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-right"></i> عودة</a>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الكشف</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- Controls -->
+      <div class="form-card mb-24 no-print">
+        <div class="controls-grid">
+          <div class="form-group-inner">
+            <label>سعر الأردب (درجة 23.5) *</label>
+            <input type="number" class="form-control" id="p_235" value="2500" onchange="generateReport()">
+          </div>
+          <div class="form-group-inner">
+            <label>سعر الأردب (درجة 23) *</label>
+            <input type="number" class="form-control" id="p_230" value="2450" onchange="generateReport()">
+          </div>
+          <div class="form-group-inner">
+            <label>سعر الأردب (درجة 22.5) *</label>
+            <input type="number" class="form-control" id="p_225" value="2400" onchange="generateReport()">
+          </div>
+          <div class="form-group-inner">
+            <button class="btn btn-success" style="height:44px; padding:0 25px;" onclick="generateReport()">تحديث التقرير</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Print Area -->
+      <div class="print-area-wrapper">
+        <div class="paper" id="printArea">
+          <div class="paper-header">
+            <div class="header-right">
+              رقم الإصدار: 1<br>
+              تاريخ الإصدار: 2023/01/01<br>
+              رقم النسخة: 1<br>
+              رقم الصفحة: 1
+            </div>
+            <div class="header-center">
+              <div>نموذج</div>
+              <div>كشف تفصيلي بتوريدات القمح المحلى الوارد</div>
+              <div>رقم (SF 8-05-B-06)</div>
+            </div>
+            <div class="header-left">
+              وزارة التموين والتجارة الداخلية<br>
+              <div style="font-size:10px; margin:5px 0;">شعار الشركة EHCSS</div>
+              قطاع الشئون المالية
+            </div>
+          </div>
+
+          <div class="table-title" id="out_table_title">كشف تفصيلي بتوريدات القمح المحلى موسم 2026 لصومعة </div>
+
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>التاريخ</th>
+                <th>عدد</th>
+                <th>رقم المحضر</th>
+                <th>الكود</th>
+                <th>الاسم</th>
+                <th>22.50</th>
+                <th>23.00</th>
+                <th>23.50</th>
+                <th>الكمية</th>
+                <th>القيمة</th>
+                <th>مهن زراعية</th>
+                <th>دمغة</th>
+                <th>الصافي</th>
+              </tr>
+            </thead>
+            <tbody id="report_body">
+              <!-- Rows will be injected here -->
+            </tbody>
+            <tfoot id="report_foot">
+              <!-- Totals will be injected here -->
+            </tfoot>
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+var user = null;
+try { user = Auth.require(); } catch(e) {}
+buildSidebar('reception');
+
+// Setup Silo Name
+if (user && user.silo_id) {
+  var siloInfo = SILOS.find(function(s) { return s.id === user.silo_id; });
+  if (siloInfo) {
+    document.getElementById('out_table_title').textContent += siloInfo.name;
+  }
+}
+
+function getTickets() {
+  return JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+}
+
+window.generateReport = function() {
+  var tickets = getTickets();
+  var siloId = user ? user.silo_id : 1;
+  
+  // Filter for local incoming for this silo
+  var localIncoming = [];
+  for (var i = 0; i < tickets.length; i++) {
+    var t = tickets[i];
+    if (t.silo_id === siloId && t.opType === 'وارد' && t.grainType === 'محلي' && t.net > 0) {
+      localIncoming.push(t);
+    }
+  }
+
+  // Prices per Ton (Price per Ardeb / 150 * 1000)
+  var p235 = (parseFloat(document.getElementById('p_235').value) || 2500) / 150 * 1000;
+  var p230 = (parseFloat(document.getElementById('p_230').value) || 2450) / 150 * 1000;
+  var p225 = (parseFloat(document.getElementById('p_225').value) || 2400) / 150 * 1000;
+
+  // Group by (Date + Supplier Code)
+  var groups = {};
+  for (var j = 0; j < localIncoming.length; j++) {
+    var t = localIncoming[j];
+    // Extract date from timestamp (handling both English and Arabic commas)
+    var rawDate = t.timestamp;
+    var dateStr = rawDate.split('،')[0].split(',')[0].trim();
+    // Convert any Eastern Arabic numerals to English numerals
+    dateStr = dateStr.replace(/[٠-٩]/g, function(d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); });
+    
+    // Group by Date + Supplier Code + Grade (so each grade gets its own row and record number)
+    var key = dateStr + '_' + t.supplierCode + '_' + t.grade;
+    
+    if (!groups[key]) {
+      groups[key] = {
+        date: dateStr,
+        name: t.supplierName,
+        code: t.supplierCode,
+        count: 0,
+        q235: 0,
+        q230: 0,
+        q225: 0,
+      };
+    }
+    
+    groups[key].count += 1;
+    var netTons = t.net / 1000; // Convert kg to Tons
+    
+    if (t.grade === '23.5') groups[key].q235 += netTons;
+    else if (t.grade === '23') groups[key].q230 += netTons;
+    else if (t.grade === '22.5') groups[key].q225 += netTons;
+  }
+
+  var tbody = document.getElementById('report_body');
+  tbody.innerHTML = '';
+
+  var totNet = 0, totStamp = 0, totAgri = 0, totVal = 0, totQty = 0;
+  var t235 = 0, t230 = 0, t225 = 0, tCount = 0;
+
+  var keys = Object.keys(groups);
+  for (var k = 0; k < keys.length; k++) {
+    var loopKey = keys[k];
+    var g = groups[loopKey];
+    var qty = g.q235 + g.q230 + g.q225;
+    var value = (g.q235 * p235) + (g.q230 * p230) + (g.q225 * p225);
+    
+    // Agricultural Professions: 0.05 EGP per Ardeb
+    var ardebs = qty * 1000 / 150;
+    var agriProf = ardebs * 0.05;
+    
+    // Stamp: 0.40 EGP per individual ticket (count)
+    var stamp = g.count * 0.40;
+
+    var netValue = Math.round(value - agriProf - stamp);
+
+    // Totals
+    totNet += netValue;
+    totStamp += stamp;
+    totAgri += agriProf;
+    totVal += value;
+    totQty += qty;
+    t235 += g.q235;
+    t230 += g.q230;
+    t225 += g.q225;
+    tCount += g.count;
+
+    var formatW = function(w) { return w > 0 ? w.toFixed(3) : ''; };
+    
+    var savedRecords = JSON.parse(localStorage.getItem('RECORDS_NUMBERS') || '{}');
+    var currentRecord = savedRecords[loopKey] || '312---';
+
+    tbody.innerHTML += `
+      <tr>
+        <td class="col-date">${g.date}</td>
+        <td class="col-count">${g.count}</td>
+        <td class="col-record" contenteditable="true" title="اضغط هنا لكتابة رقم المحضر" style="cursor:text; outline:none; background:#ffeb3b4d;" onblur="saveRecordNumber(this, '${loopKey}')">${currentRecord}</td>
+        <td class="col-code">${g.code}</td>
+        <td class="col-name">${g.name}</td>
+        <td>${formatW(g.q225)}</td>
+        <td>${formatW(g.q230)}</td>
+        <td>${formatW(g.q235)}</td>
+        <td>${qty.toFixed(3)}</td>
+        <td>${value.toFixed(2)}</td>
+        <td>${agriProf.toFixed(2)}</td>
+        <td>${stamp.toFixed(2)}</td>
+        <td class="col-net">${netValue}</td>
+      </tr>
+    `;
+  }
+
+  if (keys.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="13" style="padding:20px; color:#666;">لا توجد توريدات قمح محلي مسجلة. قم بإصدار كارتات ميزان (وارد محلي) أولاً.</td></tr>';
+  } else {
+    // Inject Footer
+    var tfoot = document.getElementById('report_foot');
+    tfoot.innerHTML = `
+      <tr style="background-color:#fce4d6; font-weight:900;">
+        <td class="col-date"></td>
+        <td class="col-count">${tCount}</td>
+        <td colspan="3">الإجمـــالـــي</td>
+        <td>${t225 > 0 ? t225.toFixed(3) : ''}</td>
+        <td>${t230 > 0 ? t230.toFixed(3) : ''}</td>
+        <td>${t235 > 0 ? t235.toFixed(3) : ''}</td>
+        <td>${totQty.toFixed(3)}</td>
+        <td>${totVal.toFixed(2)}</td>
+        <td>${totAgri.toFixed(2)}</td>
+        <td>${totStamp.toFixed(2)}</td>
+        <td class="col-net">${totNet}</td>
+      </tr>
+    `;
+  }
+};
+
+window.saveRecordNumber = function(element, key) {
+  var savedRecords = JSON.parse(localStorage.getItem('RECORDS_NUMBERS') || '{}');
+  savedRecords[key] = element.innerText.trim();
+  localStorage.setItem('RECORDS_NUMBERS', JSON.stringify(savedRecords));
+};
+
+// Generate initially
+setTimeout(generateReport, 300);
+</script>
+</body>
+</html>
+

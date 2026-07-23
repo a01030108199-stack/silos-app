@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير حركة الأقماح الشهرية — نظام إدارة الصوامع</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .recon-header {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .controls-grid {
+    display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;
+  }
+  .control-group {
+    display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 200px;
+  }
+  .control-group label {
+    font-weight: bold; color: var(--text-sec); font-size: 0.9rem;
+  }
+  .control-group input, .control-group select, .control-group textarea {
+    padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.1); color: var(--text-primary); font-family: inherit; font-size: 1rem;
+  }
+  
+  .print-area-wrapper {
+    background: var(--bg-dark);
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+  }
+
+  /* Print Paper Design */
+  .paper {
+    background: #fff;
+    color: #000;
+    width: 297mm; /* Landscape A4 */
+    min-height: 210mm;
+    margin: 0 auto;
+    padding: 15mm;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    font-family: 'Tajawal', Arial, sans-serif;
+    position: relative;
+    box-sizing: border-box;
+  }
+  .paper-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .header-right {
+    text-align: right;
+    font-weight: bold;
+    font-size: 14pt;
+    line-height: 1.5;
+  }
+  .header-left img {
+    width: 150px;
+    height: auto;
+  }
+  
+  .company-title {
+    text-align: center;
+    font-size: 26pt;
+    font-weight: 900;
+    font-style: italic;
+    margin-bottom: 15px;
+    margin-top: -10px;
+  }
+  .greeting {
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  
+  .report-title {
+    text-align: center;
+    font-size: 15pt;
+    font-weight: bold;
+    border: 2px solid #000;
+    background-color: #f3f4f6;
+    padding: 8px;
+    margin-bottom: 0;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 3px solid #000;
+  }
+  .print-table th, .print-table td {
+    border: 2px solid #000;
+    padding: 12px;
+    text-align: center;
+    font-weight: 900;
+    font-size: 14pt;
+  }
+  .print-table th {
+    background: #f3f4f6;
+    font-size: 13pt;
+  }
+  
+  .notes-section {
+    display: flex;
+    margin-bottom: 40px;
+    font-size: 13pt;
+    font-weight: bold;
+    background: #e5e7eb;
+    padding: 10px;
+    border-radius: 4px;
+    gap: 10px;
+  }
+  .notes-label {
+    white-space: nowrap;
+  }
+  .notes-content {
+    line-height: 1.6;
+    flex: 1;
+  }
+  
+  .signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    font-size: 16pt;
+    font-weight: 900;
+    padding: 0 40px;
+  }
+  
+  .watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 120pt;
+    color: rgba(0,0,0,0.03);
+    z-index: 0;
+    pointer-events: none;
+    font-weight: bold;
+  }
+  
+  .paper-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media print {
+    body * { visibility: hidden; }
+    .paper, .paper * { visibility: visible; }
+    .paper { position: absolute; left: 0; top: 0; margin: 0; padding: 10mm; width: 100%; min-height: auto; box-shadow: none; }
+    @page { size: A4 landscape; margin: 5mm; }
+    td[contenteditable], div[contenteditable] {
+      background: transparent !important;
+    }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <header class="top-header no-print">
+      <div>
+        <div class="header-title">التقارير الشهرية لحركة الأقماح</div>
+        <div class="header-sub">توليد بيان بإجمالي حركة الأقماح المستوردة والمحلية خلال شهر</div>
+        <div id="debug_log" style="color:red; font-size:18px; font-weight:bold; max-width:800px; word-wrap:break-word; background:#fff; padding:10px; margin-top:10px; display:none;"></div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة البيان</button>
+        <a href="reception.html" class="btn btn-outline btn-sm">عودة <i class="fa-solid fa-arrow-left"></i></a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="recon-header no-print">
+        <div class="controls-grid">
+          <div class="control-group" style="flex:2">
+            <label>توجيه التقرير إلى:</label>
+            <input type="text" id="ctrl_recipient" value="السيد / مدير عام مديرية التموين بالفيوم" onchange="updateHeader()">
+          </div>
+          <div class="control-group" style="flex:1">
+            <label>الشهر:</label>
+            <input type="month" id="ctrl_month" onchange="fetchDataAndGenerate()">
+          </div>
+          <div class="control-group" style="flex:0; min-width:auto">
+            <button class="btn btn-primary" style="height:44px; padding:0 25px;" onclick="fetchDataAndGenerate()">
+              توليد (مُحَدَّث)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Print Area -->
+      <div class="print-area-wrapper">
+        <div class="paper" id="printArea">
+          <div class="watermark">Page 1</div>
+          <div class="paper-content">
+            <div class="paper-header">
+              <div class="header-right">
+                وزارة التموين والتجارة الداخلية<br>
+                الشركة المصرية القابضة<br>
+                للصوامع والتخزين<br>
+                <span id="out_silo_name">صومعة طامية</span>
+              </div>
+              <div class="header-left">
+                <!-- Replace with actual logo in production -->
+                <div style="width:200px;height:80px;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#666">شعار الشركة EHCSS</div>
+              </div>
+            </div>
+
+            <div class="company-title" id="out_recipient">السيد / مدير عام مديرية التموين بالفيوم</div>
+            <div class="greeting">تحيـــــة طيبــــة وبعـــــــــــد ،،،</div>
+            
+            <div class="report-title" id="out_report_title" style="margin-bottom: 20px;">بيان بإجمالي حركة الأقماح (المستوردة والمحلية) خلال شهر اكتوبر ٢٠٢٥ م</div>
+            
+            <!-- Imported Table -->
+            <div style="font-size:16pt; font-weight:bold; margin-bottom:10px;">أولاً: الأقماح المستوردة</div>
+            <table class="print-table" style="margin-bottom:30px;">
+              <thead>
+                <tr>
+                  <th>رصيد أول المدة</th>
+                  <th>وارد</th>
+                  <th>منصرف</th>
+                  <th>زيادة تصفية</th>
+                  <th>اتربة</th>
+                  <th>رصيد آخر المدة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="imp_opening" contenteditable="true" oninput="recalcClosing()" style="background:#fffbe6; outline:none; cursor:text;">0.000</td>
+                  <td id="imp_incoming" style="font-weight:bold">0.000</td>
+                  <td id="imp_outgoing" style="font-weight:bold">0.000</td>
+                  <td id="imp_increase" contenteditable="true" oninput="recalcClosing()" style="background:#fffbe6; outline:none; cursor:text;">0.000</td>
+                  <td id="imp_dust" contenteditable="true" oninput="recalcClosing()" style="background:#fffbe6; outline:none; cursor:text;">0.000</td>
+                  <td id="imp_closing" style="font-weight:900; background:#f3f4f6;">0.000</td>
+                </tr>
+                <tr>
+                  <td id="imp_tot_opening" style="font-weight:900">0.000</td>
+                  <td id="imp_tot_incoming" style="font-weight:900">0.000</td>
+                  <td id="imp_tot_outgoing" style="font-weight:900">0.000</td>
+                  <td id="imp_tot_increase" style="font-weight:900">0.000</td>
+                  <td id="imp_tot_dust" style="font-weight:900">0.000</td>
+                  <td id="imp_tot_closing" style="font-weight:900; background:#9ca3af;">0.000</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Local Table -->
+            <div style="font-size:16pt; font-weight:bold; margin-bottom:10px;">ثانياً: الأقماح المحلية</div>
+            <table class="print-table" style="margin-bottom:20px;">
+              <thead>
+                <tr>
+                  <th>رصيد أول المدة</th>
+                  <th>وارد</th>
+                  <th>منصرف</th>
+                  <th>زيادة تصفية</th>
+                  <th>اتربة</th>
+                  <th>رصيد آخر المدة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="loc_opening" contenteditable="true" oninput="recalcClosing()" style="background:#fffbe6; outline:none; cursor:text;">0.000</td>
+                  <td id="loc_incoming" style="font-weight:bold">0.000</td>
+                  <td id="loc_outgoing" style="font-weight:bold">0.000</td>
+                  <td id="loc_increase" contenteditable="true" oninput="recalcClosing()" style="background:#fffbe6; outline:none; cursor:text;">0.000</td>
+                  <td id="loc_dust" contenteditable="true" oninput="recalcClosing()" style="background:#fffbe6; outline:none; cursor:text;">0.000</td>
+                  <td id="loc_closing" style="font-weight:900; background:#f3f4f6;">0.000</td>
+                </tr>
+                <tr>
+                  <td id="loc_tot_opening" style="font-weight:900">0.000</td>
+                  <td id="loc_tot_incoming" style="font-weight:900">0.000</td>
+                  <td id="loc_tot_outgoing" style="font-weight:900">0.000</td>
+                  <td id="loc_tot_increase" style="font-weight:900">0.000</td>
+                  <td id="loc_tot_dust" style="font-weight:900">0.000</td>
+                  <td id="loc_tot_closing" style="font-weight:900; background:#9ca3af;">0.000</td>
+                </tr>
+              </tbody>
+            </table>
+
+
+
+            <div class="signatures">
+              <div>إعداد الميزان</div>
+              <div>مدير الصومعة</div>
+              <div>إدارة الإستلام والتخزين</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+// ==========================================
+// SIMPLIFIED SCRIPT
+// ==========================================
+var user = null;
+try {
+  user = Auth.require();
+  if (user && user.role === 'general_admin') {
+    window.location.href = 'dashboard.html';
+  }
+} catch (e) {
+  console.error("Auth error", e);
+}
+
+try {
+  buildSidebar('reception');
+} catch (e) {}
+
+var now = new Date();
+var currentMonthStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+document.getElementById('ctrl_month').value = currentMonthStr;
+
+if (user && user.silo_id) {
+  var siloInfo = SILOS.find(function(s) { return s.id === user.silo_id; });
+  if (siloInfo) {
+    document.getElementById('out_silo_name').textContent = siloInfo.name;
+  }
+}
+
+function formatNum(n) {
+  if (!n || isNaN(n)) return '0.000';
+  return Number(n).toFixed(3);
+}
+
+function updateHeader() {
+  var monthVal = document.getElementById('ctrl_month').value;
+  if (monthVal) {
+    var parts = monthVal.split('-');
+    var dDate = new Date(parts[0], parseInt(parts[1]) - 1, 1);
+    var monthName = dDate.toLocaleString('ar-EG', { month: 'long' });
+    var yearName = dDate.getFullYear();
+
+    document.getElementById('out_recipient').textContent = document.getElementById('ctrl_recipient').value;
+    document.getElementById('out_report_title').textContent = 'بيان بإجمالي حركة الأقماح (المستوردة والمحلية) خلال شهر ' + monthName + ' ' + yearName + ' م';
+  }
+}
+
+function recalcClosing() {
+  var impOpn = Number(document.getElementById('imp_opening').textContent) || 0;
+  var impIncClear = Number(document.getElementById('imp_increase').textContent) || 0;
+  var impDust = Number(document.getElementById('imp_dust').textContent) || 0;
+  var impIncoming = Number(document.getElementById('imp_incoming').textContent) || 0;
+  var impOutgoing = Number(document.getElementById('imp_outgoing').textContent) || 0;
+  var impClo = impOpn + impIncoming - impOutgoing + impIncClear - impDust;
+
+  document.getElementById('imp_closing').textContent = formatNum(impClo);
+  document.getElementById('imp_tot_opening').textContent = formatNum(impOpn);
+  document.getElementById('imp_tot_incoming').textContent = formatNum(impIncoming);
+  document.getElementById('imp_tot_outgoing').textContent = formatNum(impOutgoing);
+  document.getElementById('imp_tot_increase').textContent = formatNum(impIncClear);
+  document.getElementById('imp_tot_dust').textContent = formatNum(impDust);
+  document.getElementById('imp_tot_closing').textContent = formatNum(impClo);
+
+  var locOpn = Number(document.getElementById('loc_opening').textContent) || 0;
+  var locIncClear = Number(document.getElementById('loc_increase').textContent) || 0;
+  var locDust = Number(document.getElementById('loc_dust').textContent) || 0;
+  var locIncoming = Number(document.getElementById('loc_incoming').textContent) || 0;
+  var locOutgoing = Number(document.getElementById('loc_outgoing').textContent) || 0;
+  var locClo = locOpn + locIncClear + locIncoming - locOutgoing - locDust;
+
+  document.getElementById('loc_closing').textContent = formatNum(locClo);
+  document.getElementById('loc_tot_opening').textContent = formatNum(locOpn);
+  document.getElementById('loc_tot_incoming').textContent = formatNum(locIncoming);
+  document.getElementById('loc_tot_outgoing').textContent = formatNum(locOutgoing);
+  document.getElementById('loc_tot_increase').textContent = formatNum(locIncClear);
+  document.getElementById('loc_tot_dust').textContent = formatNum(locDust);
+  document.getElementById('loc_tot_closing').textContent = formatNum(locClo);
+}
+
+window.fetchDataAndGenerate = function() {
+  var monthVal = document.getElementById('ctrl_month').value;
+  if (!monthVal) {
+    alert('الرجاء اختيار الشهر');
+    return;
+  }
+
+  var calcImpIncoming = 0;
+  var calcImpOutgoing = 0;
+  var calcLocIncoming = 0;
+  var calcLocOutgoing = 0;
+
+  if (user && user.silo_id) {
+    var prefix = 'DAILY_REPORT_' + user.silo_id + '_';
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && key.indexOf(prefix) === 0) {
+        var dateStr = key.replace(prefix, '');
+        if (dateStr.indexOf(monthVal) === 0) {
+          var raw = localStorage.getItem(key);
+          if (raw) {
+            try {
+              var d = JSON.parse(raw);
+              if (d.cells && d.cells.length > 0) {
+                for (var j = 0; j < d.cells.length; j++) {
+                  var c = d.cells[j];
+                  if (c.type === 'مستورد') {
+                    calcImpIncoming += (Number(c.incoming) || 0);
+                    calcImpOutgoing += (Number(c.outgoing) || 0);
+                  }
+                  if (c.type === 'محلي') {
+                    calcLocIncoming += (Number(c.incoming) || 0);
+                    calcLocOutgoing += (Number(c.outgoing) || 0);
+                  }
+                }
+              }
+            } catch(e) {}
+          }
+        }
+      }
+    }
+  }
+
+  document.getElementById('imp_incoming').textContent = formatNum(calcImpIncoming);
+  document.getElementById('imp_outgoing').textContent = formatNum(calcImpOutgoing);
+  document.getElementById('loc_incoming').textContent = formatNum(calcLocIncoming);
+  document.getElementById('loc_outgoing').textContent = formatNum(calcLocOutgoing);
+  
+  updateHeader();
+  recalcClosing();
+  
+  document.getElementById('printArea').style.display = 'block';
+};
+
+// Initial Generation
+setTimeout(function() {
+  fetchDataAndGenerate();
+}, 500);
+
+</script>
+</body>
+</html>
+

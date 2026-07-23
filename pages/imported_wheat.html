@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>القمح المستورد — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  .wheat-header {
+    background: linear-gradient(135deg, var(--blue), #0b4ab5);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .wheat-header h2 { margin:0; font-size:1.5rem; font-weight:800; color:#fff;}
+  .calc-box {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    color: #fff;
+  }
+  .calc-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .calc-total {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 10px;
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">القمح المستورد</div>
+        <div class="header-sub" id="siloNameSub">تفاصيل الشحنات والمراكب</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <a href="reception.html" class="btn btn-outline btn-sm">
+          <i class="fa-solid fa-arrow-right"></i> عودة للوحة الاستلام
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="wheat-header">
+        <i class="fa-solid fa-ship" style="font-size:2rem"></i>
+        <div>
+          <h2>منظومة القمح المستورد</h2>
+          <div style="font-size:0.9rem; opacity:0.9">إدارة شحنات البواخر والمناشئ الأجنبية بالطن</div>
+        </div>
+      </div>
+
+      <div class="form-card mb-24">
+        <div class="card-header">
+          <div class="card-title">إضافة حركة قمح مستورد جديدة</div>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group-inner">
+            <label>نوع العملية *</label>
+            <select class="form-control" id="w_type" onchange="toggleFields()">
+              <option value="وارد">وارد (من الميناء)</option>
+              <option value="صرف">صرف (للمطاحن)</option>
+            </select>
+          </div>
+          <div class="form-group-inner" id="originContainer">
+            <label>بلد المنشأ *</label>
+            <select class="form-control" id="w_origin">
+              <option value="روسي">روسي</option>
+              <option value="أوكراني">أوكراني</option>
+              <option value="روماني">روماني</option>
+              <option value="فرنسي">فرنسي</option>
+              <option value="أسترالي">أسترالي</option>
+              <option value="أمريكي">أمريكي</option>
+              <option value="أخرى">أخرى</option>
+            </select>
+          </div>
+          <div class="form-group-inner" id="shipContainer">
+            <label>اسم الباخرة / رقم البوليصة</label>
+            <input type="text" class="form-control" id="w_ship" placeholder="مثال: الباخرة وادي النيل">
+          </div>
+          <div class="form-group-inner" id="destContainer" style="display:none">
+            <label>الجهة المنصرف إليها *</label>
+            <input type="text" class="form-control" id="w_dest" placeholder="مثال: مطحن الفتح">
+          </div>
+          <div class="form-group-inner" style="grid-column: 1 / -1; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; border:1px dashed var(--blue);">
+            <label style="color:var(--blue)">استدعاء كارتة الاستلام (من البسكول) *</label>
+            <div style="display:flex;gap:10px">
+              <input type="text" class="form-control" id="w_ticket" placeholder="رقم الكارتة (مثال: CRT-1234)">
+              <button class="btn btn-primary" onclick="fetchTicket()"><i class="fa-solid fa-download"></i> جلب الوزن</button>
+            </div>
+            <div id="ticketInfo" style="margin-top:10px; font-size:0.95rem; font-weight:bold; color:var(--blue);"></div>
+          </div>
+          <div class="form-group-inner" style="grid-column: 1 / -1">
+            <label>الوزن الصافي بالكيلوجرام *</label>
+            <input type="number" class="form-control" id="w_weight_kg" placeholder="0 كجم" readonly style="background:rgba(0,0,0,0.2)">
+          </div>
+        </div>
+
+        <div class="calc-box" id="calcBox">
+          <div class="calc-row">
+            <span>الوزن بالكيلوجرام:</span>
+            <span id="c_kg">0 كجم</span>
+          </div>
+          <div class="calc-row calc-total text-info">
+            <span>الوزن المعادل بالطن:</span>
+            <span id="c_ton">0.000 طن</span>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:15px">
+          <button class="btn btn-success" onclick="saveRecord()"><i class="fa-solid fa-floppy-disk"></i> حفظ الحركة وإصدار الإيصال</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">سجل حركات القمح المستورد</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>رقم الحركة</th>
+                <th>التاريخ</th>
+                <th>النوع</th>
+                <th>المنشأ / الجهة</th>
+                <th>الباخرة / البوليصة</th>
+                <th>الوزن (كجم)</th>
+                <th>الوزن (طن)</th>
+              </tr>
+            </thead>
+            <tbody id="importedBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+
+buildSidebar('reception');
+initClock(document.getElementById('clockEl'));
+document.getElementById('siloNameSub').textContent = `الفرع: ${user.name}`;
+
+let records = []; 
+
+function toggleFields() {
+  const isDispatch = document.getElementById('w_type').value === 'صرف';
+  if (isDispatch) {
+    document.getElementById('originContainer').style.display = 'none';
+    document.getElementById('shipContainer').style.display = 'none';
+    document.getElementById('destContainer').style.display = 'block';
+  } else {
+    document.getElementById('originContainer').style.display = 'block';
+    document.getElementById('shipContainer').style.display = 'block';
+    document.getElementById('destContainer').style.display = 'none';
+  }
+}
+
+function fetchTicket() {
+  const tId = document.getElementById('w_ticket').value.trim().toUpperCase();
+  if(!tId) { showToast('يرجى إدخال رقم الكارتة', 'error'); return; }
+  
+  const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  const t = tickets.find(x => x.id === tId);
+  
+  if(!t) {
+    showToast('رقم الكارتة غير موجود في البسكول', 'error');
+    return;
+  }
+  if(t.used) {
+    showToast('هذه الكارتة تم استخدامها بالفعل في محضر سابق', 'error');
+    return;
+  }
+  
+  document.getElementById('w_weight_kg').value = t.net;
+  document.getElementById('ticketInfo').textContent = `تم جلب الوزن: ${t.net.toLocaleString('ar-EG')} كجم (سيارة: ${t.plate})`;
+  
+  calc();
+  showToast('تم جلب الوزن الصافي من البسكول بنجاح', 'success');
+}
+
+function calc() {
+  const kg = parseFloat(document.getElementById('w_weight_kg').value) || 0;
+  const ton = kg / 1000;
+  
+  document.getElementById('c_kg').textContent = kg.toLocaleString('ar-EG') + ' كجم';
+  document.getElementById('c_ton').textContent = ton.toLocaleString('ar-EG', {minimumFractionDigits:3}) + ' طن';
+}
+
+function saveRecord() {
+  const type = document.getElementById('w_type').value;
+  const kg = parseFloat(document.getElementById('w_weight_kg').value);
+  const isDispatch = type === 'صرف';
+  
+  let targetOrOrigin = '';
+  let ship = '';
+
+  if (isDispatch) {
+    targetOrOrigin = document.getElementById('w_dest').value;
+    if (!targetOrOrigin || !kg) {
+      showToast('يرجى كتابة اسم المطحن وتحديد الوزن', 'error');
+      return;
+    }
+  } else {
+    targetOrOrigin = document.getElementById('w_origin').value;
+    ship = document.getElementById('w_ship').value || 'غير محدد';
+    if (!kg) {
+      showToast('يرجى تحديد الوزن', 'error');
+      return;
+    }
+  }
+
+  const ton = kg / 1000;
+
+  const newRec = {
+    id: 'IMP-' + Math.floor(Math.random()*10000),
+    date: new Date().toLocaleDateString('ar-EG'),
+    type,
+    originOrDest: targetOrOrigin,
+    ship: ship,
+    kg: kg,
+    ton: ton.toFixed(3)
+  };
+
+  records.unshift(newRec);
+  
+  // Mark ticket as used
+  const tId = document.getElementById('w_ticket').value.trim().toUpperCase();
+  if (tId) {
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    const tIndex = tickets.findIndex(x => x.id === tId);
+    if(tIndex > -1) {
+      tickets[tIndex].used = true;
+      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+    }
+  }
+
+  renderTable();
+  
+  document.getElementById('w_ticket').value = '';
+  document.getElementById('ticketInfo').textContent = '';
+  document.getElementById('w_ship').value = '';
+  document.getElementById('w_dest').value = '';
+  document.getElementById('w_weight_kg').value = '';
+  calc();
+  showToast('تم حفظ العملية المستوردة بنجاح', 'success');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('importedBody');
+  tbody.innerHTML = '';
+  if (records.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">لا توجد حركات مسجلة</td></tr>';
+    return;
+  }
+  records.forEach(r => {
+    const typeBadge = r.type === 'وارد' ? '<span class="badge badge-success">وارد ميناء</span>' : '<span class="badge badge-danger">صرف مطاحن</span>';
+    tbody.innerHTML += `
+      <tr>
+        <td class="fw-bold text-info">${r.id}</td>
+        <td>${r.date}</td>
+        <td>${typeBadge}</td>
+        <td>${r.originOrDest}</td>
+        <td>${r.ship || '—'}</td>
+        <td class="fw-bold">${r.kg.toLocaleString('ar-EG')}</td>
+        <td class="fw-bold text-primary">${r.ton}</td>
+      </tr>
+    `;
+  });
+}
+
+renderTable();
+</script>
+</body>
+</html>
+

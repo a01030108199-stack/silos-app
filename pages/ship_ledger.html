@@ -1,0 +1,663 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سجل حركة الباخرة (إدخال يدوي) — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  /* Modern Header */
+  .ledger-header {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border-top: 6px solid var(--blue);
+  }
+  .doc-title {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .doc-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; left: 10%; width: 80%;
+    height: 3px; background: var(--blue);
+    border-radius: 2px;
+  }
+  .header-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px 30px;
+  }
+  .hg-item {
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .hg-label {
+    color: var(--text-sec);
+    font-weight: bold;
+    margin-left: 10px;
+    white-space: nowrap;
+    font-size: 0.95rem;
+  }
+  .hg-val {
+    flex: 1;
+  }
+  .hg-val input, .hg-val select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    font-family: inherit;
+  }
+  .hg-val select { cursor: pointer; }
+
+  /* Modern Elegant Table */
+  .table-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  
+  /* Tabs UI */
+  .ship-tabs {
+    display: flex;
+    overflow-x: auto;
+    background: #1e293b;
+    padding: 10px 10px 0 10px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: -6px; /* pull down to connect with ledger */
+    gap: 5px;
+  }
+  .ship-tab {
+    background: rgba(255,255,255,0.1);
+    color: #cbd5e1;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.05rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border-top: 3px solid transparent;
+  }
+  .ship-tab:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .ship-tab.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-top: 3px solid var(--blue);
+  }
+  .ship-tab-add {
+    background: transparent;
+    color: #10b981;
+    border: 1px dashed #10b981;
+    border-bottom: none;
+    opacity: 0.8;
+  }
+  .ship-tab-add:hover { background: rgba(16,185,129,0.1); opacity: 1; color: #10b981; }
+
+  /* Hide tabs in print */
+  @media print {
+    .ship-tabs { display: none !important; }
+  }
+
+  .ledger-table { width: 100%; border-collapse: collapse; }
+  .ledger-table th {
+    background: rgba(0,0,0,0.2);
+    padding: 12px 10px;
+    color: var(--text-primary);
+    font-weight: 800;
+    text-align: center;
+    border-bottom: 2px solid rgba(255,255,255,0.1);
+  }
+  .ledger-table td {
+    padding: 8px 10px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-left: 1px dashed rgba(255,255,255,0.05);
+    vertical-align: middle;
+  }
+  .ledger-table td:last-child { border-left: none; }
+  .ledger-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+  
+  .totals-row td {
+    background: rgba(0,0,0,0.2);
+    font-weight: 900;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    border-bottom: none;
+    border-top: 2px solid rgba(255,255,255,0.1);
+  }
+
+  .clean-inp {
+    width: 100%;
+    border: 2px solid transparent;
+    padding: 8px 5px;
+    text-align: center;
+    font-size: 1rem;
+    outline: none;
+    font-weight: bold;
+    box-sizing: border-box;
+    font-family: inherit;
+    border-radius: 6px;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--text-primary);
+  }
+  .clean-inp:focus {
+    border: 2px solid var(--blue);
+    background: rgba(0,0,0,0.2);
+    box-shadow: 0 2px 10px rgba(59,130,246,0.1);
+  }
+  .clean-inp[readonly] { background: transparent; pointer-events: none; }
+  .clean-inp::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(1); }
+
+  /* Colors for specific columns */
+  .col-rc { color: #4ade80; }   /* Green for received */
+  .col-sh { color: #fbbf24; }   /* Orange for shipped */
+  .col-dp { color: #f87171; }   /* Red for dispatched */
+  .col-df { color: #fb7185; }   /* Rose for deficit */
+  .col-bl { color: #60a5fa; }   /* Blue for balance */
+
+  .btn-add-row {
+    background: rgba(0,0,0,0.1);
+    color: var(--text-primary);
+    border: none;
+    width: 100%;
+    padding: 15px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s;
+  }
+  .btn-add-row:hover { background: rgba(0,0,0,0.2); }
+
+  /* Add Ship Modal */
+  .modal-overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(15,23,42,0.6); display: none;
+    align-items: center; justify-content: center; z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+  .modal-box {
+    background: #fff; padding: 30px; border-radius: 12px; width: 420px;
+    color: #111; text-align: right; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .modal-box input {
+    width: 100%; padding: 12px; margin-bottom: 20px;
+    border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size:1rem;
+  }
+  .modal-box input:focus { border-color: var(--blue); outline:none; }
+
+  /* Print Styles */
+  @media print {
+    body * { visibility: hidden; }
+    .print-area, .print-area * { visibility: visible; }
+    .print-area {
+      position: absolute;
+      left: 0; top: 0; width: 100%;
+      background: #fff; color: #000;
+    }
+    .no-print, .sidebar, .top-header, .btn-add-row { display: none !important; }
+    .ledger-header { box-shadow: none; border: 2px solid #000; padding: 10px; margin-bottom: 10px; }
+    .hg-item { border:none; border-bottom: 1px solid #000; padding: 5px 0; border-radius:0; }
+    .hg-val select { border:none; appearance: none; -webkit-appearance: none; }
+    .table-container { box-shadow: none; border: 1px solid #000; border-radius: 0; }
+    .ledger-table th, .ledger-table td { border: 1px solid #000; color: #000; }
+    .ledger-table thead { background: transparent !important; color:#000; -webkit-print-color-adjust: exact; }
+    .clean-inp { border: none !important; background: transparent !important; padding: 2px; }
+    .totals-row td { border-top: 2px solid #000; background: #eee !important; -webkit-print-color-adjust: exact; }
+    @page { size: landscape; margin: 10mm; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <header class="top-header no-print">
+      <div>
+        <div class="header-title">إدارة الاستلام والتخزين</div>
+        <div class="header-sub">سجل حركة الباخرة (إدخال يدوي ومصدر بيانات البواخر)</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-danger" onclick="deleteCurrentShip()" id="btnDeleteShip"><i class="fa-solid fa-trash"></i> حذف الباخرة</button>
+        <button class="btn btn-success" onclick="saveLedger()"><i class="fa-solid fa-floppy-disk"></i> حفظ الدفتر</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الدفتر</button>
+        <a href="reception.html" class="btn btn-outline btn-sm">عودة <i class="fa-solid fa-arrow-left"></i></a>
+      </div>
+    </header>
+
+    <div class="page-content print-area">
+      
+      <!-- Tabs -->
+      <div class="ship-tabs no-print" id="shipTabs">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="ledger-header" style="border-top:none; border-radius:0 0 12px 12px;">
+        <div class="doc-title">سجل حركة باخرة</div>
+        
+        <div class="header-grid">
+          <div class="hg-item">
+            <span class="hg-label">اسم الباخرة:</span>
+            <div class="hg-val">
+              <input type="text" id="h_ship_display" readonly style="color:var(--blue); font-size:1.15rem; border:none; pointer-events:none;">
+            </div>
+          </div>
+          <div class="hg-item">
+            <span class="hg-label">تاريخ الرحلة:</span>
+            <div class="hg-val"><input type="text" id="h_voyage" placeholder="--"></div>
+          </div>
+          <div class="hg-item">
+            <span class="hg-label">صومعة:</span>
+            <div class="hg-val"><input type="text" id="h_silo" readonly></div>
+          </div>
+          <div class="hg-item">
+            <span class="hg-label">نوع القمح:</span>
+            <div class="hg-val"><input type="text" id="h_type" placeholder="--"></div>
+          </div>
+          <div class="hg-item">
+            <span class="hg-label">ميناء الشحن:</span>
+            <div class="hg-val"><input type="text" id="h_port" placeholder="--"></div>
+          </div>
+          <div class="hg-item">
+            <span class="hg-label">درجة النظافة:</span>
+            <div class="hg-val"><input type="text" id="h_grade" placeholder="--"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ledger Table -->
+      <div class="table-container">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th style="width:40px">م</th>
+              <th style="width:140px">التاريخ</th>
+              <th style="width:120px">المشحون (طن)</th>
+              <th style="width:120px">المستلم (طن)</th>
+              <th style="width:120px">العجز (طن)</th>
+              <th style="width:120px">المنصرف (طن)</th>
+              <th style="width:130px">الرصيد (طن)</th>
+              <th>ملاحظات</th>
+              <th class="no-print" style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody id="rowsBody">
+            <tr><td colspan="9" style="padding:40px; color:var(--text-sec); text-align:center; font-size:1.1rem">الرجاء إضافة باخرة جديدة من علامات التبويب بالأعلى...</td></tr>
+          </tbody>
+          <tfoot id="totalsBody" style="display:none">
+            <tr class="totals-row">
+              <td colspan="2" style="text-align:left; padding-left:20px">الإجماليات:</td>
+              <td id="tot_shipped" class="col-sh">0.000</td>
+              <td id="tot_received" class="col-rc">0.000</td>
+              <td id="tot_deficit" class="col-df">0.000</td>
+              <td id="tot_dispatched" class="col-dp">0.000</td>
+              <td id="final_balance" class="col-bl">0.000</td>
+              <td></td>
+              <td class="no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
+        <button class="btn-add-row no-print" onclick="addRow()"><i class="fa-solid fa-plus"></i> إضافة يوم جديد في الدفتر</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="addShipModal">
+  <div class="modal-box">
+    <h3 style="margin-top:0; border-bottom:1px solid #e2e8f0; padding-bottom:15px; font-size:1.4rem">إضافة باخرة جديدة</h3>
+    <label style="display:block; margin-bottom:8px; font-weight:bold; color:#334155">اسم الباخرة</label>
+    <input type="text" id="newShipName" placeholder="مثال: وادي النيل">
+    <div style="display:flex; justify-content:flex-end; gap:10px">
+      <button class="btn btn-outline" onclick="closeAddShip()">إلغاء</button>
+      <button class="btn btn-success" onclick="confirmAddShip()">تسجيل الباخرة</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+buildSidebar('reception');
+
+document.getElementById('h_silo').value = user.name;
+
+let registeredShips = [];
+let ledgerRows = [];
+let currentShipName = '';
+
+function init() {
+  const shipsStr = localStorage.getItem('REGISTERED_SHIPS');
+  if (shipsStr) registeredShips = JSON.parse(shipsStr);
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  let shipParam = urlParams.get('ship');
+  const actionParam = urlParams.get('action');
+
+  if (!shipParam && registeredShips.length > 0) {
+    shipParam = registeredShips[0];
+  }
+
+  renderTabs(shipParam);
+
+  if (actionParam === 'new') {
+    openAddShip();
+  }
+}
+
+function renderTabs(activeShip = null) {
+  const tabsContainer = document.getElementById('shipTabs');
+  tabsContainer.innerHTML = '';
+  
+  registeredShips.sort().forEach(s => {
+    tabsContainer.innerHTML += `
+      <button class="ship-tab ${s === activeShip ? 'active' : ''}" onclick="selectShip('${s}')">${s}</button>
+    `;
+  });
+  
+  tabsContainer.innerHTML += `
+    <button class="ship-tab ship-tab-add" onclick="openAddShip()"><i class="fa-solid fa-plus"></i> إضافة باخرة</button>
+  `;
+  
+  if (activeShip) {
+    document.getElementById('btnDeleteShip').style.display = 'inline-block';
+    selectShip(activeShip);
+  } else {
+    // No ship selected/exists
+    document.getElementById('btnDeleteShip').style.display = 'none';
+    currentShipName = '';
+    loadLedger();
+  }
+}
+
+function selectShip(shipName) {
+  currentShipName = shipName;
+  document.getElementById('h_ship_display').value = shipName;
+  
+  // Update active class
+  const tabs = document.querySelectorAll('.ship-tab:not(.ship-tab-add)');
+  tabs.forEach(t => {
+    if(t.textContent === shipName) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+  
+  loadLedger();
+}
+
+function openAddShip() {
+  document.getElementById('addShipModal').style.display = 'flex';
+  document.getElementById('newShipName').value = '';
+  document.getElementById('newShipName').focus();
+}
+function closeAddShip() {
+  document.getElementById('addShipModal').style.display = 'none';
+}
+function confirmAddShip() {
+  const name = document.getElementById('newShipName').value.trim();
+  if (!name) return;
+  if (registeredShips.includes(name)) {
+    showToast('هذه الباخرة مسجلة مسبقاً', 'error');
+    return;
+  }
+  registeredShips.push(name);
+  localStorage.setItem('REGISTERED_SHIPS', JSON.stringify(registeredShips));
+  
+  // initialize empty ledger
+  const initData = {
+    header: { voyage: '', type: '', port: '', grade: '' },
+    rows: [ getEmptyRow() ]
+  };
+  localStorage.setItem(`SHIP_MANUAL_LEDGER_${name}`, JSON.stringify(initData));
+  
+  closeAddShip();
+  renderTabs(name);
+  showToast('تمت إضافة الباخرة بنجاح', 'success');
+}
+
+function getEmptyRow() {
+  return { date: '', shipped: '', received: '', dispatched: '', note: '' };
+}
+
+function migrateOldData(row) {
+  // If row has old format (sh_t, sh_k), convert to shipped (decimal)
+  if (row.sh_t !== undefined) {
+    const st = parseInt(row.sh_t)||0; const sk = parseInt(row.sh_k)||0;
+    const rt = parseInt(row.rc_t)||0; const rk = parseInt(row.rc_k)||0;
+    const dt = parseInt(row.dp_t)||0; const dk = parseInt(row.dp_k)||0;
+    return {
+      date: row.date || '',
+      shipped: st + (sk/1000) || '',
+      received: rt + (rk/1000) || '',
+      dispatched: dt + (dk/1000) || '',
+      note: row.note || ''
+    };
+  }
+  return row;
+}
+
+function loadLedger() {
+  if (!currentShipName) {
+    document.getElementById('rowsBody').innerHTML = '<tr><td colspan="9" style="padding:40px; color:var(--text-sec); text-align:center; font-size:1.1rem">الرجاء إضافة باخرة جديدة من علامات التبويب بالأعلى...</td></tr>';
+    document.getElementById('totalsBody').style.display = 'none';
+    document.getElementById('h_voyage').value = '';
+    document.getElementById('h_type').value = '';
+    document.getElementById('h_port').value = '';
+    document.getElementById('h_grade').value = '';
+    ledgerRows = [];
+    return;
+  }
+
+  const saved = localStorage.getItem(`SHIP_MANUAL_LEDGER_${currentShipName}`);
+  if (saved) {
+    const data = JSON.parse(saved);
+    document.getElementById('h_voyage').value = data.header.voyage || '';
+    document.getElementById('h_type').value = data.header.type || '';
+    document.getElementById('h_port').value = data.header.port || '';
+    document.getElementById('h_grade').value = data.header.grade || '';
+    
+    ledgerRows = (data.rows || []).map(migrateOldData);
+    if(ledgerRows.length === 0) ledgerRows.push(getEmptyRow());
+  } else {
+    ledgerRows = [];
+  }
+  
+  // NEW AUTOMATION: Sync with tickets
+  syncWithTickets();
+  
+  document.getElementById('totalsBody').style.display = 'table-footer-group';
+  calculateAndRender();
+}
+
+function parseTicketDate(ts) {
+  if (!ts) return '';
+  let d = ts.replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x));
+  d = d.replace(/[^\d\/\-\.\s:]/g, '');
+  let m = d.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,4})/);
+  if (!m) return '';
+  let p1 = m[1], p2 = m[2], p3 = m[3];
+  if (p1.length === 4) return p1 + '-' + p2.padStart(2,'0') + '-' + p3.padStart(2,'0');
+  return p3 + '-' + p2.padStart(2,'0') + '-' + p1.padStart(2,'0');
+}
+
+function syncWithTickets() {
+  if (!currentShipName) return;
+  const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  
+  // Reset received and dispatched to 0 before recalculating
+  ledgerRows.forEach(r => {
+    r.received = 0;
+    r.dispatched = 0;
+  });
+
+  tickets.forEach(t => {
+    if (t.silo_id !== user.silo_id || t.grainType !== 'مستورد' || t.shipName !== currentShipName) return;
+    
+    let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
+    if (!tIsoDate) return;
+
+    let netTons = (t.net || 0) / 1000;
+    
+    // Find row for this date
+    let row = ledgerRows.find(r => r.date === tIsoDate);
+    if (!row) {
+      row = getEmptyRow();
+      row.date = tIsoDate;
+      ledgerRows.push(row);
+    }
+
+    if (t.opType === 'وارد') {
+      row.received = (parseFloat(row.received) || 0) + netTons;
+    } else if (t.opType === 'صرف') {
+      row.dispatched = (parseFloat(row.dispatched) || 0) + netTons;
+    }
+  });
+
+  // Sort rows by date ascending
+  ledgerRows.sort((a, b) => {
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return a.date.localeCompare(b.date);
+  });
+  
+  // Ensure at least one empty row at the end if all are filled, or just keep it clean
+  if (ledgerRows.length === 0) ledgerRows.push(getEmptyRow());
+}
+
+function addRow() {
+  if (!currentShipName) return showToast('الرجاء اختيار باخرة أولاً', 'error');
+  ledgerRows.push(getEmptyRow());
+  calculateAndRender();
+}
+function deleteRow(i) {
+  ledgerRows.splice(i, 1);
+  calculateAndRender();
+}
+
+function updateRow(index, field, val) {
+  ledgerRows[index][field] = val;
+  calculateAndRender();
+}
+
+function calculateAndRender() {
+  const tbody = document.getElementById('rowsBody');
+  tbody.innerHTML = '';
+  
+  let currentBalance = 0;
+  let totSh = 0, totRc = 0, totDf = 0, totDp = 0;
+
+  ledgerRows.forEach((r, i) => {
+    const sh = parseFloat(r.shipped) || 0;
+    const rc = parseFloat(r.received) || 0;
+    const dp = parseFloat(r.dispatched) || 0;
+    
+    // Deficit
+    let df = 0;
+    if (sh > 0 && rc > 0 && sh > rc) {
+      df = sh - rc;
+    }
+    
+    currentBalance = currentBalance + rc - dp;
+    
+    totSh += sh;
+    totRc += rc;
+    totDf += df;
+    totDp += dp;
+
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-weight:bold; color:var(--text-sec)">${i+1}</td>
+        <td><input type="date" class="clean-inp" style="color:var(--text-primary)" value="${r.date||''}" onchange="updateRow(${i}, 'date', this.value)"></td>
+        
+        <td><input type="number" step="0.001" class="clean-inp col-sh" value="${r.shipped||''}" placeholder="0.000" onchange="updateRow(${i}, 'shipped', this.value)"></td>
+        <td><input type="number" step="0.001" class="clean-inp col-rc" style="background:rgba(5,150,105,0.05)" value="${r.received||''}" placeholder="0.000" readonly tabindex="-1" title="محسوب آلياً من الميزان"></td>
+        
+        <td><input type="text" class="clean-inp col-df" value="${df>0 ? df.toFixed(3) : '-'}" readonly tabindex="-1"></td>
+        
+        <td><input type="number" step="0.001" class="clean-inp col-dp" style="background:rgba(220,38,38,0.05)" value="${r.dispatched||''}" placeholder="0.000" readonly tabindex="-1" title="محسوب آلياً من الميزان"></td>
+        
+        <td><input type="text" class="clean-inp col-bl" style="font-size:1.15rem; background:rgba(37,99,235,0.05)" value="${currentBalance>0 ? currentBalance.toFixed(3) : '-'}" readonly tabindex="-1"></td>
+        
+        <td><input type="text" class="clean-inp" value="${r.note||''}" placeholder="..." onchange="updateRow(${i}, 'note', this.value)"></td>
+        <td class="no-print"><button class="btn btn-outline btn-sm" style="border:none; color:#ef4444" onclick="deleteRow(${i})"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>
+    `;
+  });
+
+  // Update totals
+  document.getElementById('tot_shipped').textContent = totSh > 0 ? totSh.toFixed(3) : '0.000';
+  document.getElementById('tot_received').textContent = totRc > 0 ? totRc.toFixed(3) : '0.000';
+  document.getElementById('tot_deficit').textContent = totDf > 0 ? totDf.toFixed(3) : '0.000';
+  document.getElementById('tot_dispatched').textContent = totDp > 0 ? totDp.toFixed(3) : '0.000';
+  document.getElementById('final_balance').textContent = currentBalance > 0 ? currentBalance.toFixed(3) : '0.000';
+}
+
+function saveLedger() {
+  if (!currentShipName) return showToast('الرجاء اختيار باخرة أولاً', 'error');
+
+  const data = {
+    header: {
+      voyage: document.getElementById('h_voyage').value,
+      type: document.getElementById('h_type').value,
+      port: document.getElementById('h_port').value,
+      grade: document.getElementById('h_grade').value
+    },
+    rows: ledgerRows
+  };
+
+  localStorage.setItem(`SHIP_MANUAL_LEDGER_${currentShipName}`, JSON.stringify(data));
+  showToast('تم حفظ سجل الباخرة بنجاح', 'success');
+}
+
+function deleteCurrentShip() {
+  if (!currentShipName) return showToast('لا توجد باخرة محددة للحذف', 'error');
+  if (confirm(`هل أنت متأكد من حذف الباخرة "${currentShipName}" بالكامل من النظام؟ لا يمكن التراجع عن هذه الخطوة!`)) {
+    // Remove from registered array
+    registeredShips = registeredShips.filter(s => s !== currentShipName);
+    localStorage.setItem('REGISTERED_SHIPS', JSON.stringify(registeredShips));
+    
+    // Remove ledger data
+    localStorage.removeItem(`SHIP_MANUAL_LEDGER_${currentShipName}`);
+    
+    showToast('تم حذف الباخرة بنجاح', 'success');
+    
+    // Load first available or empty
+    const nextShip = registeredShips.length > 0 ? registeredShips[0] : null;
+    renderTabs(nextShip);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
+

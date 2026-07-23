@@ -1,0 +1,1030 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>غرفة الميزان (البسكول) — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  .wheat-header {
+    background: linear-gradient(135deg, var(--success), #1b5e20);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .wheat-header h2 { margin:0; font-size:1.5rem; font-weight:800; color:#fff;}
+  .calc-box {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    color: #fff;
+  }
+  .calc-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .calc-total {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 10px;
+    margin-top: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+  }
+  .print-only { display: none; }
+  @media print {
+    body > :not(#printSlip) { display: none !important; }
+    #printSlip { display: block !important; }
+    #printSlip {
+      position: absolute; left: 0; top: 0; width: 100%;
+      padding: 15px; font-family: 'Segoe UI', Arial, sans-serif;
+      direction: rtl; color: #000; background: #fff;
+    }
+    .slip-container {
+      max-width: 800px; margin: 0 auto; border: 2px solid #000;
+      padding: 20px; border-radius: 12px;
+    }
+    .slip-header { position: relative; display: flex; align-items: center; justify-content: center; min-height: 110px; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; }
+    .slip-logo { position: absolute; right: 0; top: 50%; transform: translateY(-50%); max-width: 180px; max-height: 110px; mix-blend-mode: multiply; }
+    .slip-header-text { text-align: center; margin: 0 auto; }
+    .slip-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 4px;}
+    .slip-subtitle { font-size: 1.3rem; font-weight: bold; }
+    .slip-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 6px 0; font-size: 1.2rem; }
+    .slip-row span { color: #333; }
+    .slip-row strong { font-weight: 900; }
+    .slip-weights { border: 2px solid #000; border-radius: 8px; padding: 15px; margin-top: 15px; text-align: center; }
+    .slip-weights div { font-size: 1.3rem; margin-bottom: 4px; }
+    .slip-weights .net { font-size: 1.8rem; font-weight: bold; margin-top: 10px; border-top: 1px solid #000; padding-top: 10px;}
+    .slip-footer { display: flex; justify-content: space-between; margin-top: 30px; font-size: 1.2rem; font-weight: bold; }
+    .slip-signature { text-align: center; width: 45%; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">غرفة البسكول</div>
+        <div class="header-sub" id="siloNameSub">عمليات الوزن المباشرة للسيارات</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <a href="reception.html" class="btn btn-outline btn-sm">
+          <i class="fa-solid fa-arrow-right"></i> عودة
+        </a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="wheat-header">
+        <i class="fa-solid fa-scale-balanced" style="font-size:2rem"></i>
+        <div>
+          <h2>ميزان السيارات (البسكول)</h2>
+          <div style="font-size:0.9rem; opacity:0.9">تسجيل الوزن القائم والفارغ وإصدار كارتات الاستلام</div>
+        </div>
+      </div>
+
+      <div class="form-card mb-24">
+        <div class="card-header">
+          <div class="card-title">إصدار كارتة استلام جديدة</div>
+          <div class="badge badge-success" id="ticketIdDisplay" style="font-size:1.2rem">CRT-####</div>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group-inner">
+            <label>رقم السيارة *</label>
+            <input type="text" class="form-control" id="s_plate" placeholder="أ ب ج 1234">
+          </div>
+          <div class="form-group-inner">
+            <label>اسم السائق *</label>
+            <input type="text" class="form-control" id="s_driver" placeholder="اسم السائق">
+          </div>
+          
+          <div class="form-group-inner">
+            <label>نوع العملية *</label>
+            <select class="form-control" id="s_op_type" onchange="toggleDynamicFields()">
+              <option value="وارد">وارد (استلام)</option>
+              <option value="صرف">منصرف (شحن)</option>
+            </select>
+          </div>
+          
+          <div class="form-group-inner">
+            <label>نوع الحبوب *</label>
+            <select class="form-control" id="s_grain_type" onchange="toggleDynamicFields()">
+              <option value="محلي">محلي</option>
+              <option value="مستورد">مستورد</option>
+            </select>
+          </div>
+
+          <!-- Dynamic: Local Incoming Info -->
+          <div class="form-group-inner" id="div_supplier_name" style="display:none;">
+            <label>اسم المورد / الجهة *</label>
+            <input type="text" class="form-control" id="s_supplier_name" placeholder="مثال: مكتب الزهور لتوريد الغلال" list="supplier_names_list" oninput="onSupplierNameChange()">
+          </div>
+          <div class="form-group-inner" id="div_supplier_code" style="display:none;">
+            <label>كود المورد *</label>
+            <input type="text" class="form-control" id="s_supplier_code" placeholder="مثال: 5114" list="supplier_codes_list" oninput="onSupplierCodeChange()">
+          </div>
+
+          <!-- Dynamic: Local Grade -->
+          <div class="form-group-inner" id="div_grade">
+            <label>درجة النظافة *</label>
+            <select class="form-control" id="s_grade">
+              <option value="23.5">23.5 قيراط</option>
+              <option value="23">23 قيراط</option>
+              <option value="22.5">22.5 قيراط</option>
+            </select>
+          </div>
+
+          <!-- Packaging Type for Local -->
+          <div class="form-group-inner" id="div_packaging" style="display:none;">
+            <label>نوع التعبئة *</label>
+            <select class="form-control" id="s_packaging" onchange="toggleSacksInput()">
+              <option value="bulk">صب</option>
+              <option value="sacks">أجولة بلاستيك</option>
+            </select>
+          </div>
+          
+          <div class="form-group-inner" id="div_sacks_count" style="display:none;">
+            <label>عدد الأجولة *</label>
+            <input type="number" class="form-control" id="s_sacks" placeholder="أدخل عدد الأجولة" oninput="calcNet()">
+          </div>
+
+
+
+          <div class="form-group-inner" id="div_wheat_type" style="display:none;">
+            <label>نوع القمح *</label>
+            <select class="form-control" id="s_wheat_type">
+              <option value="روسي">روسي</option>
+              <option value="روماني">روماني</option>
+              <option value="فرنسي">فرنسي</option>
+              <option value="أوكراني">أوكراني</option>
+              <option value="أسترالي">أسترالي</option>
+            </select>
+          </div>
+
+
+          <!-- Dynamic: Destination (For Outgoing) -->
+          <div class="form-group-inner" id="div_destination" style="display:none;">
+            <label>جهة الصرف / المطحن *</label>
+            <input type="text" class="form-control" id="s_destination" placeholder="اسم المطحن">
+          </div>
+
+          <!-- Dynamic: Dispense Order (For Outgoing) -->
+          <div class="form-group-inner" id="div_order_no" style="display:none; grid-column: 1 / -1; background: rgba(33,150,243,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(33,150,243,0.3);">
+            <div style="margin-bottom:15px; font-weight:bold; color:#90caf9;"><i class="fa-solid fa-file-invoice"></i> بيانات إذن الصرف</div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+              <div>
+                <label>رقم إذن الصرف *</label>
+                <div style="display:flex; gap:10px;">
+                  <input type="text" class="form-control" id="s_order_no" placeholder="أدخل رقم الإذن" list="order_no_list" onblur="loadOrderData()">
+                  <button class="btn btn-outline" style="white-space:nowrap; padding:0 10px;" onclick="saveOrderData()"><i class="fa-solid fa-save"></i> حفظ</button>
+                </div>
+                <datalist id="order_no_list"></datalist>
+              </div>
+              <div>
+                <label>تاريخ الانتهاء *</label>
+                <input type="date" class="form-control" id="s_order_expiry" onchange="calcOrderBalance()">
+              </div>
+              <div>
+                <label>الكمية الأساسية (بالطن) *</label>
+                <input type="number" class="form-control" id="s_order_qty" placeholder="الكمية بالطن" oninput="calcOrderBalance()">
+              </div>
+              <div>
+                <label>التعزيز بالطن (إن وُجد)</label>
+                <input type="number" class="form-control" id="s_order_bonus" placeholder="التعزيز بالطن" oninput="calcOrderBalance()">
+              </div>
+            </div>
+            <div style="margin-top: 15px; background:#111827; padding:15px; border-radius:5px; display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); text-align:center; gap:10px;">
+              <div>
+                <div style="color:var(--text-sec); font-size:0.9rem;">إجمالي الإذن (الأساسي+التعزيز)</div>
+                <div id="lbl_order_total_view" style="font-size:1.2rem; font-weight:bold; color:#90caf9;">0 كجم</div>
+              </div>
+              <div>
+                <div style="color:var(--text-sec); font-size:0.9rem;">الكمية المنصرفة</div>
+                <div id="lbl_order_dispensed_view" style="font-size:1.2rem; font-weight:bold; color:var(--warning);">0 كجم</div>
+              </div>
+              <div>
+                <div style="color:var(--text-sec); font-size:0.9rem;">الرصيد المتاح حالياً</div>
+                <div id="lbl_order_balance" style="font-size:1.3rem; font-weight:bold; color:var(--success);">---</div>
+              </div>
+              <div>
+                <div style="color:var(--text-sec); font-size:0.9rem;">تاريخ الانتهاء</div>
+                <div id="lbl_order_expiry_view" style="font-size:1.2rem; font-weight:bold; color:#fff;">--/--/----</div>
+              </div>
+            </div>
+            <div id="order_error_msg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
+          </div>
+
+          <!-- Always: Target Cell -->
+          <div class="form-group-inner" id="div_cell">
+            <label>رقم الخلية *</label>
+            <select class="form-control" id="s_cell" onchange="checkCellContent()">
+              <option value="" disabled selected>-- اختر الخلية --</option>
+              <option value="1">خلية 1</option>
+              <option value="2">خلية 2</option>
+              <option value="3">خلية 3</option>
+              <option value="4">خلية 4</option>
+              <option value="5">خلية 5</option>
+              <option value="6">خلية 6</option>
+              <option value="7">خلية 7</option>
+              <option value="8">خلية 8</option>
+              <option value="9">خلية 9</option>
+              <option value="10">خلية 10</option>
+              <option value="11">خلية 11</option>
+              <option value="12">خلية 12</option>
+            </select>
+            <div id="cell_status_label" style="margin-top:5px;font-size:0.85rem;font-weight:bold;"></div>
+          </div>
+
+          <div class="form-group-inner" style="grid-column: 1 / -1">
+            <label>الوزن القائم (والسيارة محملة) *</label>
+            <div style="display:flex;gap:10px">
+              <input type="number" class="form-control" id="s_gross" placeholder="0 كجم" oninput="calcNet()" style="flex:1" readonly>
+              <button class="btn btn-primary" onclick="readScale('gross')"><i class="fa-solid fa-truck"></i> قراءة الوزن القائم</button>
+            </div>
+          </div>
+          <div class="form-group-inner" style="grid-column: 1 / -1">
+            <label>الوزن الفارغ (بعد التفريغ) *</label>
+            <div style="display:flex;gap:10px">
+              <input type="number" class="form-control" id="s_tare" placeholder="0 كجم" oninput="calcNet()" style="flex:1" readonly>
+              <button class="btn btn-danger" onclick="readScale('tare')"><i class="fa-solid fa-truck-moving"></i> قراءة الوزن الفارغ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-box">
+          <div class="calc-row">
+            <span>الوزن القائم:</span>
+            <span id="lbl_gross">0 كجم</span>
+          </div>
+          <div class="calc-row text-warning">
+            <span>الوزن الفارغ:</span>
+            <span id="lbl_tare">0 كجم</span>
+          </div>
+          <div class="calc-row text-danger" id="row_deduction" style="display:none;">
+            <span>خصم الأجولة:</span>
+            <span id="lbl_deduction">0 كجم</span>
+          </div>
+          <div class="calc-row calc-total text-success">
+            <span>الوزن الصافي للحمولة:</span>
+            <span id="lbl_net">0 كجم</span>
+          </div>
+        </div>
+
+        <div id="formActions" style="display:flex;justify-content:flex-end;margin-top:15px;gap:10px;">
+          <!-- Buttons rendered dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card" style="overflow-x:auto">
+        <div class="table-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="card-title">سجل كارتات الميزان</div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label style="margin:0; font-weight:bold;">تاريخ السجل:</label>
+            <input type="date" id="filter_date" class="form-control" style="width: auto; padding: 5px;" onchange="renderTable()">
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>رقم الكارتة</th>
+              <th>الوقت</th>
+              <th>رقم السيارة</th>
+              <th>السائق</th>
+              <th>نوع الحبوب</th>
+              <th>الوزن القائم</th>
+              <th>الوزن الفارغ</th>
+              <th>الصافي (كجم)</th>
+              <th>الحالة</th>
+            </tr>
+          </thead>
+          <tbody id="ticketsBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Print Container -->
+<div id="printSlip" class="print-only"></div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+
+buildSidebar('reception');
+initClock(document.getElementById('clockEl'));
+document.getElementById('siloNameSub').textContent = `صومعة ${user.name}`;
+
+let currentTicketId = '';
+
+function generateTicketId() {
+  return 'CRT-' + Math.floor(1000 + Math.random() * 9000);
+}
+
+function toggleDynamicFields() {
+  const opType = document.getElementById('s_op_type').value;
+  const grainType = document.getElementById('s_grain_type').value;
+
+  // Defaults
+  document.getElementById('div_supplier_name').style.display = 'none';
+  document.getElementById('div_supplier_code').style.display = 'none';
+  document.getElementById('div_grade').style.display = 'none';
+  document.getElementById('div_packaging').style.display = 'none';
+  document.getElementById('div_sacks_count').style.display = 'none';
+
+  document.getElementById('div_wheat_type').style.display = 'none';
+  document.getElementById('div_destination').style.display = 'none';
+  if (document.getElementById('div_order_no')) document.getElementById('div_order_no').style.display = 'none';
+  document.getElementById('div_cell').style.display = 'block';
+
+  // Grade is for ALL Local operations (Incoming and Outgoing)
+  if (grainType === 'محلي') {
+    document.getElementById('div_grade').style.display = 'block';
+  }
+
+  if (opType === 'وارد') {
+    if (grainType === 'مستورد') {
+      document.getElementById('div_wheat_type').style.display = 'block';
+    } else {
+      // Local Incoming
+      document.getElementById('div_supplier_name').style.display = 'block';
+      document.getElementById('div_supplier_code').style.display = 'block';
+      document.getElementById('div_packaging').style.display = 'block';
+      toggleSacksInput();
+    }
+  } else { // منصرف
+    document.getElementById('div_destination').style.display = 'block';
+    if (document.getElementById('div_order_no')) document.getElementById('div_order_no').style.display = 'block';
+    if (typeof refreshOrderList === 'function') refreshOrderList();
+    if (typeof calcOrderBalance === 'function') calcOrderBalance();
+  }
+}
+
+function getOrders() { return JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}'); }
+function saveOrderData() {
+  const no = document.getElementById('s_order_no').value.trim();
+  if(!no) return;
+  const orders = getOrders();
+  orders[no] = {
+    expiry: document.getElementById('s_order_expiry').value,
+    qty: parseFloat(document.getElementById('s_order_qty').value) || 0,
+    bonus: parseFloat(document.getElementById('s_order_bonus').value) || 0
+  };
+  localStorage.setItem('DISPENSE_ORDERS', JSON.stringify(orders));
+  showToast('تم حفظ بيانات إذن الصرف بنجاح', 'success');
+  refreshOrderList();
+  calcOrderBalance();
+}
+function loadOrderData() {
+  const no = document.getElementById('s_order_no').value.trim();
+  if(!no) { calcOrderBalance(); return; }
+  const orders = getOrders();
+  if (orders[no]) {
+    document.getElementById('s_order_expiry').value = orders[no].expiry || '';
+    document.getElementById('s_order_qty').value = orders[no].qty || '';
+    document.getElementById('s_order_bonus').value = orders[no].bonus || '';
+  }
+  calcOrderBalance();
+}
+function refreshOrderList() {
+  const list = document.getElementById('order_no_list');
+  if(!list) return;
+  list.innerHTML = '';
+  const orders = getOrders();
+  for (const k in orders) { list.innerHTML += `<option value="${k}">`; }
+}
+function calcOrderBalance() {
+  const no = document.getElementById('s_order_no').value.trim();
+  const msg = document.getElementById('order_error_msg');
+  if (!no) {
+    if(document.getElementById('lbl_order_total_view')) document.getElementById('lbl_order_total_view').textContent = '0 كجم';
+    if(document.getElementById('lbl_order_dispensed_view')) document.getElementById('lbl_order_dispensed_view').textContent = '0 كجم';
+    document.getElementById('lbl_order_balance').textContent = '---';
+    if(document.getElementById('lbl_order_expiry_view')) document.getElementById('lbl_order_expiry_view').textContent = '--/--/----';
+    if(msg) msg.style.display = 'none';
+    return 0;
+  }
+  const qty = parseFloat(document.getElementById('s_order_qty').value) || 0;
+  const bonus = parseFloat(document.getElementById('s_order_bonus').value) || 0;
+  const expiry = document.getElementById('s_order_expiry').value;
+  let isExpired = false;
+  if (expiry) {
+    const today = new Date().toISOString().split('T')[0];
+    if (today > expiry) isExpired = true;
+  }
+  let dispensed = 0;
+  getTickets().forEach(t => {
+    if (t.opType === 'صرف' && t.orderNo === no && t.status === 'completed') {
+      dispensed += (t.net || 0);
+    }
+  });
+  const totalKg = Math.round((qty + bonus) * 1000);
+  const remaining = Math.max(0, totalKg - dispensed);
+  
+  if(document.getElementById('lbl_order_total_view')) document.getElementById('lbl_order_total_view').textContent = totalKg.toLocaleString('ar-EG') + ' كجم';
+  if(document.getElementById('lbl_order_dispensed_view')) document.getElementById('lbl_order_dispensed_view').textContent = dispensed.toLocaleString('ar-EG') + ' كجم';
+  if(document.getElementById('lbl_order_expiry_view')) document.getElementById('lbl_order_expiry_view').textContent = expiry ? expiry : 'غير محدد';
+  
+  if (isExpired) {
+    document.getElementById('lbl_order_balance').textContent = '0 كجم (منتهي)';
+    document.getElementById('lbl_order_balance').style.color = 'var(--danger)';
+    if(msg) { msg.textContent = 'إذن الصرف منتهي الصلاحية والتصريح لاغي.'; msg.style.display = 'block'; }
+    return 0;
+  } else {
+    document.getElementById('lbl_order_balance').textContent = remaining.toLocaleString('ar-EG') + ' كجم';
+    document.getElementById('lbl_order_balance').style.color = 'var(--success)';
+    if(msg) msg.style.display = 'none';
+    return remaining;
+  }
+}
+
+function toggleSacksInput() {
+  const pack = document.getElementById('s_packaging');
+  const sacksDiv = document.getElementById('div_sacks_count');
+  if (pack && pack.value === 'sacks') {
+    sacksDiv.style.display = 'block';
+  } else {
+    sacksDiv.style.display = 'none';
+    if(document.getElementById('s_sacks')) document.getElementById('s_sacks').value = '';
+  }
+  calcNet();
+}
+
+let scaleMode = 'first'; // 'first' or 'second'
+let pendingTicketId = null;
+
+function renderActionButtons() {
+  const actionsDiv = document.getElementById('formActions');
+  if (scaleMode === 'first') {
+    actionsDiv.innerHTML = `
+      <button class="btn btn-outline" onclick="resetForm()"><i class="fa-solid fa-rotate-right"></i> إعادة ضبط</button>
+      <button class="btn btn-primary" onclick="saveFirstWeight()"><i class="fa-solid fa-print"></i> حفظ الوزنة الأولى وطباعة</button>
+    `;
+  } else {
+    actionsDiv.innerHTML = `
+      <button class="btn btn-danger" onclick="cancelSecondWeight()"><i class="fa-solid fa-xmark"></i> إلغاء</button>
+      <button class="btn btn-success" onclick="saveSecondWeight()"><i class="fa-solid fa-print"></i> حفظ الوزنة الثانية وطباعة</button>
+    `;
+  }
+}
+
+function initForm(keepSettings = false) {
+  scaleMode = 'first';
+  pendingTicketId = null;
+  ['s_plate', 's_driver', 's_op_type', 's_grain_type', 's_cell', 's_order_no', 's_order_qty', 's_order_bonus', 's_order_expiry'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = false;
+  });
+  renderActionButtons();
+
+  currentTicketId = generateTicketId();
+  document.getElementById('ticketIdDisplay').textContent = currentTicketId;
+  document.getElementById('s_plate').value = '';
+  document.getElementById('s_driver').value = '';
+  document.getElementById('s_gross').value = '';
+  document.getElementById('s_tare').value = '';
+  if (document.getElementById('s_packaging')) document.getElementById('s_packaging').value = 'bulk';
+  if (document.getElementById('s_sacks')) document.getElementById('s_sacks').value = '';
+  if (document.getElementById('s_order_no')) document.getElementById('s_order_no').value = '';
+  if (document.getElementById('s_order_expiry')) document.getElementById('s_order_expiry').value = '';
+  if (document.getElementById('s_order_qty')) document.getElementById('s_order_qty').value = '';
+  if (document.getElementById('s_order_bonus')) document.getElementById('s_order_bonus').value = '';
+  if (document.getElementById('lbl_order_total_view')) document.getElementById('lbl_order_total_view').textContent = '0 كجم';
+  if (document.getElementById('lbl_order_dispensed_view')) document.getElementById('lbl_order_dispensed_view').textContent = '0 كجم';
+  if (document.getElementById('lbl_order_balance')) document.getElementById('lbl_order_balance').textContent = '---';
+  if (document.getElementById('lbl_order_expiry_view')) document.getElementById('lbl_order_expiry_view').textContent = '--/--/----';
+  if (document.getElementById('order_error_msg')) document.getElementById('order_error_msg').style.display = 'none';
+  calcNet();
+
+  if (!keepSettings) {
+    document.getElementById('s_op_type').value = 'وارد';
+    document.getElementById('s_grain_type').value = 'محلي';
+    document.getElementById('s_supplier_name').value = '';
+    document.getElementById('s_supplier_code').value = '';
+    document.getElementById('s_grade').value = '23.5';
+    document.getElementById('s_wheat_type').value = 'روسي';
+    document.getElementById('s_destination').value = '';
+    document.getElementById('s_cell').value = '';
+    document.getElementById('cell_status_label').innerHTML = '';
+  }
+  toggleDynamicFields();
+}
+
+function readScale(type) {
+  if (type === 'gross') {
+    const w = Math.floor(Math.random() * 40000) + 30000; // 30k to 70k kg
+    document.getElementById('s_gross').value = w;
+    showToast('تم التقاط الوزن القائم', 'success');
+  } else {
+    const gross = parseFloat(document.getElementById('s_gross').value) || 0;
+    let tare = Math.floor(Math.random() * 15000) + 10000; // 10k to 25k empty
+    if (gross > 0 && tare >= gross) tare = gross - 1000; // safety logic for random
+    document.getElementById('s_tare').value = tare;
+    showToast('تم التقاط الوزن الفارغ', 'success');
+  }
+  calcNet();
+}
+
+function calcNet() {
+  const gross = parseFloat(document.getElementById('s_gross').value) || 0;
+  const tare = parseFloat(document.getElementById('s_tare').value) || 0;
+  let net = Math.max(0, gross - tare);
+
+  // Sacks deduction
+  let deduction = 0;
+  const pack = document.getElementById('s_packaging');
+  const grainType = document.getElementById('s_grain_type');
+  const opType = document.getElementById('s_op_type');
+
+  if (pack && pack.value === 'sacks' && grainType && grainType.value === 'محلي' && opType && opType.value === 'وارد') {
+    const sacksCount = parseInt(document.getElementById('s_sacks').value) || 0;
+    deduction = Math.round(sacksCount * 0.125);
+    net = Math.max(0, net - deduction);
+  }
+
+  document.getElementById('lbl_gross').textContent = gross.toLocaleString('ar-EG') + ' كجم';
+  document.getElementById('lbl_tare').textContent = tare.toLocaleString('ar-EG') + ' كجم';
+  
+  const dedRow = document.getElementById('row_deduction');
+  if (dedRow) {
+    if (deduction > 0) {
+      dedRow.style.display = 'flex';
+      document.getElementById('lbl_deduction').textContent = deduction.toLocaleString('ar-EG') + ' كجم';
+    } else {
+      dedRow.style.display = 'none';
+    }
+  }
+  document.getElementById('lbl_net').textContent = net.toLocaleString('ar-EG') + ' كجم';
+  return net;
+}
+
+function resetForm() {
+  initForm();
+}
+
+function getTickets() {
+  return JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+}
+
+function getLiveCellType(cellNum) {
+  let latestDate = null;
+  let latestData = null;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('DAILY_REPORT_' + user.silo_id + '_')) {
+       const dateStr = key.replace('DAILY_REPORT_' + user.silo_id + '_', '');
+       if (!latestDate || dateStr > latestDate) {
+         latestDate = dateStr;
+         latestData = JSON.parse(localStorage.getItem(key));
+       }
+    }
+  }
+
+  let type = 'فارغة';
+  let balance = 0;
+  if (latestData && latestData.cells) {
+    const c = latestData.cells[cellNum - 1];
+    if (c) {
+      type = c.type || 'فارغة';
+      balance = c.closing || 0;
+    }
+  }
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  if (latestDate !== todayStr) {
+    const tickets = getTickets().filter(t => t.silo_id === user.silo_id && t.cell == cellNum && t.dateStr === todayStr).reverse();
+    for (const t of tickets) {
+      let net = (t.net || 0) / 1000;
+      if (t.opType === 'وارد') {
+        balance += net;
+        if (type === 'فارغة' || balance === net) type = t.grainType;
+      } else if (t.opType === 'صرف') {
+        balance -= net;
+        if (balance <= 0) { balance = 0; type = 'فارغة'; }
+      }
+    }
+  }
+
+  if (balance <= 0) return 'فارغة';
+  return type;
+}
+
+function checkCellContent() {
+  const cell = document.getElementById('s_cell').value;
+  const label = document.getElementById('cell_status_label');
+  if (!cell) {
+    if (label) label.innerHTML = '';
+    return;
+  }
+  const type = getLiveCellType(cell);
+  if (type === 'فارغة') {
+    label.innerHTML = `<span style="color:#a5d6a7"><i class="fa-solid fa-check"></i> الخلية فارغة (متاحة)</span>`;
+  } else if (type === 'محلي') {
+    label.innerHTML = `<span style="color:#fde047"><i class="fa-solid fa-wheat-awn"></i> محتوى الخلية الحالي: محلي</span>`;
+  } else if (type === 'مستورد') {
+    label.innerHTML = `<span style="color:#60a5fa"><i class="fa-solid fa-ship"></i> محتوى الخلية الحالي: مستورد</span>`;
+  }
+}
+
+function validateFormCommon() {
+  const plate = document.getElementById('s_plate').value.trim();
+  const driver = document.getElementById('s_driver').value.trim();
+  const opType = document.getElementById('s_op_type').value;
+  const grainType = document.getElementById('s_grain_type').value;
+  const cell = document.getElementById('s_cell').value;
+  
+  if (!plate || !driver) return 'يرجى إدخال رقم السيارة واسم السائق';
+  if (!cell) return 'يرجى اختيار رقم الخلية';
+  
+  if (opType === 'وارد' && grainType === 'محلي') {
+    if (!document.getElementById('s_supplier_name').value.trim() || !document.getElementById('s_supplier_code').value.trim())
+      return 'يرجى إدخال اسم المورد وكود المورد';
+  }
+
+  if (opType === 'صرف') {
+    if (!document.getElementById('s_destination').value.trim()) {
+      return 'يرجى إدخال جهة الصرف / المطحن';
+    }
+    const orderNo = document.getElementById('s_order_no') ? document.getElementById('s_order_no').value.trim() : '';
+    if (!orderNo) return 'يرجى إدخال رقم إذن الصرف';
+    
+    // Check expiry
+    const expiry = document.getElementById('s_order_expiry') ? document.getElementById('s_order_expiry').value : '';
+    if (expiry) {
+      const today = new Date().toISOString().split('T')[0];
+      if (today > expiry) return 'إذن الصرف منتهي الصلاحية والتصريح لاغي.';
+    }
+  }
+
+  if (cell && opType === 'وارد') {
+    const liveType = getLiveCellType(cell);
+    if (liveType !== 'فارغة' && liveType !== grainType) {
+      return `يمنع الخلط! الخلية رقم ${cell} تحتوي حالياً على قمح (${liveType}). لا يمكن إضافة قمح (${grainType}) إليها.`;
+    }
+  }
+
+  return null;
+}
+
+function saveFirstWeight() {
+  const err = validateFormCommon();
+  if (err) { showToast(err, 'error'); return; }
+
+  const opType = document.getElementById('s_op_type').value;
+  const gross = parseFloat(document.getElementById('s_gross').value) || 0;
+  const tare = parseFloat(document.getElementById('s_tare').value) || 0;
+
+  if (opType === 'وارد' && gross === 0) { showToast('يرجى التقاط الوزن القائم للوارد', 'error'); return; }
+  if (opType === 'صرف' && tare === 0) { showToast('يرجى التقاط الوزن الفارغ للمنصرف', 'error'); return; }
+  
+  if (opType === 'صرف') {
+    if(typeof saveOrderData === 'function') saveOrderData();
+  }
+
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const localIsoDate = `${yyyy}-${mm}-${dd}`;
+
+  let deduction = 0;
+  const pack = document.getElementById('s_packaging');
+  if (pack && pack.value === 'sacks') {
+    deduction = Math.round((parseInt(document.getElementById('s_sacks').value) || 0) * 0.125);
+  }
+
+  const newTicket = {
+    id: currentTicketId,
+    timestamp: new Date().toLocaleString('ar-EG'),
+    dateStr: localIsoDate,
+    silo_id: user.silo_id,
+    status: 'pending',
+    plate: document.getElementById('s_plate').value.trim(),
+    driver: document.getElementById('s_driver').value.trim(),
+    opType,
+    grainType: document.getElementById('s_grain_type').value,
+    supplierName: document.getElementById('s_supplier_name').value.trim(),
+    supplierCode: document.getElementById('s_supplier_code').value.trim(),
+    grade: document.getElementById('s_grade').value,
+    wheatType: document.getElementById('s_wheat_type').value,
+    destination: document.getElementById('s_destination').value.trim(),
+    orderNo: document.getElementById('s_order_no') ? document.getElementById('s_order_no').value.trim() : '',
+    cell: document.getElementById('s_cell').value,
+    packaging: pack ? pack.value : 'bulk',
+    sacksCount: parseInt(document.getElementById('s_sacks').value) || 0,
+    gross,
+    tare,
+    net: 0,
+    deduction
+  };
+
+  const tickets = getTickets();
+  tickets.unshift(newTicket);
+  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+
+  if (newTicket.supplierCode && newTicket.supplierName) {
+    saveSupplier(newTicket.supplierCode, newTicket.supplierName);
+  }
+
+  printSlip(newTicket, true);
+  renderTable();
+  initForm(true); 
+  showToast('تم حفظ الوزنة الأولى بنجاح', 'success');
+}
+
+function loadPendingTicket(id) {
+  const tickets = getTickets();
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  
+  scaleMode = 'second';
+  pendingTicketId = t.id;
+  
+  document.getElementById('ticketIdDisplay').textContent = t.id;
+  document.getElementById('s_plate').value = t.plate;
+  document.getElementById('s_driver').value = t.driver;
+  document.getElementById('s_op_type').value = t.opType;
+  document.getElementById('s_grain_type').value = t.grainType;
+  document.getElementById('s_cell').value = t.cell;
+  
+  if (t.supplierName) document.getElementById('s_supplier_name').value = t.supplierName;
+  if (t.supplierCode) document.getElementById('s_supplier_code').value = t.supplierCode;
+  if (t.grade) document.getElementById('s_grade').value = t.grade;
+  if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
+  if (t.destination) document.getElementById('s_destination').value = t.destination;
+  if (t.packaging) document.getElementById('s_packaging').value = t.packaging;
+  if (t.sacksCount !== undefined) document.getElementById('s_sacks').value = t.sacksCount;
+  if (t.orderNo && document.getElementById('s_order_no')) {
+    document.getElementById('s_order_no').value = t.orderNo;
+    loadOrderData();
+  }
+  
+  document.getElementById('s_gross').value = t.gross || '';
+  document.getElementById('s_tare').value = t.tare || '';
+  
+  toggleDynamicFields();
+  calcNet();
+  renderActionButtons();
+  
+  ['s_plate', 's_driver', 's_op_type', 's_grain_type', 's_cell', 's_order_no', 's_order_qty', 's_order_bonus', 's_order_expiry', 's_packaging', 's_sacks'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (el) el.disabled = true;
+  });
+  
+  showToast('تم استدعاء بيانات السيارة لإكمال الوزنة الثانية', 'info');
+}
+
+function cancelSecondWeight() {
+  initForm();
+}
+
+function saveSecondWeight() {
+  const opType = document.getElementById('s_op_type').value;
+  const gross = parseFloat(document.getElementById('s_gross').value) || 0;
+  const tare = parseFloat(document.getElementById('s_tare').value) || 0;
+  const net = calcNet();
+
+  if (opType === 'صرف') {
+    const no = document.getElementById('s_order_no') ? document.getElementById('s_order_no').value.trim() : '';
+    if (no) {
+      const remaining = calcOrderBalance();
+      if (document.getElementById('order_error_msg') && document.getElementById('order_error_msg').style.display === 'block' && remaining === 0) {
+        showToast('خطأ: إذن الصرف منتهي الصلاحية والتصريح لاغي.', 'error');
+        return;
+      }
+      if (net > remaining) {
+        showToast(`خطأ: الوزن الصافي (${net}) يتخطى الرصيد المتاح لإذن الصرف (${remaining})`, 'error');
+        return;
+      }
+    }
+  }
+
+  if (opType === 'وارد' && tare === 0) { showToast('يرجى التقاط الوزن الفارغ', 'error'); return; }
+  if (opType === 'صرف' && gross === 0) { showToast('يرجى التقاط الوزن القائم', 'error'); return; }
+  if (net <= 0) { showToast('يجب أن يكون الوزن الصافي أكبر من صفر', 'error'); return; }
+
+  const tickets = getTickets();
+  const idx = tickets.findIndex(x => x.id === pendingTicketId);
+  if (idx === -1) return;
+
+  let deduction = 0;
+  const pack = document.getElementById('s_packaging');
+  if (pack && pack.value === 'sacks') {
+    deduction = Math.round((parseInt(document.getElementById('s_sacks').value) || 0) * 0.125);
+  }
+
+  tickets[idx].gross = gross;
+  tickets[idx].tare = tare;
+  tickets[idx].net = net;
+  tickets[idx].deduction = deduction;
+  tickets[idx].status = 'completed';
+  tickets[idx].timestamp2 = new Date().toLocaleString('ar-EG');
+
+  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+
+  printSlip(tickets[idx], false);
+  renderTable();
+  initForm(true);
+  showToast('تم اكتمال التذكرة وترحيلها بنجاح!', 'success');
+}
+
+function printSlip(t, isFirst) {
+  const typeText = t.opType === 'وارد' ? 'استلام (وارد)' : 'شحن (صرف)';
+  const dedHtml = t.deduction > 0 ? `<div class="net" style="color:#d32f2f; font-size:1.1rem;">خصم التعبئة (أجولة): <b>${t.deduction.toLocaleString('ar-EG')}</b> كجم</div>` : '';
+  const weightText = isFirst 
+    ? (t.opType === 'وارد' ? `<div>الوزن القائم: <b>${t.gross.toLocaleString('ar-EG')}</b> كجم</div>` : `<div>الوزن الفارغ: <b>${t.tare.toLocaleString('ar-EG')}</b> كجم</div>`)
+    : `<div>الوزن القائم: <b>${t.gross.toLocaleString('ar-EG')}</b> كجم</div>
+       <div>الوزن الفارغ: <b>${t.tare.toLocaleString('ar-EG')}</b> كجم</div>
+       ${dedHtml}
+       <div class="net">الوزن الصافي: <b>${t.net.toLocaleString('ar-EG')}</b> كجم</div>`;
+
+  const safeName = user.name.includes('صومعة') ? user.name : 'صومعة ' + user.name;
+
+  let detailsHtml = '';
+  if (t.opType === 'وارد') {
+    if (t.grainType === 'مستورد') {
+      detailsHtml += `<div class="slip-row"><span>المورد:</span> <strong>${t.supplierName || 'مستورد'}</strong></div>`;
+      detailsHtml += `<div class="slip-row"><span>نوع القمح:</span> <strong>${t.wheatType || ''}</strong></div>`;
+    } else {
+      detailsHtml += `<div class="slip-row"><span>اسم المورد:</span> <strong>${t.supplierName || ''}</strong></div>`;
+      detailsHtml += `<div class="slip-row"><span>درجة النظافة:</span> <strong>${t.grade || ''} قيراط</strong></div>`;
+    }
+  } else {
+    detailsHtml += `<div class="slip-row"><span>جهة الصرف:</span> <strong>${t.destination || ''}</strong></div>`;
+    if (t.orderNo) detailsHtml += `<div class="slip-row"><span>إذن الصرف:</span> <strong>${t.orderNo}</strong></div>`;
+  }
+
+  const html = `
+    <div class="slip-container">
+      <div class="slip-header">
+        <img src="../assets/logo.png" class="slip-logo">
+        <div class="slip-header-text">
+          <div class="slip-title">${safeName}</div>
+          <div class="slip-subtitle">تذكرة ${typeText}</div>
+          <div style="font-size:1.2rem; margin-top:8px; color:#555;">${isFirst ? 'الوزنة الأولى (مبدئية)' : 'الوزنة النهائية (مكتملة)'}</div>
+        </div>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; margin-bottom: 25px;">
+        <div style="font-size:1.5rem">رقم التذكرة: <strong>${t.id}</strong></div>
+        <div style="font-size:1.3rem; color:#444;">${isFirst ? t.timestamp : t.timestamp2}</div>
+      </div>
+
+      <div class="slip-row"><span>رقم السيارة:</span> <strong>${t.plate}</strong></div>
+      <div class="slip-row"><span>اسم السائق:</span> <strong>${t.driver}</strong></div>
+      <div class="slip-row"><span>الصنف:</span> <strong>قمح ${t.grainType}</strong></div>
+      ${detailsHtml}
+      <div class="slip-row"><span>رقم الخلية:</span> <strong>${t.cell || '---'}</strong></div>
+
+      <div class="slip-weights">
+        ${weightText}
+      </div>
+
+      <div class="slip-footer">
+        <div class="slip-signature">توقيع السائق<br><br>..........................</div>
+        <div class="slip-signature">توقيع الوزان<br><br>..........................</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('printSlip').innerHTML = html;
+  
+  const printImg = document.querySelector('#printSlip img.slip-logo');
+  if (printImg && !printImg.complete) {
+    printImg.onload = () => window.print();
+    printImg.onerror = () => window.print(); // اطبع في كل الأحوال
+  } else {
+    window.print();
+  }
+}
+
+function deleteTicket(id) {
+  if (!confirm('هل أنت متأكد من مسح هذه الكارتة (الوزنة) بشكل نهائي؟')) return;
+  let tickets = getTickets();
+  tickets = tickets.filter(t => t.id !== id);
+  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  
+  // If the deleted ticket is currently being weighed, reset the form
+  if (scaleMode === 'second' && pendingTicketId === id) {
+    initForm();
+  }
+  
+  renderTable();
+  if (typeof calcOrderBalance === 'function') calcOrderBalance();
+  showToast('تم مسح الكارتة بنجاح', 'info');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('ticketsBody');
+  tbody.innerHTML = '';
+  let tickets = getTickets();
+  
+  const filterDate = document.getElementById('filter_date');
+  if (filterDate && filterDate.value) {
+    tickets = tickets.filter(t => t.dateStr === filterDate.value);
+  }
+
+  if (tickets.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px;">لا توجد كارتات مسجلة في هذا التاريخ</td></tr>';
+    return;
+  }
+
+  tickets.forEach(t => {
+    const statusBadge = t.status === 'pending'
+      ? `<button class="btn btn-warning btn-sm" onclick="loadPendingTicket('${t.id}')"><i class="fa-solid fa-truck-moving"></i> استكمال الوزنة</button>
+         <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح"><i class="fa-solid fa-trash"></i></button>`
+      : `<span class="badge badge-success"><i class="fa-solid fa-check"></i> مكتملة</span>
+         <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح" style="margin-right:5px;"><i class="fa-solid fa-trash"></i></button>`;
+
+    tbody.innerHTML += `
+      <tr style="${t.status === 'pending' ? 'background:rgba(255,193,7,0.1)' : ''}">
+        <td class="fw-bold text-info">${t.id}</td>
+        <td style="font-size:0.85rem">${t.timestamp2 || t.timestamp}</td>
+        <td class="fw-bold">${t.plate}</td>
+        <td>${t.driver}</td>
+        <td>${t.grainType === 'مستورد' ? t.wheatType || 'مستورد' : (t.grade ? t.grade + ' قيراط' : 'محلي')}</td>
+        <td class="${t.gross ? 'text-primary' : 'text-muted'}">${t.gross ? t.gross.toLocaleString('en-US') : '-'}</td>
+        <td class="${t.tare ? 'text-danger' : 'text-muted'}">${t.tare ? t.tare.toLocaleString('en-US') : '-'}</td>
+        <td class="fw-bold text-success">${t.net ? t.net.toLocaleString('en-US') : '-'}</td>
+        <td>${statusBadge}</td>
+      </tr>
+    `;
+  });
+}
+
+initForm();
+
+// Set default filter date to today
+const _now = new Date();
+const _localIsoDate = `${_now.getFullYear()}-${String(_now.getMonth() + 1).padStart(2, '0')}-${String(_now.getDate()).padStart(2, '0')}`;
+const fd = document.getElementById('filter_date');
+if(fd) fd.value = _localIsoDate;
+
+renderTable();
+</script>
+
+<datalist id="supplier_names_list"></datalist>
+<datalist id="supplier_codes_list"></datalist>
+
+<script>
+// --- Supplier Dictionary ---
+let suppliersDict = JSON.parse(localStorage.getItem('SUPPLIERS_DICT') || '{}');
+
+function saveSupplier(code, name) {
+  if (!code || !name) return;
+  suppliersDict[code] = name;
+  localStorage.setItem('SUPPLIERS_DICT', JSON.stringify(suppliersDict));
+  renderSupplierLists();
+}
+
+function renderSupplierLists() {
+  const codesList = document.getElementById('supplier_codes_list');
+  const namesList = document.getElementById('supplier_names_list');
+  if (!codesList || !namesList) return;
+  codesList.innerHTML = '';
+  namesList.innerHTML = '';
+  for (const [code, name] of Object.entries(suppliersDict)) {
+    codesList.innerHTML += `<option value="${code}">`;
+    namesList.innerHTML += `<option value="${name}">`;
+  }
+}
+
+function onSupplierCodeChange() {
+  const code = document.getElementById('s_supplier_code').value.trim();
+  if (suppliersDict[code]) {
+    document.getElementById('s_supplier_name').value = suppliersDict[code];
+  }
+}
+
+function onSupplierNameChange() {
+  const name = document.getElementById('s_supplier_name').value.trim();
+  const code = Object.keys(suppliersDict).find(k => suppliersDict[k] === name);
+  if (code) {
+    document.getElementById('s_supplier_code').value = code;
+  }
+}
+
+renderSupplierLists();
+</script>
+</body>
+</html>
+

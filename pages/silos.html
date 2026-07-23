@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصوامع — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">إدارة الصوامع</div>
+        <div class="header-sub">جميع الصوامع على مستوى الجمهورية — 48 صومعة</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> طباعة
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Summary cards -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:20px" id="siloSummary"></div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box">
+          <input type="text" id="searchBox" placeholder="ابحث بالاسم أو المحافظة أو الكود..." oninput="filterSilos()">
+          <i class="fa-solid fa-search search-icon"></i>
+        </div>
+        <select class="filter-select" id="regionFilter" onchange="filterSilos()">
+          <option value="">كل المناطق</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="filterSilos()">
+          <option value="">كل الحالات</option>
+          <option value="active">نشطة</option>
+          <option value="maintenance">صيانة</option>
+          <option value="inactive">متوقفة</option>
+        </select>
+        <div id="siloCount" style="font-size:0.82rem;color:var(--text-sec);white-space:nowrap;"></div>
+      </div>
+
+      <!-- Silos Grid -->
+      <div class="silos-grid" id="silosGrid"></div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Silo Detail -->
+<div class="modal-overlay hidden" id="siloModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">تفاصيل الصومعة</div>
+      <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">إغلاق</button>
+      <a href="reception.html" class="btn btn-primary">
+        <i class="fa-solid fa-scale-balanced"></i> الاستلام والتخزين
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+Auth.require();
+buildSidebar('silos');
+initClock(document.getElementById('clockEl'));
+
+// Summary cards
+const actives = SILOS.filter(s=>s.status==='active').length;
+const maint   = SILOS.filter(s=>s.status==='maintenance').length;
+const totalStk= SILOS.reduce((a,s)=>a+s.stock,0);
+const totalCap= SILOS.reduce((a,s)=>a+s.cap,0);
+const summary = [
+  { icon:'fa-building-wheat', cls:'ic-gold',  label:'إجمالي الصوامع',   val:48, unit:'' },
+  { icon:'fa-circle-check',   cls:'ic-green', label:'صوامع نشطة',        val:actives, unit:'' },
+  { icon:'fa-tools',          cls:'ic-amber', label:'صوامع في صيانة',    val:maint, unit:'' },
+  { icon:'fa-box',            cls:'ic-blue',  label:'إجمالي المخزون',    val:Math.round(totalStk/1000), unit:'ألف طن' },
+  { icon:'fa-gauge',          cls:'ic-purple',label:'نسبة الامتلاء',      val:Math.round((totalStk/totalCap)*100), unit:'%' },
+];
+const sg = document.getElementById('siloSummary');
+summary.forEach(s => {
+  sg.innerHTML += `<div class="stat-card">
+    <div class="stat-icon ${s.cls}"><i class="fa-solid ${s.icon}"></i></div>
+    <div class="stat-body">
+      <div class="stat-value">${s.val.toLocaleString('ar-EG')}<span class="unit">${s.unit}</span></div>
+      <div class="stat-label">${s.label}</div>
+    </div></div>`;
+});
+
+// Populate region filter
+REGIONS.forEach(r => {
+  document.getElementById('regionFilter').innerHTML +=
+    `<option value="${r.id}">${r.name}</option>`;
+});
+
+function renderSilos(list) {
+  const grid = document.getElementById('silosGrid');
+  document.getElementById('siloCount').textContent = `عرض ${list.length} من 48 صومعة`;
+  grid.innerHTML = '';
+  if (!list.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">
+      <i class="fa-solid fa-magnifying-glass" style="font-size:2rem;margin-bottom:12px;display:block"></i>
+      لا توجد صوامع تطابق البحث</div>`;
+    return;
+  }
+  list.forEach(s => {
+    const p = pct(s.stock, s.cap);
+    const col = pctColor(p);
+    const region = REGIONS.find(r=>r.id===s.rid);
+    grid.innerHTML += `
+      <div class="silo-card ${s.status}" onclick="showSilo(${s.id})">
+        <div class="silo-card-header">
+          <div>
+            <div class="silo-code">${s.code}</div>
+            <div class="silo-name">${s.name}</div>
+            <div class="silo-gov"><i class="fa-solid fa-location-dot" style="font-size:0.7rem"></i> ${s.gov}</div>
+          </div>
+          ${statusBadge(s.status)}
+        </div>
+        <div style="font-size:0.72rem;color:${region?.color||'var(--text-sec)'};margin-bottom:10px">
+          <i class="fa-solid fa-circle" style="font-size:0.5rem"></i> ${region?.name||''}
+        </div>
+        <div class="silo-stock">
+          <div class="stock-numbers">
+            <span class="stock-current">${formatNum(s.stock)} طن</span>
+            <span class="stock-pct" style="color:${col==='red'?'var(--danger)':col==='amber'?'var(--warning)':'var(--success)'}">${p}%</span>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-bar ${col}" data-width="${p}" style="width:${p}%"></div>
+          </div>
+          <div class="stock-cap" style="margin-top:5px;font-size:0.71rem">من ${formatNum(s.cap)} طن طاقة كاملة</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;font-size:0.72rem;color:var(--text-sec)">
+          <span title="قمح"><i class="fa-solid fa-wheat-awn text-gold"></i> ${formatNum(s.wheat)}</span>
+          <span title="ذرة"><i class="fa-solid fa-seedling text-success"></i> ${formatNum(s.corn)}</span>
+          <span title="شعير"><i class="fa-solid fa-leaf text-info"></i> ${formatNum(s.barley)}</span>
+        </div>
+      </div>`;
+  });
+}
+
+function filterSilos() {
+  const q   = document.getElementById('searchBox').value.toLowerCase();
+  const rid = +document.getElementById('regionFilter').value;
+  const st  = document.getElementById('statusFilter').value;
+  renderSilos(SILOS.filter(s =>
+    (!q  || s.name.includes(q) || s.gov.includes(q) || s.code.toLowerCase().includes(q)) &&
+    (!rid|| s.rid === rid) &&
+    (!st || s.status === st)
+  ));
+}
+
+renderSilos(SILOS);
+
+// Modal
+function showSilo(id) {
+  const s = SILOS.find(x=>x.id===id);
+  const region = REGIONS.find(r=>r.id===s.rid);
+  const p = pct(s.stock, s.cap);
+  const col = pctColor(p);
+  const recentRcp = RECEIPTS.filter(r=>r.silo_id===id).slice(0,3);
+  const openMaint = MAINTENANCE.filter(m=>m.silo_id===id && m.status!=='done').length;
+  const openSec   = SECURITY.filter(m=>m.silo_id===id && m.status!=='resolved').length;
+
+  document.getElementById('modalTitle').textContent = s.name;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:var(--bg-hover);border-radius:8px;padding:12px">
+        <div style="font-size:0.75rem;color:var(--text-sec);margin-bottom:4px">الكود</div>
+        <div style="font-weight:700">${s.code}</div>
+      </div>
+      <div style="background:var(--bg-hover);border-radius:8px;padding:12px">
+        <div style="font-size:0.75rem;color:var(--text-sec);margin-bottom:4px">المحافظة</div>
+        <div style="font-weight:700">${s.gov}</div>
+      </div>
+      <div style="background:var(--bg-hover);border-radius:8px;padding:12px">
+        <div style="font-size:0.75rem;color:var(--text-sec);margin-bottom:4px">المنطقة</div>
+        <div style="font-weight:700;color:${region?.color}">${region?.name}</div>
+      </div>
+      <div style="background:var(--bg-hover);border-radius:8px;padding:12px">
+        <div style="font-size:0.75rem;color:var(--text-sec);margin-bottom:4px">الحالة</div>
+        ${statusBadge(s.status)}
+      </div>
+    </div>
+
+    <div style="background:var(--bg-hover);border-radius:8px;padding:16px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:0.85rem;font-weight:700">المخزون الحالي</span>
+        <span style="font-size:1.2rem;font-weight:900;color:${col==='red'?'var(--danger)':col==='amber'?'var(--warning)':'var(--success)'}">${p}%</span>
+      </div>
+      <div class="progress-wrap" style="height:10px">
+        <div class="progress-bar ${col}" style="width:${p}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.78rem;color:var(--text-sec)">
+        <span>${formatNum(s.stock)} طن مخزن</span>
+        <span>الطاقة: ${formatNum(s.cap)} طن</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:12px;text-align:center">
+        <div style="color:var(--gold);font-size:1.3rem;font-weight:900">${formatNum(s.wheat)}</div>
+        <div style="font-size:0.72rem;color:var(--text-sec)">قمح (طن)</div>
+      </div>
+      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:12px;text-align:center">
+        <div style="color:var(--success);font-size:1.3rem;font-weight:900">${formatNum(s.corn)}</div>
+        <div style="font-size:0.72rem;color:var(--text-sec)">ذرة (طن)</div>
+      </div>
+      <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:8px;padding:12px;text-align:center">
+        <div style="color:var(--info);font-size:1.3rem;font-weight:900">${formatNum(s.barley)}</div>
+        <div style="font-size:0.72rem;color:var(--text-sec)">شعير (طن)</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:${openMaint>0?'rgba(245,158,11,0.08)':'rgba(34,197,94,0.08)'};border:1px solid ${openMaint>0?'rgba(245,158,11,0.25)':'rgba(34,197,94,0.25)'};border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.5rem;font-weight:900;color:${openMaint>0?'var(--warning)':'var(--success)'}">${openMaint}</div>
+        <div style="font-size:0.75rem;color:var(--text-sec)">طلبات صيانة مفتوحة</div>
+      </div>
+      <div style="background:${openSec>0?'rgba(239,68,68,0.08)':'rgba(34,197,94,0.08)'};border:1px solid ${openSec>0?'rgba(239,68,68,0.25)':'rgba(34,197,94,0.25)'};border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.5rem;font-weight:900;color:${openSec>0?'var(--danger)':'var(--success)'}">${openSec}</div>
+        <div style="font-size:0.75rem;color:var(--text-sec)">حوادث أمنية مفتوحة</div>
+      </div>
+    </div>
+
+    ${recentRcp.length ? `
+    <div>
+      <div style="font-size:0.82rem;font-weight:700;margin-bottom:8px;color:var(--text-sec)">آخر عمليات الاستلام:</div>
+      ${recentRcp.map(r=>`
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg-hover);border-radius:6px;margin-bottom:6px;font-size:0.78rem">
+          <span class="fw-bold text-info">${r.id}</span>
+          <span>${r.grain} — ${formatNum(r.net)} طن</span>
+          <span class="badge ${r.quality==='A'?'badge-success':'badge-warning'}">${r.quality}</span>
+          <span class="text-sec">${r.date}</span>
+        </div>`).join('')}
+    </div>` : `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.82rem">لا توجد عمليات حديثة</div>`}
+  `;
+  document.getElementById('siloModal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('siloModal').classList.add('hidden');
+}
+</script>
+</body>
+</html>
+

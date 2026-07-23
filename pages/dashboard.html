@@ -1,0 +1,416 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم الرئيسية — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <!-- Header -->
+    <header class="top-header">
+      <div>
+        <div class="header-title" id="pageTitle">لوحة التحكم الرئيسية</div>
+        <div class="header-sub" id="pageDate"></div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <div class="btn-icon" title="تنبيهات" onclick="scrollToAlerts()">
+          <i class="fa-solid fa-bell"></i>
+          <span class="badge" id="alertBadge">4</span>
+        </div>
+        <div class="btn-icon" title="طباعة" onclick="window.print()">
+          <i class="fa-solid fa-print"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+
+      <!-- Stats Cards -->
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <!-- Charts Row -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">حركة الاستلام والصرف الأسبوعية</div>
+              <div class="card-sub">بالطن — آخر 7 أيام</div>
+            </div>
+            <select class="filter-select" style="width:auto">
+              <option>هذا الأسبوع</option>
+              <option>الشهر الحالي</option>
+            </select>
+          </div>
+          <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">توزيع القمح (محلي + مستورد)</div>
+              <div class="card-sub">المخزون الكلي — حسب الدرجة والمنشأ</div>
+            </div>
+          </div>
+          <div style="position: relative; height: 280px; width: 100%; display: flex; justify-content: center;">
+            <canvas id="grainChart"></canvas>
+          </div>
+          <!-- ملخص سريع محلي / مستورد -->
+          <div id="wheatSummaryBar" style="display:flex;gap:10px;margin:10px 0;padding:0 8px"></div>
+          <div id="grainLegend" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
+        </div>
+      </div>
+
+      <!-- Regions Row -->
+      <div class="chart-card mb-24">
+        <div class="card-header">
+          <div>
+            <div class="card-title">المخزون حسب المنطقة الجغرافية</div>
+            <div class="card-sub">إجمالي المخزون بالطن في كل منطقة</div>
+          </div>
+        </div>
+        <div class="regions-grid" id="regionsGrid" style="margin-bottom:16px"></div>
+        <div style="position: relative; height: 250px; width: 100%;">
+          <canvas id="regionChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Two columns: Alerts + Recent Ops -->
+      <div style="display:grid; grid-template-columns:1fr 1.6fr; gap:16px; margin-bottom:24px;">
+
+        <!-- Alerts -->
+        <div class="chart-card" id="alertsSection">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><i class="fa-solid fa-triangle-exclamation text-warning"></i> التنبيهات العاجلة</div>
+              <div class="card-sub">تحتاج إلى متابعة فورية</div>
+            </div>
+          </div>
+          <div class="alert-list" id="alertsList"></div>
+        </div>
+
+        <!-- Recent Operations -->
+        <div class="table-card" style="margin:0">
+          <div class="table-header">
+            <div>
+              <div class="card-title">آخر عمليات الاستلام والصرف</div>
+              <div class="card-sub">على مستوى جميع الصوامع</div>
+            </div>
+            <a href="reception.html" class="btn btn-outline btn-sm">عرض الكل</a>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>رقم العملية</th>
+                  <th>الصومعة</th>
+                  <th>النوع</th>
+                  <th>الحبوب</th>
+                  <th>الوزن (طن)</th>
+                  <th>الجودة</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="recentOpsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maintenance Alerts -->
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-wrench text-warning"></i> طلبات الصيانة المعلقة والحرجة</div>
+          </div>
+          <a href="maintenance.html" class="btn btn-outline btn-sm">إدارة الصيانة</a>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>رقم الطلب</th>
+                <th>الصومعة</th>
+                <th>المعدة</th>
+                <th>الأولوية</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+              </tr>
+            </thead>
+            <tbody id="maintBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+// ── Init ────────────────────────────────────────────────────
+const user = Auth.require();
+buildSidebar('dashboard');
+document.getElementById('pageDate').textContent = todayDate();
+initClock(document.getElementById('clockEl'));
+
+const isGeneral = user.role === 'general_admin';
+if (!isGeneral) {
+  document.getElementById('pageTitle').textContent = `لوحة تحكم — ${user.name}`;
+} else {
+  document.getElementById('pageTitle').textContent = 'لوحة التحكم الرئيسية (الإدارة العامة)';
+}
+
+// ── Data Filtering ──────────────────────────────────────────
+const filteredSilos = isGeneral ? SILOS : SILOS.filter(s => s.id === user.silo_id);
+const filteredReceipts = isGeneral ? RECEIPTS : RECEIPTS.filter(r => r.silo_id === user.silo_id);
+const filteredSec = isGeneral ? SECURITY : SECURITY.filter(s => s.silo_id === user.silo_id);
+const filteredMaint = isGeneral ? MAINTENANCE : MAINTENANCE.filter(m => m.silo_id === user.silo_id);
+
+const openAlerts = filteredSec.filter(s => s.status !== 'resolved');
+const openMaint = filteredMaint.filter(m => m.status === 'in_progress' || m.status === 'pending');
+
+document.getElementById('alertBadge').textContent = openAlerts.length;
+
+// ── Stats Cards ─────────────────────────────────────────────
+let tStock = 0, tCap = 0, tRec = 0, tDisp = 0;
+if (isGeneral) {
+  tStock = DAILY_STATS.total_stock;
+  tCap = DAILY_STATS.total_capacity;
+  tRec = DAILY_STATS.today_received;
+  tDisp = DAILY_STATS.today_dispatched;
+} else {
+  const mySilo = filteredSilos[0];
+  tStock = mySilo.stock; // بالطن
+  tCap = mySilo.cap;     // بالطن
+  // r.net بالكيلوجرام، للتحويل إلى طن نقسم على 1000
+  tRec = filteredReceipts.filter(r => r.type === 'استلام').reduce((acc, r) => acc + (r.net / 1000), 0);
+  tDisp = filteredReceipts.filter(r => r.type === 'صرف').reduce((acc, r) => acc + (r.net / 1000), 0);
+}
+
+// تحويل إحصائيات الإدارة العامة من كجم إلى طن إن لزم
+if (isGeneral) {
+  tRec = tRec / 1000;
+  tDisp = tDisp / 1000;
+  DAILY_STATS.monthly_received = DAILY_STATS.monthly_received / 1000;
+}
+
+const stockPct = Math.round((tStock / tCap) * 100) || 0;
+const statsData = [
+  { icon:'fa-wheat-awn',    cls:'ic-gold',   label:'إجمالي المخزون الحالي',     val:Math.round(tStock),     unit:'طن', change:'', dir:'up' },
+  { icon:'fa-building',     cls:'ic-blue',   label: isGeneral ? 'الصوامع النشطة' : 'سعة الصومعة', val: isGeneral ? DAILY_STATS.active_silos : Math.round(tCap), unit: isGeneral ? '' : 'طن', change:'', dir:'up' },
+  { icon:'fa-arrow-down',   cls:'ic-green',  label:'الاستلام اليومي',            val:Math.round(tRec),  unit:'طن', change:'', dir:'up' },
+  { icon:'fa-arrow-up',     cls:'ic-purple', label:'الصرف اليومي',               val:Math.round(tDisp), unit:'طن', change:'', dir:'down' },
+  { icon:'fa-gauge',        cls:'ic-amber',  label:'نسبة الامتلاء',             val:stockPct, unit:'%',  change:'', dir:'up' },
+  { icon:'fa-triangle-exclamation', cls:'ic-red', label:'تنبيهات مفتوحة',      val:openAlerts.length, unit:'', change:'', dir:'down' },
+  { icon:'fa-wrench',       cls:'ic-cyan',   label:'صيانة جارية',               val:openMaint.length, unit:'', change:'', dir:'down' },
+  { icon:'fa-chart-line',   cls:'ic-gold',   label:'الاستلام الشهري (تقريبي)',  val: isGeneral ? Math.round(DAILY_STATS.monthly_received) : Math.round(tRec*10), unit:'طن', change:'', dir:'up' },
+];
+
+const grid = document.getElementById('statsGrid');
+statsData.forEach((s,i) => {
+  const card = document.createElement('div');
+  card.className = 'stat-card';
+  card.style.animationDelay = `${i * 0.07}s`;
+  card.innerHTML = `
+    <div class="stat-icon ${s.cls}"><i class="fa-solid ${s.icon}"></i></div>
+    <div class="stat-body">
+      <div class="stat-value"><span class="count-el" data-val="${s.val}">0</span><span class="unit">${s.unit}</span></div>
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-change ${s.dir}">
+        <i class="fa-solid ${s.dir === 'up' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i>
+        ${s.change}
+      </div>
+    </div>`;
+  grid.appendChild(card);
+});
+
+// Animate counts
+document.querySelectorAll('.count-el').forEach(el => {
+  animateCount(el, +el.dataset.val);
+});
+
+// ── Weekly Chart ─────────────────────────────────────────────
+new Chart(document.getElementById('weeklyChart'), {
+  type: 'bar',
+  data: {
+    labels: WEEKLY_CHART.labels,
+    datasets: [
+      { label:'استلام (طن)', data: WEEKLY_CHART.received,   backgroundColor:'rgba(34,197,94,0.7)',  borderRadius:6 },
+      { label:'صرف (طن)',    data: WEEKLY_CHART.dispatched,  backgroundColor:'rgba(239,68,68,0.7)',   borderRadius:6 },
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{ labels:{ color:'#7a8ba8', font:{family:'Cairo',size:12} } } },
+    scales: {
+      x: { grid:{color:'#1a2d50'}, ticks:{color:'#7a8ba8', font:{family:'Cairo'}} },
+      y: { grid:{color:'#1a2d50'}, ticks:{color:'#7a8ba8', font:{family:'Cairo'},
+           callback: v => (v/1000).toFixed(0)+'K طن'} }
+    }
+  }
+});
+
+// ── Grain Donut Chart ─────────────────────────────────────────
+new Chart(document.getElementById('grainChart'), {
+  type: 'doughnut',
+  data: {
+    labels: GRAIN_DIST.labels,
+    datasets: [{ data: GRAIN_DIST.data, backgroundColor: GRAIN_DIST.colors, borderWidth:0, hoverOffset:8 }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false, cutout:'60%',
+    plugins: { legend:{display:false}, tooltip:{
+      callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString('en-US')} طن` }
+    }}
+  }
+});
+
+// ملخص محلي / مستورد
+if (typeof WHEAT_SUMMARY !== 'undefined') {
+  const wb = document.getElementById('wheatSummaryBar');
+  const totW = (WHEAT_SUMMARY.total_local + WHEAT_SUMMARY.total_imported) || 1;
+  const lPct = Math.round(WHEAT_SUMMARY.total_local / totW * 100);
+  const iPct = 100 - lPct;
+  wb.innerHTML = `
+    <div style="flex:1;background:rgba(253,224,71,0.1);border:1px solid rgba(253,224,71,0.3);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:0.7rem;color:#fde047">قمح محلي</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#fde047">${(WHEAT_SUMMARY.total_local/1000).toFixed(0)}K طن</div>
+      <div style="font-size:0.7rem;color:#aaa">${lPct}%</div>
+    </div>
+    <div style="flex:1;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:0.7rem;color:#60a5fa">قمح مستورد</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#60a5fa">${(WHEAT_SUMMARY.total_imported/1000).toFixed(0)}K طن</div>
+      <div style="font-size:0.7rem;color:#aaa">${iPct}%</div>
+    </div>
+    <div style="flex:1;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:0.7rem;color:#22c55e">ذرة</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#22c55e">${(WHEAT_SUMMARY.total_corn/1000).toFixed(0)}K طن</div>
+    </div>
+  `;
+}
+
+// Custom legend
+const leg = document.getElementById('grainLegend');
+GRAIN_DIST.labels.forEach((l,i) => {
+  if (GRAIN_DIST.data[i] === 0) return;
+  leg.innerHTML += `<div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#7a8ba8">
+    <span style="width:9px;height:9px;border-radius:50%;background:${GRAIN_DIST.colors[i]};display:inline-block;flex-shrink:0"></span>
+    ${l}: <strong style="color:#e8eaf0">${(GRAIN_DIST.data[i]/1000).toFixed(0)}K</strong>
+  </div>`;
+});
+
+// ── Region Chart ──────────────────────────────────────────────
+const regGrid = document.getElementById('regionsGrid');
+if (!isGeneral) {
+  document.getElementById('regionChart').parentElement.style.display = 'none'; // Hide region distribution for single silo
+} else {
+  REGIONS.forEach((r,i) => {
+    const silosInRegion = SILOS.filter(s => s.rid === r.id);
+    const totalCap  = silosInRegion.reduce((a,s) => a+s.cap, 0);
+    const totalStk  = silosInRegion.reduce((a,s) => a+s.stock, 0);
+    regGrid.innerHTML += `
+      <div class="region-card" style="border-color:${r.color}33">
+        <div class="region-dot" style="color:${r.color};background:${r.color}"></div>
+        <div class="region-name" style="color:${r.color}">${r.name}</div>
+        <div class="region-count" style="color:${r.color}">${silosInRegion.length} صوامع</div>
+        <div class="region-stock-val">${(totalStk/1000).toFixed(0)}K / ${(totalCap/1000).toFixed(0)}K طن</div>
+      </div>`;
+  });
+}
+
+new Chart(document.getElementById('regionChart'), {
+  type: 'bar',
+  data: {
+    labels: REGION_STOCK.labels,
+    datasets: [{ label:'المخزون (طن)', data: REGION_STOCK.data,
+      backgroundColor: REGION_STOCK.colors.map(c => c+'bb'), borderRadius:6 }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false, indexAxis:'y',
+    plugins:{ legend:{display:false} },
+    scales: {
+      x:{ grid:{color:'#1a2d50'}, ticks:{color:'#7a8ba8', font:{family:'Cairo'},
+          callback: v => (v/1000).toFixed(0)+'K'} },
+      y:{ grid:{color:'transparent'}, ticks:{color:'#e8eaf0', font:{family:'Cairo',size:12}} }
+    }
+  }
+});
+
+// ── Alerts ────────────────────────────────────────────────────
+const aList = document.getElementById('alertsList');
+if (openAlerts.length === 0) {
+  aList.innerHTML = '<div style="padding:20px;text-align:center;color:#7a8ba8">لا توجد تنبيهات عاجلة</div>';
+} else {
+  openAlerts.forEach(a => {
+    aList.innerHTML += `
+      <div class="alert-item ${a.severity}">
+        <div class="alert-icon"><i class="fa-solid fa-shield"></i></div>
+        <div>
+          <div class="alert-title">${a.type} — ${siloName(a.silo_id)}</div>
+          <div class="alert-desc">${a.desc}</div>
+          <div class="alert-time"><i class="fa-regular fa-clock"></i> ${a.date}</div>
+        </div>
+      </div>`;
+  });
+}
+
+// ── Recent Operations ─────────────────────────────────────────
+const tbody = document.getElementById('recentOpsBody');
+if (filteredReceipts.length === 0) {
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">لا توجد عمليات</td></tr>';
+} else {
+  filteredReceipts.slice(0,8).forEach(r => {
+    const qBadge = r.quality === 'A' ? 'badge-success' : r.quality === 'B' ? 'badge-warning' : 'badge-danger';
+    const tBadge = r.type === 'استلام' ? 'badge-success' : 'badge-purple';
+    tbody.innerHTML += `
+      <tr>
+        <td class="fw-bold text-info">${r.id}</td>
+        <td>${siloName(r.silo_id)}</td>
+        <td><span class="badge ${tBadge}">${r.type}</span></td>
+        <td>${r.grain}</td>
+        <td class="fw-bold">${formatNum(r.net)}</td>
+        <td><span class="badge ${qBadge}">${r.quality || '—'}</span></td>
+        <td class="text-sec">${r.date}</td>
+      </tr>`;
+  });
+}
+
+// ── Maintenance Table ─────────────────────────────────────────
+const mb = document.getElementById('maintBody');
+if (openMaint.length === 0) {
+  mb.innerHTML = '<tr><td colspan="6" style="text-align:center">لا توجد طلبات صيانة</td></tr>';
+} else {
+  openMaint.slice(0,5).forEach(m => {
+    mb.innerHTML += `
+      <tr>
+        <td class="fw-bold text-warning">${m.id}</td>
+        <td>${siloName(m.silo_id)}</td>
+        <td>${m.equip}</td>
+        <td>${severityBadge(m.priority)}</td>
+        <td>${maintenanceBadge(m.status)}</td>
+        <td class="text-sec">${m.date}</td>
+      </tr>`;
+  });
+}
+
+function scrollToAlerts() {
+  document.getElementById('alertsSection').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>
+

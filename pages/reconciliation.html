@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مطابقات المطاحن — نظام إدارة الصوامع</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .recon-header {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  .controls-grid {
+    display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;
+  }
+  .control-group {
+    display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 200px;
+  }
+  .control-group label {
+    font-weight: bold; color: var(--text-sec); font-size: 0.9rem;
+  }
+  .control-group input, .control-group select {
+    padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.1); color: var(--text-primary); font-family: inherit; font-size: 1rem;
+  }
+
+  /* Print Paper Design */
+  .paper {
+    background: #fff;
+    color: #000;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 20mm;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    font-family: 'Tajawal', Arial, sans-serif;
+    position: relative;
+  }
+  .paper-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .company-title {
+    font-size: 24pt;
+    font-weight: 900;
+    margin-bottom: 10px;
+  }
+  .greeting {
+    font-size: 16pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+  .request-text {
+    font-size: 14pt;
+    font-weight: bold;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  
+  .section-title {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 30px;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 3px solid #000;
+  }
+  .print-table th, .print-table td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+  }
+  .print-table th {
+    background: #e5e7eb;
+  }
+  .print-table .totals td {
+    background: #9ca3af;
+    font-weight: 900;
+    font-size: 14pt;
+  }
+  .print-table .sub-head th {
+    border-bottom: 2px solid #000;
+  }
+  
+  .signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    font-size: 14pt;
+    font-weight: bold;
+  }
+
+  /* Hide print elements in screen if empty, hide screen elements in print */
+  @media print {
+    body * { visibility: hidden; }
+    .paper, .paper * { visibility: visible; }
+    .paper { position: absolute; left: 0; top: 0; margin: 0; padding: 10mm; width: 100%; min-height: auto; box-shadow: none; }
+    @page { size: A4; margin: 10mm; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+
+  <main class="main-content">
+    <header class="top-header no-print">
+      <div>
+        <div class="header-title">المطابقات</div>
+        <div class="header-sub">توليد مطابقة شهرية للمطاحن (مستورد ومحلي)</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة المطابقة</button>
+        <a href="reception.html" class="btn btn-outline btn-sm">عودة <i class="fa-solid fa-arrow-left"></i></a>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="recon-header no-print">
+        <div class="controls-grid">
+          <div class="control-group">
+            <label>السيد مدير عام مطحن (الجهة):</label>
+            <input type="text" id="ctrl_company" value="مصر الوسطي الفيوم" onchange="updateHeader()">
+          </div>
+          <div class="control-group">
+            <label>الشهر:</label>
+            <input type="month" id="ctrl_month" onchange="generateReport()">
+          </div>
+          <div class="control-group">
+            <label>اسم المطحن (للتصفية في الجدول):</label>
+            <input type="text" id="ctrl_filter" placeholder="مثال: اطسا" onchange="generateReport()">
+          </div>
+          <div class="control-group">
+            <label>اسم الصومعة (مكان التخزين):</label>
+            <input type="text" id="ctrl_silo" value="صومعة طامية - الفيوم التابعة للشركة القابضة للصوامع والتخزين" onchange="updateHeader()">
+          </div>
+          <div class="control-group" style="flex:0; min-width:auto">
+            <button class="btn btn-primary" style="height:44px; padding:0 25px;" onclick="generateReport()">
+              توليد
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Print Area -->
+      <div class="paper" id="printArea" style="display:none;">
+        <div class="paper-header">
+          <div class="company-title">السيد / مدير عام مطحن <span id="out_company"></span></div>
+          <hr style="border: 1px solid #000; width: 100%; margin: 10px 0;">
+          <div class="greeting">تحية طيبه وبعد ،،،</div>
+          <div class="request-text">
+            الرجاء من سيادتكم التكرم بمطابقة الكمية المنصرفة من الأقماح المستوردة و المحلية خلال شهر <span id="out_month"></span><br>
+            من <span id="out_silo"></span>.
+          </div>
+        </div>
+
+        <div class="section-title" style="color:black">أولاً:- القمح مستورد</div>
+        <table class="print-table">
+          <thead class="sub-head">
+            <tr>
+              <th>م</th>
+              <th>اسم المطحن</th>
+              <th>اسم الباخرة</th>
+              <th>درجة النظافة</th>
+              <th>تاريخ الرحلة</th>
+              <th>نوع القمح</th>
+              <th>الكمية المنصرفة</th>
+            </tr>
+          </thead>
+          <tbody id="tb_imported">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+
+        <div class="section-title" style="color:black">ثانياً:- القمح المحلي</div>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th rowspan="2">م</th>
+              <th rowspan="2">اسم المطحن</th>
+              <th colspan="3">درجة النظافة</th>
+              <th rowspan="2">الكمية المنصرفة</th>
+            </tr>
+            <tr class="sub-head">
+              <th>23.5</th>
+              <th>23</th>
+              <th>22.5</th>
+            </tr>
+          </thead>
+          <tbody id="tb_local">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+
+        <div class="signatures">
+          <div>مدير الصومعة</div>
+          <div>إدارة الاستلام</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+try {
+  const user = Auth.require();
+  if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+  buildSidebar('reception');
+
+  // Set default month to current
+  const now = new Date();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('ctrl_month').value = currentMonthStr;
+
+  function updateHeader() {
+    document.getElementById('out_company').textContent = document.getElementById('ctrl_company').value;
+    
+    const m = document.getElementById('ctrl_month').value; // YYYY-MM
+    if(m) {
+      const d = new Date(m + '-01');
+      const monthName = d.toLocaleString('ar-EG', { month: 'long' });
+      document.getElementById('out_month').textContent = `${monthName} ${d.getFullYear()}`;
+    }
+    
+    document.getElementById('out_silo').textContent = document.getElementById('ctrl_silo').value;
+  }
+
+  function generateReport() {
+    const monthVal = document.getElementById('ctrl_month').value;
+    if(!monthVal) return showToast('الرجاء اختيار الشهر', 'error');
+
+    updateHeader();
+    document.getElementById('printArea').style.display = 'block';
+
+    const filterVal = (document.getElementById('ctrl_filter').value || '').trim().toLowerCase();
+
+    let importedData = {}; // key: "millName|shipName", value: amount
+    let localData = {};    // key: "millName", value: { d235, d230, d225, total }
+
+    // 1. Scan WEIGHBRIDGE_TICKETS for all dispatches in this month
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    
+    function parseTicketDate(ts) {
+      if (!ts) return '';
+      let d = ts.replace(/[٠-٩]/g, x => '٠١٢٣٤٥٦٧٨٩'.indexOf(x));
+      d = d.replace(/[^\d\/\-\.\s:]/g, '');
+      let m = d.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,4})/);
+      if (!m) return '';
+      let p1 = m[1], p2 = m[2], p3 = m[3];
+      if (p1.length === 4) return p1 + '-' + p2.padStart(2,'0') + '-' + p3.padStart(2,'0');
+      return p3 + '-' + p2.padStart(2,'0') + '-' + p1.padStart(2,'0');
+    }
+
+    tickets.forEach(t => {
+      if (t.silo_id !== user.silo_id || t.opType !== 'صرف' || !t.destination) return;
+      
+      let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
+      if (!tIsoDate.startsWith(monthVal)) return;
+
+      if (filterVal && !t.destination.toLowerCase().includes(filterVal)) return;
+
+      let netTons = (t.net || 0) / 1000;
+
+      if (t.grainType === 'مستورد') {
+        const sName = t.shipName || 'غير محدد';
+        const k = `${t.destination}|${sName}`;
+        importedData[k] = (importedData[k] || 0) + netTons;
+      } else if (t.grainType === 'محلي') {
+        if (!localData[t.destination]) {
+          localData[t.destination] = { d235:0, d230:0, d225:0, total:0 };
+        }
+        if (t.grade === '23.5') localData[t.destination].d235 += netTons;
+        else if (t.grade === '23') localData[t.destination].d230 += netTons;
+        else if (t.grade === '22.5') localData[t.destination].d225 += netTons;
+      }
+    });
+
+    // 2. Render Imported Table
+    const tbImp = document.getElementById('tb_imported');
+    tbImp.innerHTML = '';
+    let impTotal = 0;
+    let impIndex = 1;
+    const impKeys = Object.keys(importedData).sort();
+    
+    if (impKeys.length === 0) {
+      tbImp.innerHTML = `<tr><td colspan="7">لا توجد منصرفات مستوردة خلال هذا الشهر</td></tr>`;
+    } else {
+      impKeys.forEach(k => {
+        const [millName, shipName] = k.split('|');
+        const amount = importedData[k];
+        impTotal += amount;
+
+        // Try to fetch ship details from SHIP_MANUAL_LEDGER_
+        let grade = '', voyage = '', type = '';
+        const shipRaw = localStorage.getItem(`SHIP_MANUAL_LEDGER_${shipName}`);
+        if (shipRaw) {
+          const sd = JSON.parse(shipRaw);
+          if (sd.header) {
+            grade = sd.header.grade || '';
+            voyage = sd.header.voyage || '';
+            type = sd.header.type || '';
+          }
+        }
+
+        tbImp.innerHTML += `
+          <tr>
+            <td>${impIndex++}</td>
+            <td>${millName}</td>
+            <td>${shipName}</td>
+            <td>${grade}</td>
+            <td>${voyage}</td>
+            <td>${type}</td>
+            <td style="font-weight:bold">${Number(amount).toFixed(3)}</td>
+          </tr>
+        `;
+      });
+      
+      tbImp.innerHTML += `
+        <tr class="totals">
+          <td colspan="6" style="text-align:left; padding-left:20px;">الإجمالــــــــــــــي</td>
+          <td>${Number(impTotal).toFixed(3)}</td>
+        </tr>
+      `;
+    }
+
+    // 3. Render Local Table
+    const tbLoc = document.getElementById('tb_local');
+    tbLoc.innerHTML = '';
+    let locTotal235 = 0, locTotal230 = 0, locTotal225 = 0, locTotalAll = 0;
+    let locIndex = 1;
+    const locKeys = Object.keys(localData).sort();
+
+    if (locKeys.length === 0) {
+      tbLoc.innerHTML = `<tr><td colspan="6">لا توجد منصرفات محلية خلال هذا الشهر</td></tr>`;
+    } else {
+      locKeys.forEach(millName => {
+        const d = localData[millName];
+        const rowTot = d.d235 + d.d230 + d.d225;
+        locTotal235 += d.d235; locTotal230 += d.d230; locTotal225 += d.d225;
+        locTotalAll += rowTot;
+
+        tbLoc.innerHTML += `
+          <tr>
+            <td>${locIndex++}</td>
+            <td>${millName}</td>
+            <td>${d.d235 > 0 ? Number(d.d235).toFixed(3) : '0.000'}</td>
+            <td>${d.d230 > 0 ? Number(d.d230).toFixed(3) : '0.000'}</td>
+            <td>${d.d225 > 0 ? Number(d.d225).toFixed(3) : '0.000'}</td>
+            <td style="font-weight:bold">${Number(rowTot).toFixed(3)}</td>
+          </tr>
+        `;
+      });
+
+      tbLoc.innerHTML += `
+        <tr class="totals">
+          <td colspan="2" style="text-align:left; padding-left:20px;">الإجمالــــــــــــــي</td>
+          <td>${Number(locTotal235).toFixed(3)}</td>
+          <td>${Number(locTotal230).toFixed(3)}</td>
+          <td>${Number(locTotal225).toFixed(3)}</td>
+          <td>${Number(locTotalAll).toFixed(3)}</td>
+        </tr>
+      `;
+    }
+
+  }
+
+  // Initial generation
+  window.generateReport = generateReport;
+  window.updateHeader = updateHeader;
+  generateReport();
+
+} catch (e) {
+  document.body.innerHTML += '<div style="color:red;font-size:24px;padding:20px;background:#fff;position:fixed;top:0;left:0;z-index:9999;width:100%;height:100%;overflow:auto;"><b>ERROR:</b><br>' + e.message + '<br><pre>' + e.stack + '</pre></div>';
+}
+</script>
+</body>
+</html>
+

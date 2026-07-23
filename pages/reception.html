@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة الاستلام والتخزين — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+  }
+  .portal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text-primary);
+    display: block;
+  }
+  .portal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+  }
+  .portal-card.local::before { background: linear-gradient(90deg, var(--gold), #c07800); }
+  .portal-card.imported::before { background: linear-gradient(90deg, var(--blue), #0b4ab5); }
+  
+  .portal-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .portal-card.local:hover { box-shadow: 0 12px 24px rgba(245, 166, 35, 0.15); }
+  .portal-card.imported:hover { box-shadow: 0 12px 24px rgba(26, 110, 245, 0.15); }
+
+  .portal-icon {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .portal-card.local .portal-icon { color: var(--gold); }
+  .portal-card.imported .portal-icon { color: var(--blue); }
+  .portal-card.scale .portal-icon { color: var(--success); }
+
+  .portal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .portal-desc {
+    color: var(--text-sec);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+  .portal-features {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .feature-badge {
+    background: rgba(255,255,255,0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #e8eaf0;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">إدارة الاستلام والتخزين</div>
+        <div class="header-sub">الرجاء اختيار نوع العملية (قمح محلي أو قمح مستورد)</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="portal-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        
+        <!-- Weighbridge Portal -->
+        <a href="scale.html" class="portal-card scale">
+          <div class="portal-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div class="portal-title">غرفة البسكول (الميزان)</div>
+          <div class="portal-desc">
+            مخصصة لوزن السيارات (قائم وفارغ)، وطباعة كارتات الاستلام للأوزان الصافية قبل توجيهها للفرز.
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-scale-unbalanced"></i> الدخول لغرفة الميزان</span>
+          </div>
+        </a>
+
+
+
+        <!-- Daily Report Portal -->
+        <a href="daily_report.html" class="portal-card" style="border-color:rgba(149,117,205,0.3)">
+          <div class="portal-icon" style="color:#ce93d8"><i class="fa-solid fa-newspaper"></i></div>
+          <div class="portal-title">البيان اليومي</div>
+          <div class="portal-desc">
+            بيان يومي شامل لحركة الخلايا الـ12، أرصدة الأقماح المستوردة حسب الدول، حركة المحلي بالدرجات، وصرف البواخر. ينقل الرصيد تلقائياً لليوم التالي.
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-warehouse"></i> 12 خلية</span>
+            <span class="feature-badge"><i class="fa-solid fa-print"></i> طباعة</span>
+          </div>
+        </a>
+
+        <!-- Imported Unloading Portal -->
+        <a href="imported_unloading.html" class="portal-card" style="border-color:rgba(76,175,80,0.3)">
+          <div class="portal-icon" style="color:#81c784"><i class="fa-solid fa-truck-ramp-box"></i></div>
+          <div class="portal-title">كشف تفريغ مستورد</div>
+          <div class="portal-desc">
+            نموذج كشف تفريغ كميات الحبوب المستوردة الواردة اليومية، مرتبط بكارتات الميزان لحساب الزيادة والعجز تلقائياً (نموذج SF 8-05-B-09).
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-print"></i> طباعة معتمدة</span>
+            <span class="feature-badge"><i class="fa-solid fa-calculator"></i> حساب آلي</span>
+          </div>
+        </a>
+
+        <!-- Local Supplies Report Portal -->
+        <a href="local_supplies_report.html" class="portal-card" style="border-color:rgba(255,152,0,0.3)">
+          <div class="portal-icon" style="color:#ffb74d"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <div class="portal-title">كشف توريدات محلي وارد</div>
+          <div class="portal-desc">
+            كشف تفصيلي بتوريدات القمح المحلي الوارد مع حساب الكميات بالدرجات، وتطبيق خصومات الدمغة والمهن الزراعية تلقائياً.
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-calculator"></i> ماليات</span>
+            <span class="feature-badge"><i class="fa-solid fa-print"></i> طباعة نموذج</span>
+          </div>
+        </a>
+
+        <!-- Ship Ledger Portal -->
+        <a href="ship_ledger.html" class="portal-card" style="border-color:rgba(255,152,0,0.3)">
+          <div class="portal-icon" style="color:#ffb74d"><i class="fa-solid fa-book-open"></i></div>
+          <div class="portal-title">دفاتر حركة البواخر</div>
+          <div class="portal-desc">
+            إدارة وتسجيل حركة جميع البواخر (المشحون، المستلم، المنصرف) في دفاتر مبوبة وحساب الرصيد التراكمي.
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-calculator"></i> تجميع آلي</span>
+            <span class="feature-badge"><i class="fa-solid fa-print"></i> طباعة الدفتر</span>
+          </div>
+        </a>
+
+        <!-- Mill Reconciliations Portal -->
+        <a href="reconciliation.html" class="portal-card" style="border-color:rgba(156,39,176,0.3)">
+          <div class="portal-icon" style="color:#ba68c8"><i class="fa-solid fa-file-signature"></i></div>
+          <div class="portal-title">مطابقات المطاحن</div>
+          <div class="portal-desc">
+            توليد كشوف مطابقة للكميات المنصرفة من الأقماح (المحلية والمستوردة) للمطاحن خلال شهر محدد وطباعتها.
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-magic"></i> تجميع آلي</span>
+            <span class="feature-badge"><i class="fa-solid fa-print"></i> طباعة المطابقة</span>
+          </div>
+        </a>
+
+        <!-- Monthly Movement Report Portal -->
+        <a href="monthly_movement_report.html?v=2" class="portal-card" style="border-color:rgba(233,30,99,0.3)">
+          <div class="portal-icon" style="color:#f48fb1"><i class="fa-solid fa-chart-pie"></i></div>
+          <div class="portal-title">تقارير حركة الأقماح</div>
+          <div class="portal-desc">
+            إنشاء بيان بإجمالي حركة الأقماح الشهرية (مستورد أو محلي) وطباعته وفقاً للنموذج المعتمد رسمياً لتقديمه للمديريات.
+          </div>
+          <div class="portal-features">
+            <span class="feature-badge"><i class="fa-solid fa-magic"></i> تجميع آلي</span>
+            <span class="feature-badge"><i class="fa-solid fa-print"></i> طباعة رسمية</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+buildSidebar('reception');
+initClock(document.getElementById('clockEl'));
+</script>
+</body>
+</html>
+

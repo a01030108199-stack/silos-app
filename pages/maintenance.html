@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصيانة — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">إدارة الصيانة</div>
+        <div class="header-sub">متابعة طلبات الصيانة والأعطال في جميع الصوامع</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-primary" onclick="openMaintModal()">
+          <i class="fa-solid fa-plus"></i> طلب صيانة جديد
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon ic-amber"><i class="fa-solid fa-clock"></i></div>
+          <div class="stat-body"><div class="stat-value" id="pendCnt">0</div><div class="stat-label">معلقة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-blue"><i class="fa-solid fa-gears"></i></div>
+          <div class="stat-body"><div class="stat-value" id="inCnt">0</div><div class="stat-label">جارية</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-green"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-body"><div class="stat-value" id="doneCnt">0</div><div class="stat-label">منجزة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-red"><i class="fa-solid fa-bolt"></i></div>
+          <div class="stat-body"><div class="stat-value" id="critCnt">0</div><div class="stat-label">حرجة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-gold"><i class="fa-solid fa-coins"></i></div>
+          <div class="stat-body">
+            <div class="stat-value" id="costCnt">0<span class="unit">ج.م</span></div>
+            <div class="stat-label">إجمالي التكاليف</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Critical Alert -->
+      <div id="criticalSection"></div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box">
+          <input type="text" id="mSearch" placeholder="بحث في طلبات الصيانة..." oninput="filterMaint()">
+          <i class="fa-solid fa-search search-icon"></i>
+        </div>
+        <select class="filter-select" id="mPriority" onchange="filterMaint()">
+          <option value="">كل الأولويات</option>
+          <option value="critical">حرجة</option>
+          <option value="high">عالية</option>
+          <option value="medium">متوسطة</option>
+          <option value="low">منخفضة</option>
+        </select>
+        <select class="filter-select" id="mStatus" onchange="filterMaint()">
+          <option value="">كل الحالات</option>
+          <option value="pending">معلقة</option>
+          <option value="in_progress">جارية</option>
+          <option value="done">منجزة</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">قائمة طلبات الصيانة</div>
+          <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i></button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>رقم الطلب</th>
+                <th>الصومعة</th>
+                <th>المعدة / العطل</th>
+                <th>وصف المشكلة</th>
+                <th>الأولوية</th>
+                <th>الحالة</th>
+                <th>المعين له</th>
+                <th>التكلفة</th>
+                <th>التاريخ</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="maintBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="maintModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-wrench text-primary"></i> طلب صيانة جديد</div>
+      <button class="modal-close" onclick="closeMaintModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <!-- Silo selection removed, using user.silo_id -->
+        <div class="form-group-inner">
+          <label>اسم المعدة المعطلة *</label>
+          <input type="text" class="form-control" id="m_equip" placeholder="مثال: ناقل حبوب رقم 2">
+        </div>
+        <div class="form-group-inner" style="grid-column:1/-1">
+          <label>وصف المشكلة *</label>
+          <textarea class="form-control" id="m_desc" rows="3" placeholder="اشرح المشكلة بالتفصيل..." style="resize:vertical"></textarea>
+        </div>
+        <div class="form-group-inner">
+          <label>الأولوية</label>
+          <select class="form-control" id="m_priority">
+            <option value="low">منخفضة</option>
+            <option value="medium">متوسطة</option>
+            <option value="high">عالية</option>
+            <option value="critical">حرجة — تحتاج تدخل فوري</option>
+          </select>
+        </div>
+        <div class="form-group-inner">
+          <label>الجهة المقترحة للصيانة</label>
+          <input type="text" class="form-control" id="m_assigned" placeholder="اسم الشركة أو الفني">
+        </div>
+        <div class="form-group-inner">
+          <label>التكلفة التقديرية (ج.م)</label>
+          <input type="number" class="form-control" id="m_cost" placeholder="0">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeMaintModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveMaint()">
+        <i class="fa-solid fa-floppy-disk"></i> حفظ الطلب
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+
+buildSidebar('maintenance');
+initClock(document.getElementById('clockEl'));
+
+let maintList = MAINTENANCE.filter(m => m.silo_id === user.silo_id);
+
+function updateStats() {
+  document.getElementById('pendCnt').textContent = maintList.filter(m=>m.status==='pending').length;
+  document.getElementById('inCnt').textContent   = maintList.filter(m=>m.status==='in_progress').length;
+  document.getElementById('doneCnt').textContent = maintList.filter(m=>m.status==='done').length;
+  document.getElementById('critCnt').textContent = maintList.filter(m=>m.priority==='critical').length;
+  const total = maintList.reduce((a,m)=>a+(m.cost||0),0);
+  document.getElementById('costCnt').querySelector('.stat-value').innerHTML =
+    `${total.toLocaleString('ar-EG')}<span class="unit">ج.م</span>`;
+}
+updateStats();
+
+// Critical alert
+const criticals = maintList.filter(m=>m.priority==='critical' && m.status!=='done');
+if (criticals.length) {
+  document.getElementById('criticalSection').innerHTML = `
+    <div class="chart-card mb-24" style="border-color:rgba(239,68,68,0.4)">
+      <div class="card-header">
+        <div class="card-title"><i class="fa-solid fa-bolt text-danger pulse"></i> أعطال حرجة تحتاج تدخلاً فورياً</div>
+        <span class="badge badge-danger">${criticals.length} أعطال</span>
+      </div>
+      <div class="alert-list">
+        ${criticals.map(m=>`
+          <div class="alert-item critical">
+            <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div style="flex:1">
+              <div class="alert-title">${m.equip} — ${siloName(m.silo_id)}</div>
+              <div class="alert-desc">${m.problem}</div>
+              <div class="alert-time">طلب بواسطة: ${m.req_by} | الحالة: ${m.status === 'in_progress' ? 'جارٍ العمل عليها' : 'في انتظار الإسناد'}</div>
+            </div>
+            ${maintenanceBadge(m.status)}
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderMaint(list) {
+  const tbody = document.getElementById('maintBody');
+  tbody.innerHTML = '';
+  list.forEach(m => {
+    tbody.innerHTML += `
+      <tr>
+        <td class="fw-bold text-warning" style="font-size:0.78rem">${m.id}</td>
+        <td style="font-size:0.78rem">${siloName(m.silo_id)}</td>
+        <td style="font-weight:600;font-size:0.82rem">${m.equip}</td>
+        <td style="font-size:0.73rem;max-width:180px;color:var(--text-sec)">${m.problem.substring(0,55)}...</td>
+        <td>${severityBadge(m.priority)}</td>
+        <td>${maintenanceBadge(m.status)}</td>
+        <td style="font-size:0.78rem">${m.assigned || '—'}</td>
+        <td class="fw-bold">${m.cost ? formatNum(m.cost)+' ج.م' : '—'}</td>
+        <td class="text-sec" style="font-size:0.78rem">${m.date}</td>
+        <td>
+          <div style="display:flex;gap:4px">
+          ${m.status === 'pending' ? `
+            <button class="btn btn-primary btn-xs" onclick="changeStatus('${m.id}','in_progress')">
+              <i class="fa-solid fa-play"></i>
+            </button>` : ''}
+          ${m.status === 'in_progress' ? `
+            <button class="btn btn-success btn-xs" onclick="changeStatus('${m.id}','done')">
+              <i class="fa-solid fa-check"></i>
+            </button>` : ''}
+          ${m.status === 'done' ? '<span style="color:var(--success);font-size:0.75rem">✓ منجز</span>' : ''}
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+function filterMaint() {
+  const q  = document.getElementById('mSearch').value.toLowerCase();
+  const pr = document.getElementById('mPriority').value;
+  const st = document.getElementById('mStatus').value;
+  renderMaint(maintList.filter(m =>
+    (!q  || m.equip.includes(q) || siloName(m.silo_id).includes(q) || m.problem.includes(q)) &&
+    (!pr || m.priority === pr) &&
+    (!st || m.status === st)
+  ));
+}
+renderMaint(maintList);
+
+function changeStatus(id, newSt) {
+  const m = maintList.find(x=>x.id===id);
+  if (m) { m.status = newSt; filterMaint(); updateStats(); showToast(`تم تحديث حالة الطلب ${id}`, 'success'); }
+}
+
+// Modal (silo options removed)
+
+function openMaintModal()  { document.getElementById('maintModal').classList.remove('hidden'); }
+function closeMaintModal() { document.getElementById('maintModal').classList.add('hidden'); }
+
+function saveMaint() {
+  const equip = document.getElementById('m_equip').value.trim();
+  const desc  = document.getElementById('m_desc').value.trim();
+  if (!equip || !desc) { showToast('يرجى ملء الحقول المطلوبة', 'error'); return; }
+  const newM = {
+    id:       'MNT-' + String(Math.floor(Math.random()*1000)).padStart(3,'0'),
+    silo_id:  user.silo_id,
+    date:     new Date().toLocaleDateString('ar-EG'),
+    equip,
+    problem:  desc,
+    priority: document.getElementById('m_priority').value,
+    status:   'pending',
+    req_by:   Auth.current()?.name || 'موظف',
+    assigned: document.getElementById('m_assigned').value || '—',
+    cost:     +document.getElementById('m_cost').value || null,
+  };
+  maintList.unshift(newM);
+  filterMaint(); updateStats();
+  closeMaintModal();
+  showToast(`✓ تم تسجيل طلب الصيانة ${newM.id}`, 'success');
+}
+</script>
+</body>
+</html>
+

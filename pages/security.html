@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة الأمن — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script></head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">إدارة الأمن والسلامة</div>
+        <div class="header-sub">تسجيل الحوادث الأمنية ومتابعتها على مستوى الجمهورية</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-danger" onclick="openIncident()">
+          <i class="fa-solid fa-triangle-exclamation"></i> تسجيل حادثة جديدة
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon ic-red"><i class="fa-solid fa-circle-exclamation"></i></div>
+          <div class="stat-body"><div class="stat-value" id="openCnt">0</div><div class="stat-label">حوادث مفتوحة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-amber"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div class="stat-body"><div class="stat-value" id="invCnt">0</div><div class="stat-label">قيد التحقيق</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-green"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-body"><div class="stat-value" id="resCnt">0</div><div class="stat-label">محلولة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-red"><i class="fa-solid fa-fire"></i></div>
+          <div class="stat-body"><div class="stat-value" id="critCnt">0</div><div class="stat-label">حرجة</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon ic-blue"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="stat-body"><div class="stat-value">7</div><div class="stat-label">إجمالي الحوادث</div></div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="search-box">
+          <input type="text" id="secSearch" placeholder="ابحث في الحوادث..." oninput="filterSec()">
+          <i class="fa-solid fa-search search-icon"></i>
+        </div>
+        <select class="filter-select" id="sevFilter" onchange="filterSec()">
+          <option value="">كل الأولويات</option>
+          <option value="critical">حرجة</option>
+          <option value="high">عالية</option>
+          <option value="medium">متوسطة</option>
+          <option value="low">منخفضة</option>
+        </select>
+        <select class="filter-select" id="stFilter" onchange="filterSec()">
+          <option value="">كل الحالات</option>
+          <option value="open">مفتوحة</option>
+          <option value="investigating">قيد التحقيق</option>
+          <option value="resolved">محلولة</option>
+        </select>
+      </div>
+
+      <!-- Alerts panel for open incidents -->
+      <div class="chart-card mb-24" id="openAlerts">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-bell text-danger pulse"></i> حوادث تحتاج متابعة فورية</div>
+        </div>
+        <div class="alert-list" id="urgentList"></div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">سجل جميع الحوادث الأمنية</div>
+          <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>رقم الحادثة</th>
+                <th>الصومعة</th>
+                <th>نوع الحادثة</th>
+                <th>الوصف</th>
+                <th>الخطورة</th>
+                <th>الحالة</th>
+                <th>المبلّغ</th>
+                <th>الحارس</th>
+                <th>التاريخ</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="secBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- New Incident Modal -->
+<div class="modal-overlay hidden" id="incidentModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-triangle-exclamation text-danger"></i> تسجيل حادثة أمنية جديدة</div>
+      <button class="modal-close" onclick="closeIncident()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <!-- Silo selection removed, using user.silo_id -->
+        <div class="form-group-inner">
+          <label>نوع الحادثة *</label>
+          <select class="form-control" id="inc_type">
+            <option>محاولة دخول غير مصرح</option>
+            <option>سرقة</option>
+            <option>حريق صغير</option>
+            <option>حادث عمل</option>
+            <option>تلف في السياج</option>
+            <option>عطل في كاميرات المراقبة</option>
+            <option>تنبيه منظومة الإنذار</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+        <div class="form-group-inner" style="grid-column:1/-1">
+          <label>وصف تفصيلي للحادثة *</label>
+          <textarea class="form-control" id="inc_desc" rows="3" placeholder="اكتب تفاصيل الحادثة بوضوح..." style="resize:vertical"></textarea>
+        </div>
+        <div class="form-group-inner">
+          <label>درجة الخطورة</label>
+          <select class="form-control" id="inc_sev">
+            <option value="low">منخفضة</option>
+            <option value="medium">متوسطة</option>
+            <option value="high">عالية</option>
+            <option value="critical">حرجة — إبلاغ فوري</option>
+          </select>
+        </div>
+        <div class="form-group-inner">
+          <label>اسم الحارس</label>
+          <input type="text" class="form-control" id="inc_guard" placeholder="اسم حارس الأمن">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeIncident()">إلغاء</button>
+      <button class="btn btn-danger" onclick="saveIncident()">
+        <i class="fa-solid fa-triangle-exclamation"></i> تسجيل الحادثة وإرسال تنبيه
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/app.js"></script>
+<script>
+const user = Auth.require();
+if (user.role === 'general_admin') window.location.href = 'dashboard.html';
+
+buildSidebar('security');
+initClock(document.getElementById('clockEl'));
+
+let incidents = SECURITY.filter(s => s.silo_id === user.silo_id);
+
+// Stats
+function updateStats() {
+  document.getElementById('openCnt').textContent = incidents.filter(i=>i.status==='open').length;
+  document.getElementById('invCnt').textContent  = incidents.filter(i=>i.status==='investigating').length;
+  document.getElementById('resCnt').textContent  = incidents.filter(i=>i.status==='resolved').length;
+  document.getElementById('critCnt').textContent = incidents.filter(i=>i.severity==='critical').length;
+}
+updateStats();
+
+// Urgent alerts
+function renderUrgent() {
+  const urgent = incidents.filter(i=>i.status!=='resolved');
+  const ul = document.getElementById('urgentList');
+  if (!urgent.length) {
+    ul.innerHTML = `<div style="text-align:center;padding:20px;color:var(--success)">
+      <i class="fa-solid fa-shield-check" style="font-size:1.5rem;margin-bottom:8px;display:block"></i>
+      لا توجد حوادث مفتوحة — الوضع الأمني مستقر</div>`;
+    return;
+  }
+  ul.innerHTML = urgent.map(i => `
+    <div class="alert-item ${i.severity}">
+      <div class="alert-icon"><i class="fa-solid fa-shield-exclamation"></i></div>
+      <div style="flex:1">
+        <div class="alert-title">${i.type} — ${siloName(i.silo_id)}</div>
+        <div class="alert-desc">${i.desc}</div>
+        <div class="alert-time"><i class="fa-regular fa-clock"></i> ${i.date}</div>
+      </div>
+      ${secStatusBadge(i.status)}
+    </div>`).join('');
+}
+renderUrgent();
+
+// Table
+function renderTable(list) {
+  const tbody = document.getElementById('secBody');
+  tbody.innerHTML = '';
+  list.forEach(i => {
+    tbody.innerHTML += `
+      <tr>
+        <td class="fw-bold text-danger" style="font-size:0.78rem">${i.id}</td>
+        <td style="font-size:0.78rem">${siloName(i.silo_id)}</td>
+        <td style="font-size:0.8rem">${i.type}</td>
+        <td style="font-size:0.75rem;max-width:200px;color:var(--text-sec)">${i.desc.substring(0,60)}...</td>
+        <td>${severityBadge(i.severity)}</td>
+        <td>${secStatusBadge(i.status)}</td>
+        <td style="font-size:0.78rem">${i.reporter}</td>
+        <td style="font-size:0.78rem">${i.guard}</td>
+        <td class="text-sec" style="font-size:0.78rem">${i.date}</td>
+        <td>
+          ${i.status !== 'resolved' ? `
+          <button class="btn btn-success btn-xs" onclick="resolve('${i.id}')">
+            <i class="fa-solid fa-check"></i> إغلاق
+          </button>` : '<span style="color:var(--success);font-size:0.75rem">✓ محلولة</span>'}
+        </td>
+      </tr>`;
+  });
+}
+
+function filterSec() {
+  const q   = document.getElementById('secSearch').value.toLowerCase();
+  const sev = document.getElementById('sevFilter').value;
+  const st  = document.getElementById('stFilter').value;
+  renderTable(incidents.filter(i =>
+    (!q  || i.type.includes(q) || i.desc.includes(q) || siloName(i.silo_id).includes(q)) &&
+    (!sev|| i.severity === sev) &&
+    (!st || i.status === st)
+  ));
+}
+renderTable(incidents);
+
+function resolve(id) {
+  const i = incidents.find(x=>x.id===id);
+  if (i) { i.status = 'resolved'; filterSec(); renderUrgent(); updateStats(); showToast('تم إغلاق الحادثة بنجاح', 'success'); }
+}
+
+// Modal (silo options removed)
+
+function openIncident()  { document.getElementById('incidentModal').classList.remove('hidden'); }
+function closeIncident() { document.getElementById('incidentModal').classList.add('hidden'); }
+
+function saveIncident() {
+  const desc = document.getElementById('inc_desc').value.trim();
+  if (!desc) { showToast('يرجى ملء الحقول المطلوبة', 'error'); return; }
+  const newInc = {
+    id:       'SEC-' + String(Math.floor(Math.random()*1000)).padStart(3,'0'),
+    silo_id:  user.silo_id,
+    date:     new Date().toLocaleString('ar-EG'),
+    type:     document.getElementById('inc_type').value,
+    desc,
+    severity: document.getElementById('inc_sev').value,
+    status:   'open',
+    reporter: Auth.current()?.name || 'موظف',
+    guard:    document.getElementById('inc_guard').value || '—',
+  };
+  incidents.unshift(newInc);
+  filterSec(); renderUrgent(); updateStats();
+  closeIncident();
+  const sev = newInc.severity;
+  showToast(`✓ تم تسجيل الحادثة ${newInc.id} وإرسال تنبيه للإدارة العامة`, sev==='critical'||sev==='high'?'error':'warning');
+}
+</script>
+</body>
+</html>
+

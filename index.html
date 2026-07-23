@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول — نظام إدارة الصوامع</title>
+<meta name="description" content="نظام متكامل لإدارة صوامع الشركة المصرية القابضة للصوامع والتخزين">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="js/firebase-db.js"></script></head>
+<body class="login-page">
+<div class="login-container">
+
+  <!-- Brand Panel -->
+  <div class="login-brand">
+    <div class="brand-logo">
+      <img src="img/logo.jpg" alt="EHCSS Logo" class="animated-logo">
+    </div>
+    <div class="brand-title">الشركة المصرية القابضة<br>للصوامع والتخزين</div>
+    <div class="brand-sub">
+      نظام إدارة الصوامع الموحد<br>
+      يربط جميع صوامع الجمهورية بالإدارة العامة
+    </div>
+    <div class="brand-stats">
+      <div class="brand-stat">
+        <span class="num">48</span>
+        <span class="lbl">صومعة</span>
+      </div>
+      <div class="brand-stat">
+        <span class="num">7</span>
+        <span class="lbl">مناطق</span>
+      </div>
+      <div class="brand-stat">
+        <span class="num">3.1M</span>
+        <span class="lbl">طن طاقة</span>
+      </div>
+    </div>
+    
+    <div class="designer-signature">
+      <img src="img/signature.png" alt="تصميم وبرمجة / اكرم سعد">
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-form-wrap">
+    <div class="login-title">👋 أهلاً بك</div>
+    <div class="login-subtitle">سجّل الدخول للوصول إلى لوحة التحكم</div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">الفرع / الجهة</label>
+        <select id="roleSelect" class="form-input" onchange="fillCreds(this.value)" style="color:var(--text-primary);background:var(--bg-dark)">
+          <option value="" style="color:#000;background:#fff">— اختر الفرع —</option>
+          <!-- Options will be populated dynamically by JS -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">اسم المستخدم</label>
+        <div class="form-input-icon">
+          <input type="text" id="username" class="form-input" placeholder="أدخل اسم المستخدم" required>
+          <i class="fa-solid fa-user icon"></i>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <div class="form-input-icon">
+          <input type="password" id="password" class="form-input" placeholder="أدخل كلمة المرور" required>
+          <i class="fa-solid fa-lock icon"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        تسجيل الدخول
+      </button>
+    </form>
+
+    <div class="login-error" id="loginError">
+      <i class="fa-solid fa-circle-xmark"></i>
+      بيانات الدخول غير صحيحة، يرجى المحاولة مجدداً
+    </div>
+
+    <div class="demo-creds">
+      <p><i class="fa-solid fa-circle-info"></i> كلمات المرور الافتراضية للجميع هي: <span>123</span></p>
+      <div class="cred-list" style="max-height: 80px; overflow-y: auto;">
+        <div class="cred-item">الإدارة العامة: <span>admin</span></div>
+        <div class="cred-item">قصر الباسل: <span>qasr</span></div>
+        <div class="cred-item">باقي الصوامع: <span>user[رقم]</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Populate users dropdown dynamically
+  const select = document.getElementById('roleSelect');
+  const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+  const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+  
+  usersToLoad.forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u.username;
+    opt.textContent = u.name;
+    opt.style.color = '#000';
+    opt.style.background = '#fff';
+    select.appendChild(opt);
+  });
+
+  // Auto-redirect if already logged in
+  if (Auth.current()) window.location.href = 'pages/dashboard.html';
+
+  function fillCreds(username) {
+    if (!username) return;
+    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+    
+    const selectedUser = usersToLoad.find(u => u.username === username);
+    if (selectedUser) {
+      document.getElementById('username').value = selectedUser.username;
+      document.getElementById('password').value = selectedUser.password;
+    }
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-login');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ الدخول...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value;
+      const user = Auth.login(u, p);
+      if (user) {
+        window.location.href = 'pages/dashboard.html';
+      } else {
+        document.getElementById('loginError').style.display = 'flex';
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';
+        btn.disabled = false;
+      }
+    }, 800);
+  }
+</script>
+</body>
+</html>
+
