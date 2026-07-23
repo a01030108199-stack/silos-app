@@ -35,6 +35,21 @@ const Auth = {
     localStorage.removeItem('silo_user');
     window.location.href = '../index.html';
   },
+  returnToPortal() {
+    const u = this.current();
+    if (!u || u.silo_id === undefined) {
+      window.location.href = '../index.html';
+      return;
+    }
+    const usersToLoad = typeof USERS !== 'undefined' ? USERS : [];
+    const siloUser = usersToLoad.find(user => user.role === 'silo' && user.silo_id === u.silo_id);
+    if (siloUser) {
+      localStorage.setItem('silo_user', JSON.stringify(siloUser));
+      window.location.href = 'silo_portal.html';
+    } else {
+      window.location.href = '../index.html';
+    }
+  },
   current() {
     const u = localStorage.getItem('silo_user');
     return u ? JSON.parse(u) : null;
@@ -124,8 +139,14 @@ function buildSidebar(activePage) {
       </a>`;
   }).join('');
 
-  const siloInfo = user.silo_id ? SILOS.find(s => s.id === user.silo_id) : null;
+  const siloInfo = user.silo_id !== undefined ? SILOS.find(s => s.id === user.silo_id) : null;
   const subTitle = isGeneral ? 'الإدارة العامة' : (siloInfo ? siloInfo.name : '');
+
+  const portalBtn = (!isGeneral && role !== 'silo') 
+    ? `<button class="btn-logout" onclick="Auth.returnToPortal()" style="background:#475569; margin-bottom:10px">
+        <i class="fa-solid fa-arrow-right"></i> عودة للأقسام
+       </button>` 
+    : '';
 
   document.getElementById('app-sidebar').innerHTML = `
     <div class="sidebar-logo">
@@ -147,6 +168,7 @@ function buildSidebar(activePage) {
       ${items}
     </nav>
     <div class="sidebar-footer">
+      ${portalBtn}
       <button class="btn-logout" onclick="Auth.logout()">
         <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
       </button>
