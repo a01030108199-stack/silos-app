@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -200,9 +200,9 @@
       <h3>مدير الموقع</h3>
     </div>
     
-    <div class="portal-card" style="--color:#3b82f6; --color-rgb:59,130,246" onclick="openAuth('scale', 'إدارة الميزان', 'fa-scale-balanced', '#3b82f6')">
+    <div class="portal-card" style="--color:#3b82f6; --color-rgb:59,130,246" onclick="openAuth('scale', 'إدارة الاستلام والتخزين', 'fa-scale-balanced', '#3b82f6')">
       <i class="fa-solid fa-scale-balanced portal-icon"></i>
-      <h3>إدارة الميزان</h3>
+      <h3>إدارة الاستلام والتخزين</h3>
     </div>
 
     <div class="portal-card" style="--color:#ef4444; --color-rgb:239,68,68" onclick="openAuth('security', 'إدارة الأمن', 'fa-shield-halved', '#ef4444')">
@@ -284,7 +284,7 @@
       const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
       
       if (deptUser) {
-        if (selectedRole === 'scale') window.location.href = 'scale.html';
+        if (selectedRole === 'scale') window.location.href = 'reception.html';
         else if (selectedRole === 'security') window.location.href = 'security.html';
         else if (selectedRole === 'finance') window.location.href = 'finance.html';
         else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html';
