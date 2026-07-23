@@ -5,8 +5,7 @@
 // ── Auth ────────────────────────────────────────────────────
 const Auth = {
   login(username, password) {
-    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
-    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+    const usersToLoad = typeof USERS !== 'undefined' ? USERS : [];
     
     const user = usersToLoad.find(u => u.username === username && u.password === password);
     if (user) {
@@ -16,8 +15,7 @@ const Auth = {
     return null;
   },
   loginByRole(role, siloId, password) {
-    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
-    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+    const usersToLoad = typeof USERS !== 'undefined' ? USERS : [];
 
     let user;
     if (role === 'general_admin') {

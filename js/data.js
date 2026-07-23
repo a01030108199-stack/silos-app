@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // js/data.js — بيانات شاملة لنظام إدارة الصوامع
 // الشركة المصرية القابضة للصوامع والتخزين (48 صومعة)
 // ============================================================
@@ -250,15 +250,14 @@ const WHEAT_SUMMARY = {
 };
 
 if (typeof window !== 'undefined') {
-  if (localStorage.getItem('DB_VERSION') !== DB_VERSION) {
-    localStorage.clear();
-    localStorage.setItem('DB_VERSION', DB_VERSION);
+  // ── تخزين مبدئي ───────────────────────────
+  localStorage.setItem('SILOS', JSON.stringify(SILOS));
+  localStorage.setItem('REGIONS', JSON.stringify(REGIONS));
+  localStorage.setItem('USERS', JSON.stringify(USERS));
 
-    // حفظ البيانات الأساسية
-    localStorage.setItem('SILOS', JSON.stringify(SILOS));
-    localStorage.setItem('USERS', JSON.stringify(USERS));
-    localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(RECEIPTS));
-    localStorage.setItem('SECURITY', JSON.stringify(SECURITY));
+  // تهيئة الإشعارات والأعطال
+  if (!localStorage.getItem('ALERTS')) {
+    localStorage.setItem('ALERTS', JSON.stringify(SECURITY));
     localStorage.setItem('MAINTENANCE', JSON.stringify(MAINTENANCE));
     localStorage.setItem('FINANCE', JSON.stringify(FINANCE));
 
