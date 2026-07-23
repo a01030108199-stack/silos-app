@@ -188,19 +188,25 @@
     btn.disabled = true;
 
     setTimeout(() => {
-      const siloId = currentUser.silo_id;
-      const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
-      
-      if (deptUser) {
-        if (selectedRole === 'scale') window.location.href = 'reception.html?v=18';
-        else if (selectedRole === 'security') window.location.href = 'security.html?v=18';
-        else if (selectedRole === 'finance') window.location.href = 'finance.html?v=18';
-        else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=18';
-        else window.location.href = 'dashboard.html?v=18';
-      } else {
-        document.getElementById('modalError').style.display = 'block';
-        btn.innerHTML = 'تأكيد الدخول';
-        btn.disabled = false;
+      try {
+        const siloId = currentUser.silo_id;
+        const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
+        
+        if (deptUser) {
+          if (selectedRole === 'scale') window.location.href = 'reception.html?v=19';
+          else if (selectedRole === 'security') window.location.href = 'security.html?v=19';
+          else if (selectedRole === 'finance') window.location.href = 'finance.html?v=19';
+          else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=19';
+          else window.location.href = 'dashboard.html?v=19';
+        } else {
+          document.getElementById('modalError').style.display = 'block';
+          btn.innerHTML = 'تأكيد الدخول';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert("حدث خطأ: " + err.message);
+        btn.innerHTML = 'خطأ بالنظام';
+        console.error(err);
       }
     }, 600);
   }
