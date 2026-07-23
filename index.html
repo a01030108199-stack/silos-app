@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -115,12 +115,12 @@
   // Auto-redirect if already logged in
   if (Auth.current()) {
     const r = Auth.current().role;
-    if (r === 'silo') window.location.href = 'pages/silo_portal.html';
-    else if (r === 'scale') window.location.href = 'pages/scale.html';
-    else if (r === 'security') window.location.href = 'pages/security.html';
-    else if (r === 'finance') window.location.href = 'pages/finance.html';
-    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html';
-    else window.location.href = 'pages/dashboard.html';
+    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=13';
+    else if (r === 'scale') window.location.href = 'pages/reception.html?v=13';
+    else if (r === 'security') window.location.href = 'pages/security.html?v=13';
+    else if (r === 'finance') window.location.href = 'pages/finance.html?v=13';
+    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=13';
+    else window.location.href = 'pages/dashboard.html?v=13';
   }
 
   function fillCreds(username) {
@@ -144,15 +144,16 @@
     setTimeout(() => {
       const u = document.getElementById('username').value.trim();
       const p = document.getElementById('password').value;
-      const user = Auth.login(u, p);
-      if (user) {
-        if (user.role === 'silo') window.location.href = 'pages/silo_portal.html';
-        else if (user.role === 'scale') window.location.href = 'pages/scale.html';
-        else if (user.role === 'security') window.location.href = 'pages/security.html';
-        else if (user.role === 'finance') window.location.href = 'pages/finance.html';
-        else if (user.role === 'maintenance') window.location.href = 'pages/maintenance.html';
-        else window.location.href = 'pages/dashboard.html';
-      } else {
+        const user = Auth.login(u, p);
+        if (user) {
+          const r = user.role;
+          if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=13';
+          else if (r === 'scale') window.location.href = 'pages/reception.html?v=13';
+          else if (r === 'security') window.location.href = 'pages/security.html?v=13';
+          else if (r === 'finance') window.location.href = 'pages/finance.html?v=13';
+          else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=13';
+          else window.location.href = 'pages/dashboard.html?v=13';
+        } else {
         document.getElementById('loginError').style.display = 'flex';
         btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';
         btn.disabled = false;
