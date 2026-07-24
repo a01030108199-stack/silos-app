@@ -3,164 +3,217 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول — نظام إدارة الصوامع</title>
-<meta name="description" content="نظام متكامل لإدارة صوامع الشركة المصرية القابضة للصوامع والتخزين">
+<title>النظام الموحد للصوامع - تسجيل الدخول</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="js/firebase-db.js"></script></head>
-<body class="login-page">
-<div class="login-container">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+  
+  body.index-portal {
+    background: #0f1623;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+  }
+  
+  .image-map-container {
+    position: relative;
+    width: 100vw;
+    max-width: 1200px;
+  }
+  
+  .bg-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+    border-radius: 12px;
+  }
 
-  <!-- Brand Panel -->
-  <div class="login-brand">
-    <div class="brand-logo">
-      <img src="img/logo.jpg" alt="EHCSS Logo" class="animated-logo">
-    </div>
-    <div class="brand-title">الشركة المصرية القابضة<br>للصوامع والتخزين</div>
-    <div class="brand-sub">
-      نظام إدارة الصوامع الموحد<br>
-      يربط جميع صوامع الجمهورية بالإدارة العامة
-    </div>
-    <div class="brand-stats">
-      <div class="brand-stat">
-        <span class="num">48</span>
-        <span class="lbl">صومعة</span>
-      </div>
-      <div class="brand-stat">
-        <span class="num">7</span>
-        <span class="lbl">مناطق</span>
-      </div>
-      <div class="brand-stat">
-        <span class="num">3.1M</span>
-        <span class="lbl">طن طاقة</span>
-      </div>
-    </div>
+  /* ── Dynamic Stats (Left Panel) ── */
+  .stat-patch {
+    position: absolute;
+    background: #192533; /* Color of the panels to hide baked-in text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #eab308; /* Golden color from the image */
+    font-weight: 800;
+    z-index: 10;
+    /* Soft edges to blend */
+    box-shadow: 0 0 10px 5px #192533;
+    border-radius: 4px;
+    white-space: pre-line;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  #stat-capacity { top: 32%; left: 9%; width: 10%; height: 5%; font-size: 1.4vw; }
+  #stat-regions { top: 45%; left: 9%; width: 6%; height: 5%; font-size: 1.5vw; }
+  #stat-silos { top: 58%; left: 9%; width: 6%; height: 5%; font-size: 1.5vw; }
+  
+  #stat-stock { 
+    top: 73.5%; left: 24%; width: 5%; height: 6%; 
+    font-size: 1.2vw; color: #fff; background: #1f2d40; box-shadow: 0 0 5px 5px #1f2d40; border-radius: 50%;
+  }
+  
+  #stat-shipments { 
+    top: 71%; left: 10%; width: 7%; height: 8%; 
+    font-size: 1vw; color: #fff; background: #192533; box-shadow: 0 0 8px 6px #192533;
+  }
+
+  /* ── Login Form (Right Panel) ── */
+  .transparent-input {
+    position: absolute;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1vw;
+    font-weight: 600;
+    outline: none;
+    z-index: 10;
+    padding: 0 10px;
+    text-align: right;
+  }
+  
+  .transparent-input::placeholder { color: rgba(255,255,255,0.4); }
+  .transparent-input option { color: #000; background: #fff; }
+
+  #branchSelect { top: 36%; left: 77.5%; width: 14.5%; height: 4%; cursor: pointer; }
+  #username { top: 49%; left: 78%; width: 13.5%; height: 4%; }
+  #password { top: 62%; left: 78%; width: 13.5%; height: 4%; letter-spacing: 2px;}
+
+  .transparent-btn {
+    position: absolute;
+    top: 72%; left: 77.5%; width: 15%; height: 5.5%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    color: transparent; /* Text is baked into image */
+  }
+
+  /* ── Error Message ── */
+  .login-error {
+    position: absolute;
+    top: 79%; left: 77.5%; width: 15%;
+    color: #ef4444; font-size: 0.9vw; font-weight: bold; text-align: center;
+    background: rgba(15,22,35,0.9); padding: 5px; border-radius: 5px;
+    display: none; z-index: 20;
+  }
+
+</style>
+</head>
+<body class="index-portal">
+
+<div class="image-map-container">
+  <img src="img/index_bg.jpg" class="bg-image" alt="EHCSS Portal">
+
+  <!-- Left Panel Overlays (Masking original text) -->
+  <div class="stat-patch" id="stat-capacity">3.1M<br><span style="font-size:0.7em">Ton</span></div>
+  <div class="stat-patch" id="stat-regions">3</div>
+  <div class="stat-patch" id="stat-silos">48</div>
+  <div class="stat-patch" id="stat-stock">82%</div>
+  <div class="stat-patch" id="stat-shipments">12 Trains<br>4 Ships</div>
+
+  <!-- Right Panel Overlays (Inputs) -->
+  <form onsubmit="handleLogin(event)">
+    <select id="branchSelect" class="transparent-input" onchange="fillCreds(this.value)">
+      <option value="">-- اختر الفرع للبدء --</option>
+      <!-- General Admin -->
+      <option value="admin">الإدارة العامة (Dashboard)</option>
+      <!-- Auto-filled by JS -->
+    </select>
     
-    <div class="designer-signature">
-      <img src="img/signature.png" alt="تصميم وبرمجة / اكرم سعد">
-    </div>
-  </div>
-
-  <!-- Login Form -->
-  <div class="login-form-wrap">
-    <div class="login-title">👋 أهلاً بك</div>
-    <div class="login-subtitle">سجّل الدخول للوصول إلى لوحة التحكم</div>
-
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="form-group">
-        <label class="form-label">الفرع / الجهة</label>
-        <select id="roleSelect" class="form-input" onchange="fillCreds(this.value)" style="color:var(--text-primary);background:var(--bg-dark)">
-          <option value="" style="color:#000;background:#fff">— اختر الفرع —</option>
-          <!-- Options will be populated dynamically by JS -->
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">اسم المستخدم</label>
-        <div class="form-input-icon">
-          <input type="text" id="username" class="form-input" placeholder="أدخل اسم المستخدم" required>
-          <i class="fa-solid fa-user icon"></i>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">كلمة المرور</label>
-        <div class="form-input-icon">
-          <input type="password" id="password" class="form-input" placeholder="أدخل كلمة المرور" required>
-          <i class="fa-solid fa-lock icon"></i>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-login">
-        <i class="fa-solid fa-right-to-bracket"></i>
-        تسجيل الدخول
-      </button>
-    </form>
-
-    <div class="login-error" id="loginError">
-      <i class="fa-solid fa-circle-xmark"></i>
-      بيانات الدخول غير صحيحة، يرجى المحاولة مجدداً
-    </div>
-
-    <div class="demo-creds">
-      <p><i class="fa-solid fa-circle-info"></i> كلمات المرور الافتراضية للجميع هي: <span>123</span></p>
-      <div class="cred-list" style="max-height: 80px; overflow-y: auto;">
-        <div class="cred-item">الإدارة العامة: <span>admin</span></div>
-        <div class="cred-item">قصر الباسل: <span>qasr</span></div>
-        <div class="cred-item">باقي الصوامع: <span>user[رقم]</span></div>
-      </div>
-    </div>
-  </div>
+    <input type="text" id="username" class="transparent-input" placeholder="اسم المستخدم" required autocomplete="off">
+    <input type="password" id="password" class="transparent-input" placeholder="كلمة المرور" required>
+    
+    <button type="submit" class="transparent-btn" id="loginBtn" title="تسجيل الدخول"></button>
+    <div id="loginError" class="login-error">بيانات الدخول غير صحيحة</div>
+  </form>
 </div>
 
-<script src="js/data.js?v=12"></script>
-<script src="js/app.js?v=12"></script>
+<script src="js/data.js?v=21"></script>
+<script src="js/app.js?v=21"></script>
 <script>
-  // Populate users dropdown dynamically
-  const select = document.getElementById('roleSelect');
-  const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
-  const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
-  
-  usersToLoad.filter(u => u.role === 'silo' || u.role === 'general_admin').forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u.username;
-    opt.textContent = u.name;
-    opt.style.color = '#000';
-    opt.style.background = '#fff';
-    select.appendChild(opt);
-  });
-
   // Auto-redirect if already logged in
   if (Auth.current()) {
     const r = Auth.current().role;
-    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=14';
-    else if (r === 'scale') window.location.href = 'pages/reception.html?v=14';
-    else if (r === 'security') window.location.href = 'pages/security.html?v=14';
-    else if (r === 'finance') window.location.href = 'pages/finance.html?v=14';
-    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=14';
-    else window.location.href = 'pages/dashboard.html?v=14';
+    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=21';
+    else if (r === 'scale') window.location.href = 'pages/reception.html?v=21';
+    else if (r === 'security') window.location.href = 'pages/security.html?v=21';
+    else if (r === 'finance') window.location.href = 'pages/finance.html?v=21';
+    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=21';
+    else window.location.href = 'pages/dashboard.html?v=21';
   }
 
+  // Populate Dropdown
+  const select = document.getElementById('branchSelect');
+  const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
+  const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
+  
+  // Only show 'silo' level users in the main dropdown for neatness
+  usersToLoad.filter(u => u.role === 'silo').forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u.username;
+    opt.textContent = u.name;
+    select.appendChild(opt);
+  });
+
   function fillCreds(username) {
-    if (!username) return;
-    const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');
-    const usersToLoad = storedUsers.length > 0 ? storedUsers : (typeof USERS !== 'undefined' ? USERS : []);
-    
-    const selectedUser = usersToLoad.find(u => u.username === username);
-    if (selectedUser) {
-      document.getElementById('username').value = selectedUser.username;
-      document.getElementById('password').value = selectedUser.password;
+    if (!username) {
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      return;
+    }
+    const user = usersToLoad.find(u => u.username === username);
+    if (user) {
+      document.getElementById('username').value = user.username;
+      document.getElementById('password').value = user.password;
     }
   }
 
   function handleLogin(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('.btn-login');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ الدخول...';
-    btn.disabled = true;
-
-    setTimeout(() => {
-      const u = document.getElementById('username').value.trim();
-      const p = document.getElementById('password').value;
-        const user = Auth.login(u, p);
-        if (user) {
-          const r = user.role;
-          if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=14';
-          else if (r === 'scale') window.location.href = 'pages/reception.html?v=14';
-          else if (r === 'security') window.location.href = 'pages/security.html?v=14';
-          else if (r === 'finance') window.location.href = 'pages/finance.html?v=14';
-          else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=14';
-          else window.location.href = 'pages/dashboard.html?v=14';
-        } else {
-        document.getElementById('loginError').style.display = 'flex';
-        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول';
-        btn.disabled = false;
-      }
-    }, 800);
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    
+    const user = Auth.login(u, p);
+    if (user) {
+      const r = user.role;
+      if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=21';
+      else if (r === 'scale') window.location.href = 'pages/reception.html?v=21';
+      else if (r === 'security') window.location.href = 'pages/security.html?v=21';
+      else if (r === 'finance') window.location.href = 'pages/finance.html?v=21';
+      else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=21';
+      else window.location.href = 'pages/dashboard.html?v=21';
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
   }
+
+  // Populate Dynamic Stats from data.js
+  document.getElementById('stat-regions').textContent = 3;
+  document.getElementById('stat-silos').textContent = SILOS.length;
+  
+  // Calculate total capacity
+  const totalCap = SILOS.reduce((acc, s) => acc + s.capacity, 0);
+  document.getElementById('stat-capacity').innerHTML = (totalCap / 1000000).toFixed(1) + 'M<br><span style="font-size:0.7em">Ton</span>';
+  
+  // Calculate average stock
+  let totalStock = 0;
+  SILOS.forEach(s => totalStock += (s.stock || 0));
+  const stockPct = Math.round((totalStock / totalCap) * 100);
+  document.getElementById('stat-stock').textContent = stockPct + '%';
+  
+  // Randomize trains/ships for demo flavor
+  document.getElementById('stat-shipments').innerHTML = Math.floor(Math.random() * 20 + 5) + ' Trains<br>' + Math.floor(Math.random() * 5 + 1) + ' Ships';
+
 </script>
 </body>
 </html>
-
