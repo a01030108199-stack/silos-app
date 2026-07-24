@@ -51,17 +51,17 @@
     text-shadow: 0 2px 5px rgba(0,0,0,0.8);
   }
 
-  #stat-capacity { top: 31.5%; left: 8%; width: 15%; height: 6%; font-size: 1.5vw; }
-  #stat-regions { top: 45%; left: 8%; width: 15%; height: 5%; font-size: 1.6vw; }
-  #stat-silos { top: 58.5%; left: 8%; width: 15%; height: 5%; font-size: 1.6vw; }
+  #stat-capacity { top: 26%; left: 22%; width: 10%; height: 6%; font-size: 1.5vw; }
+  #stat-regions { top: 39%; left: 22%; width: 10%; height: 5%; font-size: 1.6vw; }
+  #stat-silos { top: 52%; left: 22%; width: 10%; height: 5%; font-size: 1.6vw; }
   
   #stat-stock { 
-    top: 73.5%; left: 23%; width: 6.5%; height: 7%; 
+    top: 66%; left: 29.5%; width: 5%; height: 7%; 
     font-size: 1.3vw; color: #fff; background: transparent; 
   }
   
   #stat-shipments { 
-    top: 72%; left: 8%; width: 14%; height: 8%; 
+    top: 65%; left: 16%; width: 10%; height: 8%; 
     font-size: 1vw; color: #fff; background: transparent; 
   }
 
@@ -195,7 +195,7 @@
 
   document.getElementById('stat-regions').textContent = '3';
   document.getElementById('stat-silos').textContent = SILOS ? SILOS.length : '48';
-  document.getElementById('stat-capacity').innerHTML = '3.1M<br><span style="font-size:0.7em">Ton</span>';
+  document.getElementById('stat-capacity').innerHTML = '<div dir="ltr">3.1M<br><span style="font-size:0.7em">Ton</span></div>';
   document.getElementById('stat-stock').textContent = '82%';
   document.getElementById('stat-shipments').innerHTML = Math.floor(Math.random() * 20 + 5) + ' Trains<br>' + Math.floor(Math.random() * 5 + 1) + ' Ships';
 </script>
