@@ -35,75 +35,140 @@
     display: block;
   }
 
-  /* ── Dynamic Stats (Left Panel) ── */
-  .stat-patch {
+  /* ── Panel Containers ── */
+  .left-panel-container {
     position: absolute;
-    background: transparent;
+    top: 23%; left: 11.2%; /* Adjust based on image empty area */
+    width: 20.5%; height: 56%;
+    display: flex; flex-direction: column;
+    padding: 0;
+    box-sizing: border-box;
+    z-index: 10;
+  }
+
+  .right-panel-container {
+    position: absolute;
+    top: 23%; left: 68.2%;
+    width: 20.5%; height: 56%;
+    display: flex; flex-direction: column;
+    padding: 0;
+    box-sizing: border-box;
+    z-index: 10;
+  }
+
+  .panel-header {
+    color: #eab308;
+    text-align: center;
+    font-size: 1.3vw;
+    font-weight: 800;
+    margin-bottom: 5%;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  /* ── Dynamic Stats (Left Panel) ── */
+  .stat-card {
+    background: rgba(25, 37, 51, 0.7);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    border-radius: 8px;
+    padding: 4%;
+    margin-bottom: 4%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #eab308;
-    font-weight: 800;
-    z-index: 10;
-    white-space: pre-line;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    flex: 1;
+  }
+  .stat-row {
+    display: flex;
+    gap: 4%;
+    flex: 1;
+  }
+  .stat-row .stat-card { margin-bottom: 0; }
+  
+  .stat-title {
+    color: #94a3b8;
+    font-size: 0.9vw;
+    margin-bottom: 2%;
+  }
+  .stat-value {
+    color: #fff;
+    font-size: 1.4vw;
+    font-weight: 700;
     text-align: center;
-    line-height: 1.2;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.8);
   }
-
-  #stat-capacity { top: 36%; left: 15%; width: 10%; height: 6%; font-size: 1.5vw; }
-  #stat-regions { top: 46%; left: 15%; width: 10%; height: 5%; font-size: 1.6vw; }
-  #stat-silos { top: 59%; left: 15%; width: 10%; height: 5%; font-size: 1.6vw; }
+  .stat-value small { font-size: 0.6em; color: #cbd5e1; }
   
-  #stat-stock { 
-    top: 73%; left: 25%; width: 5%; height: 7%; 
-    font-size: 1.3vw; color: #fff; background: transparent; 
-  }
-  
-  #stat-shipments { 
-    top: 73%; left: 15%; width: 10%; height: 8%; 
-    font-size: 1vw; color: #fff; background: transparent; 
-  }
+  .stat-value.gold { color: #eab308; font-size: 1.6vw; }
 
   /* ── Login Form (Right Panel) ── */
-  .transparent-input {
-    position: absolute;
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 4%;
+  }
+
+  .input-group {
+    background: rgba(15, 22, 35, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 5%;
+    height: 18%;
+  }
+  .input-group:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  }
+  
+  .input-icon {
+    color: #3b82f6;
+    font-size: 1vw;
+    width: 15%;
+    text-align: center;
+  }
+  .input-icon.gold { color: #eab308; }
+
+  .modern-input {
     background: transparent;
     border: none;
     color: #fff;
     font-family: 'Cairo', sans-serif;
-    font-size: 1.1vw;
+    font-size: 1vw;
     font-weight: 600;
     outline: none;
-    z-index: 10;
-    padding: 0 10px;
-    text-align: right;
+    flex: 1;
+    height: 100%;
   }
-  
-  .transparent-input::placeholder { color: rgba(255,255,255,0.4); }
-  .transparent-input option { color: #000; background: #fff; }
+  .modern-input::placeholder { color: rgba(255,255,255,0.4); }
+  .modern-input option { color: #000; background: #fff; }
 
-  #branchSelect { top: 27%; left: 71%; width: 17.5%; height: 4.5%; cursor: pointer; }
-  #username { top: 42%; left: 71%; width: 17.5%; height: 4.5%; }
-  #password { top: 56.5%; left: 71%; width: 17.5%; height: 4.5%; letter-spacing: 2px;}
-
-  .transparent-btn {
-    position: absolute;
-    top: 71%; left: 71%; width: 18%; height: 6%;
-    background: transparent;
-    border: none;
+  .modern-btn {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1.1vw;
+    font-weight: 700;
     cursor: pointer;
-    z-index: 10;
-    color: transparent;
+    height: 20%;
+    margin-top: auto;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+  }
+  .modern-btn:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    transform: translateY(-2px);
   }
 
   /* ── Error Message ── */
   .login-error {
-    position: absolute;
-    top: 83%; left: 74.5%; width: 15%;
-    color: #ef4444; font-size: 1vw; font-weight: bold; text-align: center;
-    background: rgba(15,22,35,0.9); padding: 5px; border-radius: 5px;
-    display: none; z-index: 20;
+    color: #ef4444; font-size: 0.9vw; font-weight: bold; text-align: center;
+    background: rgba(15,22,35,0.9); padding: 2%; border-radius: 5px;
+    display: none; margin-top: 2%;
   }
 
 </style>
@@ -111,43 +176,83 @@
 <body class="index-portal">
 
 <div class="image-map-container">
-  <img src="img/index_bg.jpg?v=2" class="bg-image" alt="EHCSS Portal">
+  <img src="img/index_bg.jpg?v=3" class="bg-image" alt="EHCSS Portal">
 
-  <!-- Left Panel Overlays (Masking original text) -->
-  <div class="stat-patch" id="stat-capacity">3.1M<br><span style="font-size:0.7em">Ton</span></div>
-  <div class="stat-patch" id="stat-regions">3</div>
-  <div class="stat-patch" id="stat-silos">48</div>
-  <div class="stat-patch" id="stat-stock">82%</div>
-  <div class="stat-patch" id="stat-shipments">12 Trains<br>4 Ships</div>
+  <!-- Left Panel: CSS-Driven Stats -->
+  <div class="left-panel-container">
+    <div class="panel-header">مؤشرات الأداء التشغيلي</div>
+    
+    <div class="stat-card">
+      <div class="stat-title">السعة التخزينية الإجمالية</div>
+      <div class="stat-value gold" id="stat-capacity">3.1 <small>مليون طن</small></div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-title">عدد المناطق الجغرافية</div>
+      <div class="stat-value gold" id="stat-regions">3</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-title">عدد الصوامع النشطة</div>
+      <div class="stat-value gold" id="stat-silos">48</div>
+    </div>
+    
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-title">المخزون</div>
+        <div class="stat-value" id="stat-stock" style="color: #10b981;">82%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">شحنات اليوم</div>
+        <div class="stat-value" id="stat-shipments" style="font-size: 0.9vw;">12 قطار<br>4 سفن</div>
+      </div>
+    </div>
+  </div>
 
-  <!-- Right Panel Overlays (Inputs) -->
-  <form onsubmit="handleLogin(event)">
-    <select id="branchSelect" class="transparent-input" onchange="fillCreds(this.value)">
-      <option value="">-- اختر الفرع للبدء --</option>
-      <!-- General Admin -->
-      <option value="admin">الإدارة العامة (Dashboard)</option>
-    </select>
+  <!-- Right Panel: CSS-Driven Login Form -->
+  <div class="right-panel-container">
+    <div class="panel-header">بوابة دخول المستخدم</div>
     
-    <input type="text" id="username" class="transparent-input" placeholder="اسم المستخدم" required autocomplete="off">
-    <input type="password" id="password" class="transparent-input" placeholder="كلمة المرور" required>
-    
-    <button type="submit" class="transparent-btn" id="loginBtn" title="تسجيل الدخول"></button>
-    <div id="loginError" class="login-error">بيانات الدخول غير صحيحة</div>
-  </form>
+    <form onsubmit="handleLogin(event)" class="login-form">
+      
+      <div class="input-group">
+        <i class="fa-solid fa-building input-icon"></i>
+        <select id="branchSelect" class="modern-input" onchange="fillCreds(this.value)">
+          <option value="">-- اختر الفرع للبدء --</option>
+          <option value="admin">الإدارة العامة (Dashboard)</option>
+        </select>
+      </div>
+      
+      <div class="input-group">
+        <i class="fa-solid fa-user input-icon"></i>
+        <input type="text" id="username" class="modern-input" placeholder="اسم المستخدم" required autocomplete="off">
+      </div>
+      
+      <div class="input-group">
+        <i class="fa-solid fa-key input-icon gold"></i>
+        <input type="password" id="password" class="modern-input" placeholder="كلمة المرور" required>
+      </div>
+      
+      <button type="submit" class="modern-btn" id="loginBtn">تسجيل الدخول <i class="fa-solid fa-arrow-left-to-bracket" style="margin-right:5px;"></i></button>
+      <div id="loginError" class="login-error">بيانات الدخول غير صحيحة</div>
+      
+    </form>
+  </div>
+
 </div>
 
-<script src="js/data.js?v=22"></script>
-<script src="js/app.js?v=22"></script>
+<script src="js/data.js?v=23"></script>
+<script src="js/app.js?v=23"></script>
 <script>
   // Auto-redirect
   if (Auth.current()) {
     const r = Auth.current().role;
-    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=22';
-    else if (r === 'scale') window.location.href = 'pages/reception.html?v=22';
-    else if (r === 'security') window.location.href = 'pages/security.html?v=22';
-    else if (r === 'finance') window.location.href = 'pages/finance.html?v=22';
-    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=22';
-    else window.location.href = 'pages/dashboard.html?v=22';
+    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=23';
+    else if (r === 'scale') window.location.href = 'pages/reception.html?v=23';
+    else if (r === 'security') window.location.href = 'pages/security.html?v=23';
+    else if (r === 'finance') window.location.href = 'pages/finance.html?v=23';
+    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=23';
+    else window.location.href = 'pages/dashboard.html?v=23';
   }
 
   const select = document.getElementById('branchSelect');
@@ -182,12 +287,12 @@
     const user = Auth.login(u, p);
     if (user) {
       const r = user.role;
-      if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=22';
-      else if (r === 'scale') window.location.href = 'pages/reception.html?v=22';
-      else if (r === 'security') window.location.href = 'pages/security.html?v=22';
-      else if (r === 'finance') window.location.href = 'pages/finance.html?v=22';
-      else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=22';
-      else window.location.href = 'pages/dashboard.html?v=22';
+      if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=23';
+      else if (r === 'scale') window.location.href = 'pages/reception.html?v=23';
+      else if (r === 'security') window.location.href = 'pages/security.html?v=23';
+      else if (r === 'finance') window.location.href = 'pages/finance.html?v=23';
+      else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=23';
+      else window.location.href = 'pages/dashboard.html?v=23';
     } else {
       document.getElementById('loginError').style.display = 'block';
     }
@@ -195,9 +300,14 @@
 
   document.getElementById('stat-regions').textContent = '3';
   document.getElementById('stat-silos').textContent = SILOS ? SILOS.length : '48';
-  document.getElementById('stat-capacity').innerHTML = '<div dir="ltr">3.1M<br><span style="font-size:0.7em">Ton</span></div>';
+  
+  let totalCap = 0;
+  if(typeof CELLS !== 'undefined') totalCap = CELLS.reduce((acc, c) => acc + c.capacity, 0);
+  else totalCap = 3100000;
+  
+  document.getElementById('stat-capacity').innerHTML = (totalCap / 1000000).toFixed(1) + ' <small>مليون طن</small>';
   document.getElementById('stat-stock').textContent = '82%';
-  document.getElementById('stat-shipments').innerHTML = Math.floor(Math.random() * 20 + 5) + ' Trains<br>' + Math.floor(Math.random() * 5 + 1) + ' Ships';
+  document.getElementById('stat-shipments').innerHTML = Math.floor(Math.random() * 20 + 5) + ' قطار<br>' + Math.floor(Math.random() * 5 + 1) + ' سفن';
 </script>
 </body>
 </html>
