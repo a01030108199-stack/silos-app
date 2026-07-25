@@ -943,6 +943,22 @@ function deleteTicket(id) {
   showToast('تم وسم الكارتة كـ "ملغاة" بنجاح، ولن يتم ترحيلها للرصيد.', 'info');
 }
 
+function restoreTicket(id) {
+  if (!confirm('هل أنت متأكد من استرجاع هذه الكارتة الملغاة وإعادتها للرصيد؟')) return;
+  let tickets = getTickets();
+  const idx = tickets.findIndex(t => t.id === id);
+  if (idx !== -1) {
+    tickets[idx].status = tickets[idx].net > 0 ? 'completed' : 'pending';
+    tickets[idx].deleteReason = null;
+    tickets[idx].deletedBy = null;
+    tickets[idx].deletedAt = null;
+    localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  }
+  renderTable();
+  if (typeof calcOrderBalance === 'function') calcOrderBalance();
+  showToast('تم استرجاع الكارتة بنجاح وعادت للرصيد', 'success');
+}
+
 function renderTable() {
   const tbody = document.getElementById('ticketsBody');
   tbody.innerHTML = '';
@@ -963,7 +979,8 @@ function renderTable() {
     let rowStyle = '';
     
     if (t.status === 'deleted') {
-       statusBadge = `<span class="badge" style="background:#dc2626;color:#fff;" title="سبب الحذف: ${t.deleteReason} (بواسطة ${t.deletedBy})"><i class="fa-solid fa-ban"></i> ملغاة</span>`;
+       statusBadge = `<span class="badge" style="background:#dc2626;color:#fff;" title="سبب الحذف: ${t.deleteReason} (بواسطة ${t.deletedBy})"><i class="fa-solid fa-ban"></i> ملغاة</span>
+       <button class="btn btn-primary btn-sm" onclick="restoreTicket('${t.id}')" title="استرجاع الكارتة" style="margin-right:5px; padding:3px 8px;"><i class="fa-solid fa-rotate-left"></i></button>`;
        rowStyle = 'background: rgba(220, 38, 38, 0.1); opacity: 0.85; text-decoration: line-through;';
     } else if (t.status === 'pending') {
        statusBadge = `<button class="btn btn-warning btn-sm" onclick="loadPendingTicket('${t.id}')"><i class="fa-solid fa-truck-moving"></i> استكمال الوزنة</button>
