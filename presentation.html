@@ -532,7 +532,7 @@
       </div>
       <div class="cover-bottom-item">
         <div class="lbl">عدد الصفحات</div>
-        <div class="val">4 صفحات</div>
+        <div class="val">5 صفحات</div>
       </div>
       <div class="cover-bottom-item">
         <div class="lbl">القسم</div>
@@ -606,7 +606,7 @@
   <div class="pfooter">
     <span>EHCSS — ISS 1.0</span>
     <span class="conf">🔴 سري للاستخدام الداخلي</span>
-    <span>صفحة 2 من 4</span>
+    <span>صفحة 2 من 5</span>
   </div>
 </div>
 
@@ -684,50 +684,134 @@
   <div class="pfooter">
     <span>EHCSS — ISS 1.0</span>
     <span class="conf">🔴 سري للاستخدام الداخلي</span>
-    <span>صفحة 3 من 4</span>
+    <span>صفحة 3 من 5</span>
   </div>
 </div>
 
-<!-- ═══════ PAGE 4: DATABASE & TOOLS ═══════ -->
+<!-- ═══════ PAGE 4: ADVANCED ER DIAGRAM ═══════ -->
 <div class="page">
   <div class="page-head">
     <div class="page-num">٤</div>
     <div>
-      <h2>قاعدة البيانات والأدوات المستخدمة</h2>
-      <p>Database Diagram & Technology Stack</p>
+      <h2>مخطط قاعدة البيانات التفصيلي (ERD)</h2>
+      <p>Entity Relationship Diagram</p>
+    </div>
+  </div>
+
+  <div class="page-content" dir="ltr" style="padding-top:20px;">
+    
+    <div style="position:relative; width:100%; height:920px; font-family:monospace;">
+      
+      <!-- SVG Connectors -->
+      <svg width="310" height="920" style="position:absolute; left:220px; top:0; pointer-events:none;">
+        <path d="M 0,450 L 40,450 M 40,95 L 40,832 M 40,95 L 310,95 M 40,284 L 310,284 M 40,472 L 310,472 M 40,664 L 310,664 M 40,832 L 310,832" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+        
+        <!-- Crow's feet right -->
+        <path d="M 300,85 L 310,95 L 300,105 M 305,85 L 305,105" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+        <path d="M 300,274 L 310,284 L 300,294 M 305,274 L 305,294" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+        <path d="M 300,462 L 310,472 L 300,482 M 305,462 L 305,482" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+        <path d="M 300,654 L 310,664 L 300,674 M 305,654 L 305,674" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+        <path d="M 300,822 L 310,832 L 300,842 M 305,822 L 305,842" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+        
+        <!-- Crow's feet left -->
+        <path d="M 5,440 L 5,460 M 10,440 L 10,460" stroke="#94a3b8" stroke-width="1.5" fill="none" />
+      </svg>
+
+      <!-- Labels (Placed carefully) -->
+      <div style="position:absolute; left:375px; top:95px; background:#fff; border:1px solid #e2e8f0; padding:2px 8px; font-size:11px; font-family:'Cairo'; font-weight:700; color:#1e293b; border-radius:4px; transform:translate(-50%, -50%);">تسجل حركات يومية</div>
+      <div style="position:absolute; left:375px; top:284px; background:#fff; border:1px solid #e2e8f0; padding:2px 8px; font-size:11px; font-family:'Cairo'; font-weight:700; color:#1e293b; border-radius:4px; transform:translate(-50%, -50%);">لها سجلات صيانة</div>
+      <div style="position:absolute; left:375px; top:472px; background:#fff; border:1px solid #e2e8f0; padding:2px 8px; font-size:11px; font-family:'Cairo'; font-weight:700; color:#1e293b; border-radius:4px; transform:translate(-50%, -50%);">تصدر تنبيهات أمنية</div>
+      <div style="position:absolute; left:375px; top:664px; background:#fff; border:1px solid #e2e8f0; padding:2px 8px; font-size:11px; font-family:'Cairo'; font-weight:700; color:#1e293b; border-radius:4px; transform:translate(-50%, -50%);">تحتوي على خلايا</div>
+      <div style="position:absolute; left:375px; top:832px; background:#fff; border:1px solid #e2e8f0; padding:2px 8px; font-size:11px; font-family:'Cairo'; font-weight:700; color:#1e293b; border-radius:4px; transform:translate(-50%, -50%);">يديرها مستخدمون</div>
+
+      <!-- SILOS TABLE (Left) -->
+      <div class="v-table" style="position:absolute; left:20px; top:354px; width:200px; background:#fff; border:1.5px solid #2563eb; border-radius:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:11.5px;">
+        <div class="v-head" style="background:#eff6ff; text-align:center; font-weight:bold; font-family:'Cairo', sans-serif; font-size:13px; color:#0f172a; padding:6px; border-bottom:1.5px solid #2563eb;">SILOS</div>
+        <div class="v-row v-pk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#fefce8;"><div class="v-type" style="color:#854d0e; font-size:10px; font-weight:bold;">PK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">name</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">governorate</div></div>
+        <div class="v-row v-fk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#f0fdf4;"><div class="v-type" style="color:#166534; font-size:10px; font-weight:bold;">FK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">region_id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">total_capacity</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">current_stock</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">status</div></div>
+      </div>
+
+      <!-- TRANSACTIONS (Right 1) -->
+      <div class="v-table" style="position:absolute; right:20px; top:0px; width:200px; background:#fff; border:1.5px solid #ef4444; border-radius:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:11.5px;">
+        <div class="v-head" style="background:#fef2f2; text-align:center; font-weight:bold; font-family:'Cairo', sans-serif; font-size:13px; color:#0f172a; padding:6px; border-bottom:1.5px solid #ef4444;">TRANSACTIONS</div>
+        <div class="v-row v-pk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#fefce8;"><div class="v-type" style="color:#854d0e; font-size:10px; font-weight:bold;">PK string</div><div class="v-name" style="color:#1e293b; font-weight:600;">receipt_id</div></div>
+        <div class="v-row v-fk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#f0fdf4;"><div class="v-type" style="color:#166534; font-size:10px; font-weight:bold;">FK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">silo_id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">datetime</div><div class="v-name" style="color:#1e293b; font-weight:600;">timestamp</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">type</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">supplier</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">net_weight</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">empty_weight</div></div>
+      </div>
+
+      <!-- MAINTENANCE_LOGS (Right 2) -->
+      <div class="v-table" style="position:absolute; right:20px; top:200px; width:200px; background:#fff; border:1.5px solid #d97706; border-radius:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:11.5px;">
+        <div class="v-head" style="background:#fffbeb; text-align:center; font-weight:bold; font-family:'Cairo', sans-serif; font-size:13px; color:#0f172a; padding:6px; border-bottom:1.5px solid #d97706;">MAINTENANCE_LOGS</div>
+        <div class="v-row v-pk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#fefce8;"><div class="v-type" style="color:#854d0e; font-size:10px; font-weight:bold;">PK string</div><div class="v-name" style="color:#1e293b; font-weight:600;">log_id</div></div>
+        <div class="v-row v-fk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#f0fdf4;"><div class="v-type" style="color:#166534; font-size:10px; font-weight:bold;">FK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">silo_id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">equipment</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">severity</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">status</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">estimated_cost</div></div>
+      </div>
+
+      <!-- SECURITY_ALERTS (Right 3) -->
+      <div class="v-table" style="position:absolute; right:20px; top:400px; width:200px; background:#fff; border:1.5px solid #dc2626; border-radius:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:11.5px;">
+        <div class="v-head" style="background:#fef2f2; text-align:center; font-weight:bold; font-family:'Cairo', sans-serif; font-size:13px; color:#0f172a; padding:6px; border-bottom:1.5px solid #dc2626;">SECURITY_ALERTS</div>
+        <div class="v-row v-pk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#fefce8;"><div class="v-type" style="color:#854d0e; font-size:10px; font-weight:bold;">PK string</div><div class="v-name" style="color:#1e293b; font-weight:600;">alert_id</div></div>
+        <div class="v-row v-fk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#f0fdf4;"><div class="v-type" style="color:#166534; font-size:10px; font-weight:bold;">FK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">silo_id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">alert_type</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">datetime</div><div class="v-name" style="color:#1e293b; font-weight:600;">time</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">status</div></div>
+      </div>
+
+      <!-- CELLS (Right 4) -->
+      <div class="v-table" style="position:absolute; right:20px; top:580px; width:200px; background:#fff; border:1.5px solid #eab308; border-radius:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:11.5px;">
+        <div class="v-head" style="background:#fefce8; text-align:center; font-weight:bold; font-family:'Cairo', sans-serif; font-size:13px; color:#0f172a; padding:6px; border-bottom:1.5px solid #eab308;">CELLS</div>
+        <div class="v-row v-pk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#fefce8;"><div class="v-type" style="color:#854d0e; font-size:10px; font-weight:bold;">PK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">id</div></div>
+        <div class="v-row v-fk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#f0fdf4;"><div class="v-type" style="color:#166534; font-size:10px; font-weight:bold;">FK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">silo_id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">grain_type</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">capacity</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">float</div><div class="v-name" style="color:#1e293b; font-weight:600;">current_amount</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">wheat_grade</div></div>
+      </div>
+
+      <!-- USERS (Right 5) -->
+      <div class="v-table" style="position:absolute; right:20px; top:760px; width:200px; background:#fff; border:1.5px solid #10b981; border-radius:6px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); font-size:11.5px;">
+        <div class="v-head" style="background:#f0fdf4; text-align:center; font-weight:bold; font-family:'Cairo', sans-serif; font-size:13px; color:#0f172a; padding:6px; border-bottom:1.5px solid #10b981;">USERS</div>
+        <div class="v-row v-pk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#fefce8;"><div class="v-type" style="color:#854d0e; font-size:10px; font-weight:bold;">PK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">id</div></div>
+        <div class="v-row v-fk" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9; background:#f0fdf4;"><div class="v-type" style="color:#166534; font-size:10px; font-weight:bold;">FK int</div><div class="v-name" style="color:#1e293b; font-weight:600;">silo_id</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">username</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px; border-bottom:1px solid #f1f5f9;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">password</div></div>
+        <div class="v-row" style="display:flex; justify-content:space-between; padding:4px 10px;"><div class="v-type" style="color:#64748b; font-size:10px;">string</div><div class="v-name" style="color:#1e293b; font-weight:600;">role</div></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="pfooter">
+    <span>EHCSS — ISS 1.0</span>
+    <span class="conf">🔴 سري للاستخدام الداخلي</span>
+    <span>صفحة 4 من 5</span>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 5: TOOLS & SUMMARY ═══════ -->
+<div class="page">
+  <div class="page-head">
+    <div class="page-num">٥</div>
+    <div>
+      <h2>الأدوات والتقنيات والخلاصة</h2>
+      <p>Technology Stack & Executive Summary</p>
     </div>
   </div>
 
   <div class="page-content">
-
-    <div class="sec-title">🗃️ مخطط العلاقات بين الجداول (ER Diagram)</div>
-    <div class="er-wrap" style="margin-bottom:25px;">
-      <div class="er-table">
-        <div class="er-head">🏛️ SILOS — الصوامع</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> silo_id <span class="ftype">INT</span></div>
-        <div class="er-field">name <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">capacity <span class="ftype">DECIMAL</span></div>
-      </div>
-      <div class="er-table green">
-        <div class="er-head">👤 USERS — المستخدمون</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> user_id <span class="ftype">INT</span></div>
-        <div class="er-field">role <span class="ftype">ENUM</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-      </div>
-      <div class="er-table gold">
-        <div class="er-head">📦 CELLS — الخلايا</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> cell_id <span class="ftype">INT</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-        <div class="er-field">stock <span class="ftype">DECIMAL</span></div>
-      </div>
-      <div class="er-table red">
-        <div class="er-head">🚛 TRANSACTIONS — الحركات</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> tx_id <span class="ftype">INT</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-        <div class="er-field">weight_net <span class="ftype">DECIMAL</span></div>
-      </div>
-    </div>
-
     <div class="sec-title">🛠️ الأدوات والتقنيات المستخدمة في البناء (Tech Stack)</div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
       
@@ -783,9 +867,8 @@
   <div class="pfooter">
     <span>تصميم وبرمجة: أكرم محمد محمود — EHCSS ISS 1.0</span>
     <span class="conf">🔴 سري للاستخدام الداخلي</span>
-    <span>صفحة 4 من 4</span>
+    <span>صفحة 5 من 5</span>
   </div>
 </div>
-
 </body>
 </html>
