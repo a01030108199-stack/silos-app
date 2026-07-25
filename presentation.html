@@ -541,85 +541,60 @@
   </div>
 </div>
 
-<!-- ═══════ PAGE 2: SYSTEM WORKFLOW ═══════ -->
+<!-- ═══════ PAGE 2: IMPORTANCE & OBJECTIVES ═══════ -->
 <div class="page">
   <div class="page-head">
     <div class="page-num">٢</div>
     <div>
-      <h2>خريطة سير العمل — رحلة الشحنة من الوصول حتى التسوية</h2>
-      <p>System Workflow — From Arrival to Final Settlement</p>
+      <h2>أهمية النظام والأهداف الاستراتيجية</h2>
+      <p>System Importance & Strategic Objectives</p>
     </div>
   </div>
 
   <div class="page-content">
-    <div class="wf-note">
-      يُبيّن هذا المخطط الرحلة الكاملة لكل شحنة قمح داخل النظام الموحد، مع ربط كل مرحلة بالقسم المسؤول عنها والمستند الرقمي المقابل.
+    <div class="sec-title">🎯 المشكلة التي نعالجها (أهمية النظام)</div>
+    <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:10px; padding:15px; margin-bottom:20px; font-size:12px; line-height:1.8; color:#881337;">
+      <strong>التحدي الحالي:</strong> تعتمد الصوامع حالياً على الأوراق والملفات اليدوية في تسجيل الأوزان وإصدار المستندات، مما يؤدي إلى تأخر في إصدار التقارير للإدارة العليا، صعوبة تتبع المخزون اللحظي عبر 48 صومعة، وزيادة احتمالية الأخطاء البشرية أو التلاعب في البيانات لصعوبة الرقابة المركزية الفورية.
+    </div>
+    
+    <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:15px; margin-bottom:25px; font-size:12px; line-height:1.8; color:#14532d;">
+      <strong>الحل المقترح (ISS 1.0):</strong> تحويل كامل المنظومة إلى بيئة رقمية مترابطة تضمن تسجيل البيانات من المنبع (الميزان والمعمل) وتأمينها وتشفيرها، وعرضها فورياً على شاشة متخذ القرار.
     </div>
 
-    <div class="wf-wrap">
-
-      <!-- Stage 1 -->
-      <div class="wf-stage">
-        <div class="wf-stage-label">مرحلة الوصول</div>
-        <div class="wf-stage-content">
-          <div class="wf-node r"><div class="ico">🔐</div><div class="lbl">بوابة الأمن</div><div class="sub">تسجيل اللوحة والجواز</div></div>
-          <div class="wf-arrow">◄</div>
-          <div class="wf-node"><div class="ico">🚛</div><div class="lbl">وصول الشاحنة</div><div class="sub">Truck / Ship Arrival</div></div>
-          <div class="wf-arrow">◄</div>
-          <div class="wf-node y"><div class="ico">⚖️</div><div class="lbl">الميزان المبدئي</div><div class="sub">الوزن الفارغ</div></div>
+    <div class="sec-title">🚀 الأهداف الرئيسية للنظام (Objectives)</div>
+    
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; gap:14px; align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+        <div style="background:#2563eb; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; flex-shrink:0;">1</div>
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#1e293b; margin-bottom:4px;">الرقابة المحكمة ومنع التلاعب (Audit & Security)</div>
+          <div style="font-size:11.5px; color:#475569; line-height:1.7;">إغلاق أي ثغرات للتلاعب عبر تسجيل لحظي للأوزان ونتائج المعمل غير قابلة للتعديل. وكل عملية مرتبطة ببصمة المستخدم والتوقيت.</div>
         </div>
       </div>
-      <div class="wf-down">▼</div>
-
-      <!-- Stage 2 -->
-      <div class="wf-stage">
-        <div class="wf-stage-label">مرحلة الجودة</div>
-        <div class="wf-stage-content" style="justify-content:center;">
-          <div class="wf-node g"><div class="ico">🧪</div><div class="lbl">قسم الجودة والمعمل</div><div class="sub">نسبة النقاء · الرطوبة · الشوائب</div></div>
-          <div class="wf-arrow">◄►</div>
-          <div class="wf-node center"><div class="ico">🏛️</div><div class="lbl">تفريغ وتخزين في الصومعة</div><div class="sub">Cell Assignment & Storage</div></div>
-        </div>
-      </div>
-      <div class="wf-down">▼</div>
-
-      <!-- Stage 3 -->
-      <div class="wf-stage">
-        <div class="wf-stage-label">مرحلة الصرف</div>
-        <div class="wf-stage-content">
-          <div class="wf-node y"><div class="ico">⚖️</div><div class="lbl">الميزان النهائي</div><div class="sub">الوزن الصافي الرسمي</div></div>
-          <div class="wf-arrow">◄</div>
-          <div class="wf-node p"><div class="ico">💰</div><div class="lbl">الشئون المالية</div><div class="sub">أذن الصرف وحساب المورد</div></div>
-          <div class="wf-arrow">◄</div>
-          <div class="wf-node"><div class="ico">📋</div><div class="lbl">إصدار المستند الرسمي</div><div class="sub">Receipt & Invoice</div></div>
-        </div>
-      </div>
-      <div class="wf-down">▼</div>
-
-      <!-- Stage 4 -->
-      <div class="wf-stage">
-        <div class="wf-stage-label">الإدارة العليا</div>
-        <div class="wf-stage-content" style="justify-content:center; gap:20px;">
-          <div class="wf-node" style="background:linear-gradient(135deg,#0f172a,#1e293b); min-width:110px;">
-            <div class="ico">📊</div><div class="lbl">لوحة القيادة</div><div class="sub">تقارير لحظية للإدارة</div>
-          </div>
-          <div class="wf-node g" style="min-width:110px;">
-            <div class="ico">🗂️</div><div class="lbl">التقارير الشهرية</div><div class="sub">Monthly & Annual Reports</div>
-          </div>
-          <div class="wf-node p" style="min-width:110px;">
-            <div class="ico">🔍</div><div class="lbl">سجل المراجعة</div><div class="sub">Audit Trail & Logs</div>
-          </div>
+      
+      <div style="display:flex; gap:14px; align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+        <div style="background:#2563eb; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; flex-shrink:0;">2</div>
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#1e293b; margin-bottom:4px;">لوحة تحكم للإدارة العليا (Executive Dashboard)</div>
+          <div style="font-size:11.5px; color:#475569; line-height:1.7;">توفير شاشة مركزية تمكن الإدارة من مراقبة السعات التخزينية وحركة الاستلام في جميع صوامع الجمهورية بضغطة زر وفي الوقت الفعلي.</div>
         </div>
       </div>
 
-    </div>
+      <div style="display:flex; gap:14px; align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+        <div style="background:#2563eb; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; flex-shrink:0;">3</div>
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#1e293b; margin-bottom:4px;">تسريع دورة العمل وتقليل التكاليف (Efficiency)</div>
+          <div style="font-size:11.5px; color:#475569; line-height:1.7;">أتمتة العمليات الحسابية بالكامل مثل (خصومات الرطوبة والنظافة، حساب الوزن الصافي آلياً، وقيمة الفاتورة) وتقليص زمن الدورة بنسبة تتجاوز 60%.</div>
+        </div>
+      </div>
 
-    <!-- Legend -->
-    <div style="display:flex; gap:14px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#991b1b;border-radius:3px;display:inline-block;"></span>الأمن</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#92400e;border-radius:3px;display:inline-block;"></span>الميزان</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#065f46;border-radius:3px;display:inline-block;"></span>الجودة</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#4c1d95;border-radius:3px;display:inline-block;"></span>المحاسبة</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#1e40af;border-radius:3px;display:inline-block;"></span>الإدارة / النظام</div>
+      <div style="display:flex; gap:14px; align-items:flex-start; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
+        <div style="background:#2563eb; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; flex-shrink:0;">4</div>
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#1e293b; margin-bottom:4px;">توحيد الإدارات في منصة واحدة (Integration)</div>
+          <div style="font-size:11.5px; color:#475569; line-height:1.7;">ربط قسم الأمن، والميزان، والمعمل، والشئون المالية، وإدارة الصومعة في بيئة متزامنة تُلغي الحاجة لتمرير الأوراق اليدوية وتمنع الازدواجية.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -630,123 +605,74 @@
   </div>
 </div>
 
-<!-- ═══════ PAGE 3: DATABASE ═══════ -->
+<!-- ═══════ PAGE 3: WORKFLOW & MODULES ═══════ -->
 <div class="page">
   <div class="page-head">
     <div class="page-num">٣</div>
     <div>
-      <h2>هيكل قاعدة البيانات ومعمارية الخادم</h2>
-      <p>Database Schema & Server Architecture</p>
+      <h2>طريقة الشرح وخريطة عمل النظام</h2>
+      <p>System Workflow & Modules Walkthrough</p>
     </div>
   </div>
 
   <div class="page-content">
-
-    <!-- Architecture -->
-    <div class="sec-title">🏗️ معمارية النظام ثلاثية الطبقات (3-Tier)</div>
-
-    <div class="arch-tier">
-      <div class="arch-tier-label">الطبقة الأولى — المستخدمون</div>
-      <div class="arch-tier-boxes">
-        <div class="arch-box blue"><div class="aico">🏛️</div><div class="atitle">مدير الصومعة</div></div>
-        <div class="arch-box blue"><div class="aico">⚖️</div><div class="atitle">قسم الميزان</div></div>
-        <div class="arch-box blue"><div class="aico">🧪</div><div class="atitle">قسم الجودة</div></div>
-        <div class="arch-box blue"><div class="aico">💰</div><div class="atitle">الشئون المالية</div></div>
-        <div class="arch-box blue"><div class="aico">🔐</div><div class="atitle">إدارة الأمن</div></div>
-        <div class="arch-box blue"><div class="aico">📊</div><div class="atitle">الإدارة العليا</div></div>
+    
+    <div class="sec-title">📍 دورة عمل الشحنة داخل النظام (Workflow)</div>
+    <div class="wf-wrap" style="margin-bottom:20px;">
+      <div class="wf-stage"><div class="wf-stage-label">وصول</div>
+        <div class="wf-stage-content">
+          <div class="wf-node r"><div class="ico">🔐</div><div class="lbl">الأمن</div></div><div class="wf-arrow">◄</div>
+          <div class="wf-node y"><div class="ico">⚖️</div><div class="lbl">الميزان (فارغ)</div></div>
+        </div>
       </div>
-    </div>
-    <div class="arch-connect">⬇ HTTPS / Browser</div>
-
-    <div class="arch-tier">
-      <div class="arch-tier-label">الطبقة الثانية — التطبيق (App Layer)</div>
-      <div class="arch-tier-boxes">
-        <div class="arch-box green" style="min-width:130px;"><div class="aico">🌐</div><div class="atitle">واجهة HTML/JS/CSS</div><div class="asub">Role-Based Access Control</div></div>
-        <div class="arch-box green" style="min-width:130px;"><div class="aico">⚙️</div><div class="atitle">محرك منطق الأعمال</div><div class="asub">app.js · data.js · auth.js</div></div>
-        <div class="arch-box green" style="min-width:130px;"><div class="aico">🖨️</div><div class="atitle">محرك التقارير</div><div class="asub">Print / Export PDF</div></div>
+      <div class="wf-down">▼</div>
+      <div class="wf-stage"><div class="wf-stage-label">فحص</div>
+        <div class="wf-stage-content" style="justify-content:center;">
+          <div class="wf-node g"><div class="ico">🧪</div><div class="lbl">المعمل (الجودة)</div></div><div class="wf-arrow">◄►</div>
+          <div class="wf-node center"><div class="ico">🏛️</div><div class="lbl">التفريغ بالصومعة</div></div>
+        </div>
       </div>
-    </div>
-    <div class="arch-connect">⬇ Firebase SDK / LocalStorage API</div>
-
-    <div class="arch-tier">
-      <div class="arch-tier-label">الطبقة الثالثة — البيانات (Data Layer)</div>
-      <div class="arch-tier-boxes">
-        <div class="arch-box gold" style="min-width:120px;"><div class="aico">☁️</div><div class="atitle">Firebase Realtime DB</div><div class="asub">بيانات سحابية لحظية</div></div>
-        <div class="arch-box gold" style="min-width:120px;"><div class="aico">💾</div><div class="atitle">LocalStorage</div><div class="asub">عمل بدون إنترنت Offline</div></div>
-        <div class="arch-box gold" style="min-width:120px;"><div class="aico">🔒</div><div class="atitle">Auth & Encryption</div><div class="asub">تشفير وتحقق هوية</div></div>
+      <div class="wf-down">▼</div>
+      <div class="wf-stage"><div class="wf-stage-label">تسوية</div>
+        <div class="wf-stage-content">
+          <div class="wf-node y"><div class="ico">⚖️</div><div class="lbl">الميزان (قائم)</div></div><div class="wf-arrow">◄</div>
+          <div class="wf-node p"><div class="ico">💰</div><div class="lbl">المالية (الصرف)</div></div>
+        </div>
       </div>
     </div>
 
-    <!-- ER Tables -->
-    <div class="sec-title" style="margin-top:18px;">🗃️ مخطط العلاقات بين الجداول (Entity Relationship)</div>
-
-    <div class="er-wrap">
-
-      <div class="er-table">
-        <div class="er-head">🏛️ SILOS — الصوامع</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> silo_id <span class="ftype">INT PK</span></div>
-        <div class="er-field">name <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">region <span class="ftype">ENUM</span></div>
-        <div class="er-field">capacity <span class="ftype">DECIMAL</span></div>
-        <div class="er-field">current_stock <span class="ftype">DECIMAL</span></div>
-        <div class="er-field">status <span class="ftype">ENUM</span></div>
+    <div class="sec-title">💻 شاشات البرنامج وصلاحيات المستخدمين (Modules)</div>
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-head"><div class="module-ico" style="background:#eff6ff;">📊</div><div><div class="module-name">شاشة الإدارة العليا</div><div class="module-role">لوحة قيادة تفاعلية</div></div></div>
+        <div class="module-feat">مراقبة سعة 48 صومعة في الوقت الفعلي.</div>
+        <div class="module-feat">مؤشرات أداء لعمليات التوريد اليومية.</div>
       </div>
-
-      <div class="er-table green">
-        <div class="er-head">👤 USERS — المستخدمون</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> user_id <span class="ftype">INT PK</span></div>
-        <div class="er-field">username <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">password_hash <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">role <span class="ftype">ENUM</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-        <div class="er-field">last_login <span class="ftype">DATETIME</span></div>
+      <div class="module-card">
+        <div class="module-head"><div class="module-ico" style="background:#fef3c7;">🔐</div><div><div class="module-name">شاشة بوابة الأمن</div><div class="module-role">ضابط الأمن</div></div></div>
+        <div class="module-feat">تسجيل بيانات السيارة لحظة الدخول.</div>
+        <div class="module-feat">إصدار تصريح مرور رقمي للميزان.</div>
       </div>
-
-      <div class="er-table gold">
-        <div class="er-head">📦 CELLS — الخلايا</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> cell_id <span class="ftype">INT PK</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-        <div class="er-field">cell_name <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">capacity <span class="ftype">DECIMAL</span></div>
-        <div class="er-field">current_stock <span class="ftype">DECIMAL</span></div>
-        <div class="er-field">status <span class="ftype">ENUM</span></div>
+      <div class="module-card">
+        <div class="module-head"><div class="module-ico" style="background:#fef9c3;">⚖️</div><div><div class="module-name">شاشة الميزان</div><div class="module-role">مسئول الميزان</div></div></div>
+        <div class="module-feat">تسجيل الوزن القائم والفارغ وإرساله.</div>
+        <div class="module-feat">احتساب آلي للوزن الصافي دون تدخل.</div>
       </div>
-
-      <div class="er-table red">
-        <div class="er-head">🚛 TRANSACTIONS — الحركات</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> tx_id <span class="ftype">INT PK</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-        <div class="er-field">date <span class="ftype">DATE</span></div>
-        <div class="er-field">weight_gross <span class="ftype">DECIMAL</span></div>
-        <div class="er-field">weight_net <span class="ftype">DECIMAL</span></div>
-        <div class="er-field">quality_pct <span class="ftype">DECIMAL</span></div>
+      <div class="module-card">
+        <div class="module-head"><div class="module-ico" style="background:#ecfdf5;">🧪</div><div><div class="module-name">شاشة المعمل والجودة</div><div class="module-role">فاحص الجودة</div></div></div>
+        <div class="module-feat">تسجيل نسبة النقاء والرطوبة والشوائب.</div>
+        <div class="module-feat">تحديد مدى قبول أو رفض الشحنة تلقائياً.</div>
       </div>
-
-      <div class="er-table purple">
-        <div class="er-head">📋 REPORTS — التقارير</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> report_id <span class="ftype">INT PK</span></div>
-        <div class="er-field">report_type <span class="ftype">ENUM</span></div>
-        <div class="er-field">period <span class="ftype">VARCHAR</span></div>
-        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
-        <div class="er-field fk">🔗 created_by <span class="ftype">INT FK</span></div>
-        <div class="er-field">data_json <span class="ftype">JSON</span></div>
+      <div class="module-card">
+        <div class="module-head"><div class="module-ico" style="background:#f0fdf4;">💰</div><div><div class="module-name">شاشة الشئون المالية</div><div class="module-role">المحاسب</div></div></div>
+        <div class="module-feat">مراجعة الحركات وإصدار أذونات الصرف.</div>
+        <div class="module-feat">حساب مستحقات الموردين بدقة آلياً.</div>
       </div>
-
-      <div class="er-table gray">
-        <div class="er-head">🔍 AUDIT_LOG — سجل المراجعة</div>
-        <div class="er-field pk"><span class="er-key">🔑</span> log_id <span class="ftype">INT PK</span></div>
-        <div class="er-field fk">🔗 user_id <span class="ftype">INT FK</span></div>
-        <div class="er-field">action <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">timestamp <span class="ftype">DATETIME</span></div>
-        <div class="er-field">record_type <span class="ftype">VARCHAR</span></div>
-        <div class="er-field">details <span class="ftype">TEXT</span></div>
+      <div class="module-card">
+        <div class="module-head"><div class="module-ico" style="background:#f3f4f6;">🏛️</div><div><div class="module-name">شاشة إدارة الصومعة</div><div class="module-role">مدير الموقع</div></div></div>
+        <div class="module-feat">مراقبة امتلاء الخلايا وتوجيه الشاحنات.</div>
+        <div class="module-feat">استخراج تقارير يومية بحركة الصومعة.</div>
       </div>
-
-    </div>
-    <div style="display:flex;gap:14px;margin-top:10px;font-size:10px;color:#64748b;">
-      <span>🔑 = مفتاح أساسي (PK)</span>
-      <span style="color:#166534;">🔗 = مفتاح خارجي (FK)</span>
-      <span style="background:#fefce8;padding:1px 6px;border-radius:3px;">خلفية صفراء = ربط بين جدولين</span>
     </div>
   </div>
 
@@ -757,112 +683,96 @@
   </div>
 </div>
 
-<!-- ═══════ PAGE 4: PROGRAM DESCRIPTION ═══════ -->
+<!-- ═══════ PAGE 4: DATABASE & TOOLS ═══════ -->
 <div class="page">
   <div class="page-head">
     <div class="page-num">٤</div>
     <div>
-      <h2>شرح البرنامج والملخص التنفيذي</h2>
-      <p>Program Description & Executive Summary</p>
+      <h2>قاعدة البيانات والأدوات المستخدمة</h2>
+      <p>Database Diagram & Technology Stack</p>
     </div>
   </div>
 
   <div class="page-content">
 
-    <div class="sec-title">📌 وحدات النظام الرئيسية</div>
-    <div class="module-grid">
+    <div class="sec-title">🗃️ مخطط العلاقات بين الجداول (ER Diagram)</div>
+    <div class="er-wrap" style="margin-bottom:25px;">
+      <div class="er-table">
+        <div class="er-head">🏛️ SILOS — الصوامع</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> silo_id <span class="ftype">INT</span></div>
+        <div class="er-field">name <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">capacity <span class="ftype">DECIMAL</span></div>
+      </div>
+      <div class="er-table green">
+        <div class="er-head">👤 USERS — المستخدمون</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> user_id <span class="ftype">INT</span></div>
+        <div class="er-field">role <span class="ftype">ENUM</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+      </div>
+      <div class="er-table gold">
+        <div class="er-head">📦 CELLS — الخلايا</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> cell_id <span class="ftype">INT</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+        <div class="er-field">stock <span class="ftype">DECIMAL</span></div>
+      </div>
+      <div class="er-table red">
+        <div class="er-head">🚛 TRANSACTIONS — الحركات</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> tx_id <span class="ftype">INT</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+        <div class="er-field">weight_net <span class="ftype">DECIMAL</span></div>
+      </div>
+    </div>
 
-      <div class="module-card">
-        <div class="module-head">
-          <div class="module-ico" style="background:#eff6ff;">🏛️</div>
-          <div><div class="module-name">بوابة الصومعة</div><div class="module-role">مدير الموقع</div></div>
+    <div class="sec-title">🛠️ الأدوات والتقنيات المستخدمة في البناء (Tech Stack)</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+      
+      <!-- Frontend -->
+      <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:15px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+        <div style="font-size:14px; font-weight:800; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🖥️</span> واجهة المستخدم (Frontend)
         </div>
-        <div class="module-feat">عرض حالة الخلايا ونسب المخزون لحظياً</div>
-        <div class="module-feat">إدخال حركات الاستلام اليومية</div>
-        <div class="module-feat">طباعة تقارير اليوم والشهر</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:24px; text-align:center; font-size:16px;">🌐</div>
+            <div style="font-size:12px; font-weight:700; color:#374151;">HTML5 & Vanilla CSS3</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; padding-right:34px; line-height:1.5;">تم بناء واجهة عصرية وسريعة الاستجابة بدون استخدام مكتبات ثقيلة لضمان السرعة المطلقة.</div>
+          
+          <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+            <div style="width:24px; text-align:center; font-size:16px;">⚡</div>
+            <div style="font-size:12px; font-weight:700; color:#374151;">JavaScript (ES6)</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; padding-right:34px; line-height:1.5;">للتحكم في منطق التطبيق والتفاعلات اللحظية وإدارة حالة الجلسات بين الصفحات المتعددة.</div>
+        </div>
       </div>
 
-      <div class="module-card">
-        <div class="module-head">
-          <div class="module-ico" style="background:#fef9c3;">⚖️</div>
-          <div><div class="module-name">قسم الاستلام والميزان</div><div class="module-role">موظف الميزان</div></div>
+      <!-- Backend & Analytics -->
+      <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:15px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+        <div style="font-size:14px; font-weight:800; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">⚙️</span> قواعد البيانات والتحليل
         </div>
-        <div class="module-feat">تسجيل الوزن المبدئي والنهائي</div>
-        <div class="module-feat">احتساب الوزن الصافي آلياً</div>
-        <div class="module-feat">ربط النتائج بنسب الجودة</div>
-      </div>
-
-      <div class="module-card">
-        <div class="module-head">
-          <div class="module-ico" style="background:#f0fdf4;">💰</div>
-          <div><div class="module-name">الشئون المالية</div><div class="module-role">المحاسب المالي</div></div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:24px; text-align:center; font-size:16px;">☁️</div>
+            <div style="font-size:12px; font-weight:700; color:#374151;">Firebase & LocalStorage</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; padding-right:34px; line-height:1.5;">قاعدة بيانات سحابية وتخزين محلي يضمن عمل النظام بسلاسة حتى عند انقطاع الإنترنت.</div>
+          
+          <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+            <div style="width:24px; text-align:center; font-size:16px;">📊</div>
+            <div style="font-size:12px; font-weight:700; color:#374151;">Power BI & Python (للمستقبل)</div>
+          </div>
+          <div style="font-size:11px; color:#64748b; padding-right:34px; line-height:1.5;">مخطط لدمج النظام مع أدوات تحليل البيانات المتقدمة لعمل تنبؤات استراتيجية للمخزون.</div>
         </div>
-        <div class="module-feat">إصدار أذونات الصرف وتتبعها</div>
-        <div class="module-feat">حسابات الموردين والفواتير</div>
-        <div class="module-feat">تقارير مالية شهرية وسنوية</div>
-      </div>
-
-      <div class="module-card">
-        <div class="module-head">
-          <div class="module-ico" style="background:#fef3c7;">🔐</div>
-          <div><div class="module-name">إدارة الأمن</div><div class="module-role">ضابط الأمن</div></div>
-        </div>
-        <div class="module-feat">تسجيل دخول وخروج الشاحنات</div>
-        <div class="module-feat">التحقق من الجوازات والتراخيص</div>
-        <div class="module-feat">سجل كامل للزيارات اليومية</div>
-      </div>
-
-      <div class="module-card">
-        <div class="module-head">
-          <div class="module-ico" style="background:#fdf4ff;">📊</div>
-          <div><div class="module-name">لوحة القيادة المركزية</div><div class="module-role">الإدارة العليا</div></div>
-        </div>
-        <div class="module-feat">رؤية شاملة لـ 48 صومعة دفعة واحدة</div>
-        <div class="module-feat">مؤشرات أداء لحظية (KPIs)</div>
-        <div class="module-feat">خرائط المناطق والطاقة الاستيعابية</div>
-      </div>
-
-      <div class="module-card">
-        <div class="module-head">
-          <div class="module-ico" style="background:#ecfdf5;">🔧</div>
-          <div><div class="module-name">الصيانة والتشغيل</div><div class="module-role">مسئول الصيانة</div></div>
-        </div>
-        <div class="module-feat">جدولة أوامر الصيانة الوقائية</div>
-        <div class="module-feat">تتبع حالة المعدات والسيور</div>
-        <div class="module-feat">سجل تاريخ الأعطال والإصلاحات</div>
       </div>
 
     </div>
 
-    <div class="sec-title">📈 المؤشرات الرئيسية التي يحققها النظام</div>
-    <div class="kpi-row">
-      <div class="kpi-box"><div class="kpi-val">48</div><div class="kpi-lbl">صومعة تحت رقابة إلكترونية</div></div>
-      <div class="kpi-box"><div class="kpi-val">3.1M</div><div class="kpi-lbl">طن سعة تخزينية محوسبة</div></div>
-      <div class="kpi-box"><div class="kpi-val">60%+</div><div class="kpi-lbl">توفير في وقت المعالجة</div></div>
-      <div class="kpi-box"><div class="kpi-val">0</div><div class="kpi-lbl">أوراق — أرشفة رقمية كاملة</div></div>
-    </div>
-
-    <div class="sec-title">🗓️ خارطة الطريق المستقبلية</div>
-    <div class="roadmap-item" style="background:#f0fdf4; border:1px solid #bbf7d0;">
-      <div class="rm-badge" style="background:#10b981;color:#fff;">✅ منجز</div>
-      <div><strong>المرحلة الأولى:</strong> النظام الأساسي الكامل — تسجيل الدخول بأدوار متعددة، إدارة الصوامع والخلايا، الاستلام والميزان، الأمن، المحاسبة، لوحة القيادة المركزية.</div>
-    </div>
-    <div class="roadmap-item" style="background:#eff6ff; border:1px solid #bfdbfe;">
-      <div class="rm-badge" style="background:#2563eb;color:#fff;">🔄 التالي</div>
-      <div><strong>المرحلة الثانية:</strong> ربط قاعدة البيانات السحابية الكاملة، التوقيع الرقمي على المستندات، توليد الفواتير آلياً، وتحديثات لحظية عبر جميع الأجهزة.</div>
-    </div>
-    <div class="roadmap-item" style="background:#fefce8; border:1px solid #fde68a;">
-      <div class="rm-badge" style="background:#eab308;color:#1e293b;">📅 مستقبل</div>
-      <div><strong>المرحلة الثالثة:</strong> تطبيق ذكاء اصطناعي للتنبؤ بالمخزون، ربط بمنظومة ERP الشركة، تطبيق جوال، وتعميم النظام على جميع الوحدات التابعة.</div>
-    </div>
-
-    <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);border-radius:10px;padding:16px 20px;color:#fff;text-align:center;margin-top:14px;">
-      <div style="color:#eab308;font-size:14px;font-weight:800;margin-bottom:6px;">الخلاصة واستدعاء للإجراء</div>
+    <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);border-radius:10px;padding:16px 20px;color:#fff;text-align:center;margin-top:25px;">
       <div style="font-size:11.5px;color:#cbd5e1;line-height:1.9;">
-        أثبت هذا المشروع أن الكفاءات البشرية الداخلية قادرة على بناء منظومة تقنية متكاملة توفر التحكم والرقابة والكفاءة التشغيلية. نطلب دعم سيادتكم لتطوير النظام وتعميمه على جميع وحدات الشركة.
+        <strong>طلب دعم الإدارة:</strong> لقد أثبت هذا النموذج قدرتنا الداخلية على التطوير، نأمل في الحصول على الموافقة والدعم لاعتماد النظام ونشره.
       </div>
     </div>
-
   </div>
 
   <div class="pfooter">
