@@ -869,7 +869,10 @@ function syncWithTickets() {
           currentData.cells[cellIdx].incoming += netTons;
           currentData.cells[cellIdx].type = t.grainType;
           if (t.grainType === 'مستورد') {
-            currentData.cells[cellIdx].ship = t.wheatType;
+            const cmap = {'روسي':'روسيا','أوكراني':'أوكرانيا','فرنسي':'فرنسا','روماني':'رومانيا','أسترالي':'أستراليا','أمريكي':'أمريكا'};
+            let cName = cmap[t.wheatType] || t.wheatType || 'أخرى';
+            currentData.cells[cellIdx].ship = cName;
+            currentData.cells[cellIdx].country = cName;
             currentData.cells[cellIdx].grade = '';
           } else if (t.grainType === 'محلي') {
             currentData.cells[cellIdx].grade = t.grade;
@@ -880,7 +883,10 @@ function syncWithTickets() {
           if (currentData.cells[cellIdx].type === 'فارغة') {
             currentData.cells[cellIdx].type = t.grainType;
             if (t.grainType === 'مستورد') {
-              currentData.cells[cellIdx].ship = t.wheatType;
+              const cmap = {'روسي':'روسيا','أوكراني':'أوكرانيا','فرنسي':'فرنسا','روماني':'رومانيا','أسترالي':'أستراليا','أمريكي':'أمريكا'};
+              let cName = cmap[t.wheatType] || t.wheatType || 'أخرى';
+              currentData.cells[cellIdx].ship = cName;
+              currentData.cells[cellIdx].country = cName;
               currentData.cells[cellIdx].grade = '';
             } else if (t.grainType === 'محلي') {
               currentData.cells[cellIdx].grade = t.grade;
