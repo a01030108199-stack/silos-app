@@ -3,1226 +3,717 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عرض مشروع النظام الموحد للصوامع - أكرم محمد</title>
+<title>عرض مشروع ISS 1.0 — أكرم محمد</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Cairo', sans-serif; background: #e5e7eb; color: #1e293b; direction: rtl; }
 
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: #f0f2f5;
-    color: #1e293b;
-    direction: rtl;
-  }
-
-  /* ── Print Utilities ── */
-  .page {
-    width: 210mm;
-    min-height: 297mm;
-    margin: 0 auto 20px;
-    background: #fff;
-    position: relative;
-    overflow: hidden;
-    page-break-after: always;
-  }
-
-  @media print {
-    body { background: #fff; }
-    .page { margin: 0; box-shadow: none; }
-    .no-print { display: none !important; }
-  }
-
-  /* ── Print Button ── */
+  /* ─── Print Button ─── */
   .print-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    background: #1e293b;
-    padding: 12px 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: fixed; top: 0; left: 0; right: 0;
+    background: #1e293b; padding: 10px 30px;
+    display: flex; align-items: center; justify-content: space-between;
     z-index: 9999;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
   }
-  .print-bar span { color: #94a3b8; font-size: 14px; }
+  .print-bar span { color: #94a3b8; font-size: 13px; }
   .print-btn {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-    border: none;
-    padding: 10px 28px;
-    border-radius: 8px;
-    font-family: 'Cairo', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    background: #2563eb; color: #fff; border: none;
+    padding: 8px 22px; border-radius: 7px;
+    font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
   }
-  .print-btn:hover { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-  body { padding-top: 60px; }
+  body { padding-top: 55px; }
   @media print { body { padding-top: 0; } .print-bar { display: none; } }
 
-  /* ══════════════════════════════════════
-     PAGE 1: COVER PAGE
-  ══════════════════════════════════════ */
-  .cover-page {
-    background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px;
-    position: relative;
-  }
-
-  .cover-pattern {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: radial-gradient(circle at 20% 20%, rgba(37,99,235,0.15) 0%, transparent 50%),
-                      radial-gradient(circle at 80% 80%, rgba(234,179,8,0.1) 0%, transparent 50%);
-  }
-
-  .cover-logo-area {
-    position: relative;
-    margin-bottom: 20px;
-  }
-
-  .cover-logo-circle {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 15px;
-    border: 3px solid rgba(234,179,8,0.5);
-    box-shadow: 0 0 30px rgba(37,99,235,0.5);
-  }
-
-  .cover-logo-circle svg { width: 55px; height: 55px; fill: #fff; }
-
-  .cover-company-name {
-    color: #94a3b8;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-  }
-
-  .cover-divider {
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #eab308, transparent);
+  /* ─── Page Setup ─── */
+  .page {
+    width: 210mm;
     margin: 15px auto;
-  }
-
-  .cover-main-title {
-    color: #ffffff;
-    font-size: 26px;
-    font-weight: 900;
-    line-height: 1.4;
-    margin-bottom: 8px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    background: #fff;
+    page-break-after: always;
+    page-break-inside: avoid;
     position: relative;
   }
-
-  .cover-subtitle {
-    color: #eab308;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 30px;
-    position: relative;
+  @media print {
+    body { background: #fff; }
+    .page { margin: 0; width: 100%; }
   }
 
-  .cover-card {
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 16px;
-    padding: 25px 35px;
-    margin: 15px 0;
-    width: 100%;
-    position: relative;
-    backdrop-filter: blur(10px);
-  }
-
-  .cover-person-name {
-    color: #fff;
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 6px;
-  }
-
-  .cover-person-title {
-    color: #60a5fa;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 15px;
-  }
-
-  .cover-info-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  .cover-info-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #cbd5e1;
-    font-size: 12px;
-  }
-
-  .cover-info-item svg { width: 14px; height: 14px; fill: #eab308; flex-shrink: 0; }
-
-  .cover-badges {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
-    position: relative;
-  }
-
-  .cover-badge {
-    background: rgba(37,99,235,0.3);
-    border: 1px solid rgba(37,99,235,0.5);
-    color: #93c5fd;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 20px;
-  }
-  .cover-badge.gold {
-    background: rgba(234,179,8,0.2);
-    border-color: rgba(234,179,8,0.5);
-    color: #fde68a;
-  }
-
-  .cover-date {
-    position: absolute;
-    bottom: 25px;
-    right: 0; left: 0;
-    color: #475569;
-    font-size: 11px;
-    text-align: center;
-  }
-
-  /* ══════════════════════════════════════
-     PAGE 2: PERSONAL PROFILE
-  ══════════════════════════════════════ */
-  .profile-page { padding: 0; }
-
-  .page-header-strip {
-    background: linear-gradient(135deg, #1e3a5f, #0f172a);
-    padding: 25px 40px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-
-  .page-header-strip .page-num {
-    background: #eab308;
-    color: #0f172a;
-    font-weight: 900;
-    font-size: 13px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .page-header-strip h2 {
-    color: #fff;
-    font-size: 18px;
-    font-weight: 800;
-  }
-
-  .page-header-strip span {
-    color: #94a3b8;
-    font-size: 13px;
-  }
-
-  .page-body { padding: 30px 40px; }
-
-  .profile-top {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    padding: 20px 25px;
-    background: linear-gradient(135deg, #eff6ff, #f0f9ff);
-    border-radius: 14px;
-    border: 1px solid #bfdbfe;
-    margin-bottom: 25px;
-  }
-
-  .profile-avatar {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border: 3px solid #eab308;
-    font-size: 28px;
-    font-weight: 900;
-    color: #fff;
-  }
-
-  .profile-name { font-size: 20px; font-weight: 900; color: #1e293b; }
-  .profile-jobtitle { color: #2563eb; font-size: 13px; font-weight: 700; margin: 3px 0; }
-  .profile-company { color: #64748b; font-size: 12px; }
-
-  .section-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #1e3a5f;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 2px solid #bfdbfe;
-    padding-bottom: 8px;
-  }
-
-  .section-title svg { width: 18px; height: 18px; fill: #2563eb; flex-shrink: 0; }
-
-  .summary-box {
-    background: #f8fafc;
-    border-right: 4px solid #2563eb;
-    border-radius: 8px;
-    padding: 15px 18px;
-    font-size: 12.5px;
-    line-height: 2;
-    color: #374151;
-    margin-bottom: 22px;
-  }
-
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
-
-  .edu-item {
-    background: #f8fafc;
-    border-radius: 10px;
-    padding: 14px;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 10px;
-  }
-
-  .edu-degree { font-size: 13px; font-weight: 800; color: #1e293b; }
-  .edu-inst { font-size: 12px; color: #2563eb; font-weight: 600; }
-  .edu-date { font-size: 11px; color: #94a3b8; }
-
-  .cert-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 14px;
-    background: #fefce8;
-    border-radius: 8px;
-    border: 1px solid #fde68a;
-    margin-bottom: 8px;
-    font-size: 12px;
-    color: #374151;
-    line-height: 1.6;
-  }
-
-  .cert-icon {
-    width: 22px;
-    height: 22px;
-    background: #eab308;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 11px;
-    color: #fff;
-    font-weight: 900;
-  }
-
-  /* ══════════════════════════════════════
-     PAGE 3: SYSTEM WORKFLOW
-  ══════════════════════════════════════ */
-  .flow-page { padding: 0; }
-
-  .flow-container { padding: 25px 35px; }
-
-  .flow-intro {
-    background: linear-gradient(135deg, #eff6ff, #f0f9ff);
-    border: 1px solid #bfdbfe;
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 12px;
-    color: #374151;
-    line-height: 1.8;
-    margin-bottom: 25px;
-    text-align: center;
-  }
-
-  .workflow-chart {
+  /* ══════════════════════════════════
+     PAGE 1: COVER (compact)
+  ══════════════════════════════════ */
+  .cover {
+    background: linear-gradient(160deg, #0a1628 0%, #1a3a6e 55%, #0a1628 100%);
+    padding: 35px 45px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0;
+    text-align: center;
+    gap: 16px;
   }
 
-  .wf-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    width: 100%;
+  .cover-logo {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #eab308;
+    box-shadow: 0 0 25px rgba(37,99,235,0.5);
+  }
+  .cover-logo svg { width: 44px; height: 44px; fill: #fff; }
+
+  .cover-title {
+    color: #fff; font-size: 22px; font-weight: 900; line-height: 1.5;
+  }
+  .cover-sub { color: #eab308; font-size: 14px; font-weight: 700; }
+
+  .cover-hr { width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #eab308, transparent); }
+
+  .cover-name { color: #fff; font-size: 20px; font-weight: 900; }
+  .cover-jobtitle { color: #93c5fd; font-size: 13px; font-weight: 600; }
+  .cover-company { color: #64748b; font-size: 11.5px; }
+
+  .qual-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    width: 100%; margin-top: 4px;
+  }
+  .qual-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; padding: 12px 14px; text-align: right;
+  }
+  .qual-label { color: #94a3b8; font-size: 9.5px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+  .qual-item { color: #e2e8f0; font-size: 11px; padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+  .qual-item::before { content: '▸'; color: #eab308; flex-shrink: 0; }
+
+  .cert-strip {
+    display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; width: 100%;
+  }
+  .cert-badge {
+    background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.4);
+    color: #fde68a; font-size: 10.5px; font-weight: 700;
+    padding: 5px 13px; border-radius: 20px;
+  }
+
+  .cover-footer {
+    color: #475569; font-size: 10px; border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 12px; width: 100%; text-align: center;
+  }
+  .cover-to {
+    background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
+    border-radius: 10px; padding: 10px 20px; width: 100%;
+    color: #fde68a; font-size: 12px; font-weight: 700;
+  }
+
+  /* ══════════════════════════════════
+     SHARED PAGE ELEMENTS
+  ══════════════════════════════════ */
+  .page-head {
+    background: linear-gradient(135deg, #1e3a5f, #0f172a);
+    padding: 18px 35px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .page-num {
+    width: 30px; height: 30px;
+    background: #eab308; color: #0f172a;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900; flex-shrink: 0;
+  }
+  .page-head h2 { color: #fff; font-size: 16px; font-weight: 800; }
+  .page-head p { color: #94a3b8; font-size: 11px; }
+
+  .page-content { padding: 22px 35px 40px; }
+
+  .sec-title {
+    font-size: 13px; font-weight: 800; color: #1e3a5f;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 2px solid #bfdbfe; padding-bottom: 7px;
+    margin-bottom: 14px; margin-top: 18px;
+  }
+  .sec-title:first-child { margin-top: 0; }
+
+  .pfooter {
+    position: absolute; bottom: 12px; right: 35px; left: 35px;
+    display: flex; justify-content: space-between;
+    border-top: 1px solid #e2e8f0; padding-top: 8px;
+    font-size: 10px; color: #94a3b8;
+  }
+  .pfooter .conf { color: #ef4444; }
+
+  /* ══════════════════════════════════
+     PAGE 2: SYSTEM WORKFLOW
+  ══════════════════════════════════ */
+  .wf-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+  .wf-stage {
+    display: flex; align-items: stretch; width: 100%;
     margin-bottom: 0;
   }
 
-  .wf-node {
-    background: linear-gradient(135deg, #1e3a5f, #1e40af);
-    border-radius: 10px;
-    padding: 10px 14px;
-    color: #fff;
-    text-align: center;
-    min-width: 100px;
-    box-shadow: 0 4px 10px rgba(30,58,95,0.3);
-    border: 1px solid rgba(255,255,255,0.15);
-  }
-
-  .wf-node.gold {
-    background: linear-gradient(135deg, #92400e, #b45309);
-    border-color: rgba(234,179,8,0.5);
-  }
-
-  .wf-node.green {
-    background: linear-gradient(135deg, #064e3b, #065f46);
-    border-color: rgba(16,185,129,0.5);
-  }
-
-  .wf-node.red {
-    background: linear-gradient(135deg, #7f1d1d, #991b1b);
-    border-color: rgba(239,68,68,0.5);
-  }
-
-  .wf-node.purple {
-    background: linear-gradient(135deg, #3b0764, #4c1d95);
-    border-color: rgba(139,92,246,0.5);
-  }
-
-  .wf-node-icon { font-size: 22px; margin-bottom: 5px; }
-  .wf-node-title { font-size: 11px; font-weight: 700; }
-  .wf-node-sub { font-size: 9.5px; color: rgba(255,255,255,0.7); margin-top: 2px; }
-
-  .wf-arrow {
-    color: #94a3b8;
-    font-size: 18px;
-    margin: 0 4px;
+  .wf-stage-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    background: #1e293b; color: #94a3b8;
+    font-size: 9px; font-weight: 700;
+    padding: 8px 5px;
+    border-radius: 6px 0 0 6px;
+    letter-spacing: 1px;
     flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    min-width: 22px;
   }
 
-  .wf-arrow-down {
-    color: #94a3b8;
-    font-size: 18px;
-    text-align: center;
-    margin: 4px 0;
-  }
-
-  .wf-center-node {
-    background: linear-gradient(135deg, #eab308, #ca8a04);
-    border-radius: 12px;
-    padding: 14px 20px;
-    color: #1e293b;
-    text-align: center;
-    min-width: 160px;
-    box-shadow: 0 6px 20px rgba(234,179,8,0.4);
-    border: 2px solid #fde68a;
-    font-weight: 900;
-    font-size: 13px;
-  }
-
-  .wf-legend {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 20px;
+  .wf-stage-content {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-right: none;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 12px;
     flex-wrap: wrap;
   }
 
-  .wf-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: #64748b;
-  }
-
-  .wf-legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
+  .wf-node {
+    display: flex; flex-direction: column; align-items: center;
+    background: linear-gradient(135deg, #1e3a5f, #1e40af);
+    border-radius: 8px; padding: 8px 12px;
+    min-width: 85px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
     flex-shrink: 0;
   }
-
-  /* ══════════════════════════════════════
-     PAGE 4: DATABASE ARCHITECTURE
-  ══════════════════════════════════════ */
-  .db-container { padding: 25px 35px; }
-
-  .db-arch {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+  .wf-node.g { background: linear-gradient(135deg, #064e3b, #065f46); }
+  .wf-node.r { background: linear-gradient(135deg, #7f1d1d, #991b1b); }
+  .wf-node.y { background: linear-gradient(135deg, #78350f, #92400e); }
+  .wf-node.p { background: linear-gradient(135deg, #3b0764, #4c1d95); }
+  .wf-node.center {
+    background: linear-gradient(135deg, #b45309, #d97706);
+    min-width: 130px; padding: 10px 16px;
   }
+  .wf-node .ico { font-size: 18px; margin-bottom: 3px; }
+  .wf-node .lbl { color: #fff; font-size: 10px; font-weight: 700; }
+  .wf-node .sub { color: rgba(255,255,255,0.65); font-size: 8.5px; margin-top: 2px; }
 
-  .db-tier {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
+  .wf-arrow { color: #94a3b8; font-size: 16px; flex-shrink: 0; }
+  .wf-down { text-align: center; color: #94a3b8; font-size: 14px; line-height: 1; padding: 3px 0; }
 
-  .db-tier-label {
-    writing-mode: horizontal-tb;
-    background: #1e293b;
-    color: #94a3b8;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 5px 10px;
-    border-radius: 6px;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-  }
-
-  .db-box {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 12px 16px;
+  .wf-note {
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+    padding: 10px 14px; font-size: 11.5px; color: #374151;
+    line-height: 1.8; margin-bottom: 16px;
     text-align: center;
-    flex: 1;
-    max-width: 130px;
   }
 
-  .db-box.primary {
-    background: linear-gradient(135deg, #eff6ff, #dbeafe);
-    border-color: #3b82f6;
+  /* ══════════════════════════════════
+     PAGE 3: DATABASE DIAGRAM (ER style)
+  ══════════════════════════════════ */
+  .er-wrap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
   }
 
-  .db-box.secondary {
-    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-    border-color: #10b981;
+  .er-table {
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    overflow: hidden;
+    page-break-inside: avoid;
   }
+  .er-table.green { border-color: #10b981; }
+  .er-table.gold { border-color: #eab308; }
+  .er-table.red { border-color: #ef4444; }
+  .er-table.purple { border-color: #8b5cf6; }
+  .er-table.gray { border-color: #64748b; }
 
-  .db-box.tertiary {
-    background: linear-gradient(135deg, #fefce8, #fef9c3);
-    border-color: #eab308;
+  .er-head {
+    background: #3b82f6; color: #fff;
+    padding: 7px 12px; font-size: 11.5px; font-weight: 800;
+    display: flex; align-items: center; gap: 6px;
   }
+  .er-table.green .er-head { background: #10b981; }
+  .er-table.gold .er-head { background: #d97706; }
+  .er-table.red .er-head { background: #ef4444; }
+  .er-table.purple .er-head { background: #8b5cf6; }
+  .er-table.gray .er-head { background: #64748b; }
 
-  .db-box-icon { font-size: 20px; margin-bottom: 5px; }
-  .db-box-title { font-size: 11px; font-weight: 800; color: #1e293b; }
-  .db-box-sub { font-size: 10px; color: #64748b; margin-top: 2px; }
-
-  .db-connect-line {
-    width: 2px;
-    height: 20px;
-    background: linear-gradient(to bottom, #94a3b8, #cbd5e1);
-    margin: 0 auto;
+  .er-field {
+    padding: 5px 12px; font-size: 10.5px; color: #374151;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; gap: 6px;
   }
+  .er-field:last-child { border-bottom: none; }
+  .er-field .ftype { color: #94a3b8; font-size: 9px; margin-right: auto; }
+  .er-field.pk { background: #fefce8; font-weight: 700; color: #92400e; }
+  .er-field.fk { background: #f0fdf4; color: #166534; }
 
-  .db-connect-row {
-    width: 70%;
-    height: 2px;
-    background: linear-gradient(to right, transparent, #94a3b8, transparent);
+  .er-key { font-size: 11px; }
+
+  /* Architecture tiers */
+  .arch-tier {
+    border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 10px;
     position: relative;
   }
-
-  .db-table-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 15px;
+  .arch-tier-label {
+    position: absolute; top: -10px; right: 14px;
+    background: #fff; padding: 0 8px;
+    font-size: 10px; font-weight: 800; color: #2563eb;
   }
-
-  .db-table-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 11px;
+  .arch-tier-boxes {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
   }
-
-  .db-table-name {
-    font-size: 12px;
-    font-weight: 800;
-    color: #1e3a5f;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  .arch-box {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 8px 14px; text-align: center; min-width: 90px;
+    font-size: 10.5px;
   }
+  .arch-box.blue { background: #eff6ff; border-color: #bfdbfe; }
+  .arch-box.green { background: #f0fdf4; border-color: #bbf7d0; }
+  .arch-box.gold { background: #fefce8; border-color: #fde68a; }
+  .arch-box .aico { font-size: 18px; margin-bottom: 4px; }
+  .arch-box .atitle { font-weight: 800; font-size: 10.5px; color: #1e293b; }
+  .arch-box .asub { font-size: 9.5px; color: #64748b; margin-top: 2px; }
+  .arch-connect { text-align: center; color: #94a3b8; font-size: 13px; margin: 4px 0; }
 
-  .db-table-name span { font-size: 14px; }
-  .db-field { color: #64748b; font-size: 10.5px; padding: 1px 0; }
-
-  /* ══════════════════════════════════════
-     PAGE 5: GOALS & OBJECTIVES
-  ══════════════════════════════════════ */
-  .goal-card {
-    display: flex;
-    gap: 15px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 15px 18px;
-    margin-bottom: 12px;
-    align-items: flex-start;
+  /* ══════════════════════════════════
+     PAGE 4: PROGRAM DESCRIPTION
+  ══════════════════════════════════ */
+  .module-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 14px;
   }
-
-  .goal-num {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: 900;
-    flex-shrink: 0;
+  .module-card {
+    border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 12px 14px; page-break-inside: avoid;
   }
-
-  .goal-title { font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 5px; }
-  .goal-desc { font-size: 12px; color: #64748b; line-height: 1.8; }
-
-  /* ══════════════════════════════════════
-     PAGE 6: VALUE & KPIs
-  ══════════════════════════════════════ */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
+  .module-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
   }
+  .module-ico {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .module-name { font-size: 13px; font-weight: 800; color: #1e293b; }
+  .module-role { font-size: 10px; color: #64748b; }
+  .module-feat { font-size: 10.5px; color: #374151; padding: 2px 0; display: flex; gap: 6px; }
+  .module-feat::before { content: '✓'; color: #10b981; font-weight: 900; flex-shrink: 0; }
 
-  .kpi-card {
+  .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi-box {
     background: linear-gradient(135deg, #1e3a5f, #1e40af);
-    border-radius: 12px;
-    padding: 18px;
-    text-align: center;
-    color: #fff;
+    border-radius: 10px; padding: 14px 10px; text-align: center;
   }
+  .kpi-val { font-size: 22px; font-weight: 900; color: #eab308; }
+  .kpi-lbl { font-size: 10px; color: #cbd5e1; margin-top: 3px; }
 
-  .kpi-value { font-size: 26px; font-weight: 900; color: #eab308; }
-  .kpi-unit { font-size: 12px; color: #93c5fd; }
-  .kpi-label { font-size: 12px; color: #cbd5e1; margin-top: 5px; }
-
-  /* ══════════════════════════════════════
-     FOOTER
-  ══════════════════════════════════════ */
-  .page-footer {
-    position: absolute;
-    bottom: 18px;
-    right: 35px;
-    left: 35px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 10px;
+  .roadmap-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 8px;
+    font-size: 11.5px; color: #374151; line-height: 1.7;
+    page-break-inside: avoid;
   }
-
-  .footer-company { font-size: 10px; color: #94a3b8; }
-  .footer-page { font-size: 10px; color: #94a3b8; }
-  .footer-conf {
-    font-size: 10px;
-    color: #ef4444;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  .rm-badge {
+    font-size: 10px; font-weight: 800; padding: 3px 10px;
+    border-radius: 20px; flex-shrink: 0; white-space: nowrap;
   }
 </style>
 </head>
 <body>
 
-<!-- Print Bar -->
-<div class="print-bar no-print">
-  <span>📄 ملف العرض التقديمي - أكرم محمد محمود</span>
-  <button class="print-btn" onclick="window.print()">
-    🖨️ طباعة / حفظ PDF
-  </button>
+<div class="print-bar">
+  <span>📄 عرض مشروع ISS 1.0 — أكرم محمد محمود</span>
+  <button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
 </div>
 
-<!-- ═══════════════════════════════════
-     PAGE 1: COVER PAGE
-════════════════════════════════════ -->
-<div class="page cover-page">
-  <div class="cover-pattern"></div>
-
-  <div class="cover-logo-area">
-    <div class="cover-logo-circle">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="40" width="16" height="45" rx="3"/>
-        <rect x="30" y="25" width="16" height="60" rx="3"/>
-        <rect x="50" y="30" width="16" height="55" rx="3"/>
-        <rect x="70" y="20" width="16" height="65" rx="3"/>
-        <rect x="5" y="88" width="90" height="7" rx="3"/>
-        <polygon points="50,2 56,18 72,18 60,28 64,44 50,34 36,44 40,28 28,18 44,18" fill="#eab308"/>
+<!-- ═══════ PAGE 1: COVER ═══════ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-logo">
+      <svg viewBox="0 0 100 100">
+        <rect x="10" y="42" width="14" height="43" rx="3"/>
+        <rect x="28" y="28" width="14" height="57" rx="3"/>
+        <rect x="46" y="34" width="14" height="51" rx="3"/>
+        <rect x="64" y="22" width="14" height="63" rx="3"/>
+        <rect x="5" y="87" width="88" height="7" rx="3"/>
+        <polygon points="50,3 56,17 70,17 59,26 63,40 50,31 37,40 41,26 30,17 44,17" fill="#eab308"/>
       </svg>
     </div>
-    <div class="cover-company-name">EHCSS · ISS · V1.0</div>
-  </div>
 
-  <div class="cover-divider"></div>
+    <div>
+      <div class="cover-title">النظام الموحد لإدارة الصوامع والاستلام</div>
+      <div class="cover-sub">Integrated Silos & Storage System — ISS V1.0</div>
+    </div>
 
-  <div class="cover-main-title" style="position:relative;">
-    النظام الموحد لإدارة الصوامع<br>والاستلام الذكي
-  </div>
-  <div class="cover-subtitle">Integrated Silos & Storage System — ISS 1.0</div>
+    <div class="cover-hr"></div>
 
-  <div class="cover-card" style="position:relative;">
-    <div class="cover-person-name">أكرم محمد محمود محمد</div>
-    <div class="cover-person-title">محاسب مالي أول ومحلل بيانات | باحث دكتوراه في المحاسبة والمراجعة</div>
-    <div class="cover-info-row">
-      <div class="cover-info-item">
-        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-        a01030108199@gmail.com
+    <div>
+      <div class="cover-name">أكرم محمد محمود محمد</div>
+      <div class="cover-jobtitle" style="margin-top:4px;">محاسب مالي أول ومحلل بيانات | الشركة المصرية القابضة للصوامع والتخزين</div>
+      <div class="cover-company" style="margin-top:3px;">خبرة 18+ سنة — منذ 2007 حتى الآن</div>
+    </div>
+
+    <div class="qual-grid">
+      <div class="qual-card">
+        <div class="qual-label">📚 المؤهلات العلمية</div>
+        <div class="qual-item">باحث دكتوراه — جامعة الزقازيق</div>
+        <div class="qual-item">ماجستير محاسبة ومراجعة 2024</div>
+        <div class="qual-item">بكالوريوس تجارة — محاسبة 2012</div>
       </div>
-      <div class="cover-info-item">
-        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        01030108199
-      </div>
-      <div class="cover-info-item">
-        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-        الفيوم، جمهورية مصر العربية
+      <div class="qual-card">
+        <div class="qual-label">🛠️ المهارات التقنية</div>
+        <div class="qual-item">Power BI · SQL · Python</div>
+        <div class="qual-item">JavaScript · HTML · CSS</div>
+        <div class="qual-item">Firebase · Excel · Power Query</div>
       </div>
     </div>
-  </div>
 
-  <div class="cover-card" style="position:relative; margin-top: 12px;">
-    <div style="color:#94a3b8; font-size:12px; margin-bottom:10px; font-weight:600;">المؤهلات والشهادات</div>
-    <div class="cover-badges">
-      <div class="cover-badge gold">باحث دكتوراه — جامعة الزقازيق</div>
-      <div class="cover-badge gold">ماجستير محاسبة ومراجعة 2024</div>
-      <div class="cover-badge">شهادة AI — مايكروسوفت</div>
-      <div class="cover-badge">Python & Java — المجلس الأمريكي</div>
-      <div class="cover-badge">IC3 حوسبة سحابية</div>
-      <div class="cover-badge">خبرة 18+ سنة في EHCSS</div>
+    <div class="cert-strip">
+      <div class="cert-badge">🤖 AI — مايكروسوفت + MCIT</div>
+      <div class="cert-badge">🐍 Python & Java — المجلس الأمريكي</div>
+      <div class="cert-badge">☁️ IC3 الحوسبة السحابية</div>
+      <div class="cert-badge">🎓 التحول الرقمي — المجلس الأعلى للجامعات</div>
+    </div>
+
+    <div class="cover-to">
+      مُقدَّم إلى سيادة السيد الدكتور / العضو المنتدب والرئيس التنفيذي
+    </div>
+
+    <div class="cover-footer">
+      الشركة المصرية القابضة للصوامع والتخزين — EHCSS &nbsp;|&nbsp; يوليو 2026 &nbsp;|&nbsp; 🔴 سري للاستخدام الداخلي
     </div>
   </div>
-
-  <div class="cover-divider" style="margin-top:25px;"></div>
-
-  <div style="color:#eab308; font-size:13px; font-weight:700; position:relative;">
-    مُقدَّم إلى: السيد الدكتور / العضو المنتدب والرئيس التنفيذي
-  </div>
-  <div style="color:#94a3b8; font-size:12px; margin-top:5px; position:relative;">
-    الشركة المصرية القابضة للصوامع والتخزين
-  </div>
-
-  <div class="cover-date">يوليو 2026 — وثيقة سرية للاستخدام الداخلي فقط</div>
 </div>
 
-<!-- ═══════════════════════════════════
-     PAGE 2: PERSONAL PROFILE
-════════════════════════════════════ -->
-<div class="page profile-page">
-  <div class="page-header-strip">
+<!-- ═══════ PAGE 2: SYSTEM WORKFLOW ═══════ -->
+<div class="page">
+  <div class="page-head">
     <div class="page-num">٢</div>
     <div>
-      <h2>الملف الشخصي والمؤهلات</h2>
-      <span>Personal Profile & Qualifications</span>
+      <h2>خريطة سير العمل — رحلة الشحنة من الوصول حتى التسوية</h2>
+      <p>System Workflow — From Arrival to Final Settlement</p>
     </div>
   </div>
 
-  <div class="page-body">
-    <div class="profile-top">
-      <div class="profile-avatar">ع م</div>
-      <div>
-        <div class="profile-name">أكرم محمد محمود محمد</div>
-        <div class="profile-jobtitle">محاسب مالي أول ومحلل بيانات مالية</div>
-        <div class="profile-company">الشركة المصرية القابضة للصوامع والتخزين (EHCSS) — منذ 2007 حتى الآن (18+ سنة)</div>
-      </div>
+  <div class="page-content">
+    <div class="wf-note">
+      يُبيّن هذا المخطط الرحلة الكاملة لكل شحنة قمح داخل النظام الموحد، مع ربط كل مرحلة بالقسم المسؤول عنها والمستند الرقمي المقابل.
     </div>
 
-    <div class="section-title">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-      الملخص المهني
-    </div>
-    <div class="summary-box">
-      محاسب مالي أول متمرس بخبرة تمتد لأكثر من <strong>18 عاماً</strong> في المحاسبة والمراجعة بالشركة المصرية القابضة للصوامع والتخزين.
-      باحث دكتوراه في المحاسبة والمراجعة بجامعة الزقازيق وحاصل على درجة الماجستير العلمي لعام <strong>2024</strong>.
-      محترف في دمج العلوم المحاسبية بأدوات تحليل البيانات الحديثة مثل Power BI وSQL وPython
-      لتحويل البيانات المالية المعقدة إلى تقارير ولوحات تفاعلية تدعم الإدارة العليا في اتخاذ القرارات الاستراتيجية.
-    </div>
+    <div class="wf-wrap">
 
-    <div class="two-col">
-      <div>
-        <div class="section-title">
-          <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-          المؤهلات العلمية
-        </div>
-        <div class="edu-item">
-          <div class="edu-degree">🎓 باحث دكتوراه — محاسبة ومراجعة</div>
-          <div class="edu-inst">جامعة الزقازيق</div>
-          <div class="edu-date">2024 — حتى الآن</div>
-        </div>
-        <div class="edu-item">
-          <div class="edu-degree">📜 ماجستير — محاسبة ومراجعة</div>
-          <div class="edu-inst">كلية التجارة</div>
-          <div class="edu-date">2024</div>
-        </div>
-        <div class="edu-item">
-          <div class="edu-degree">🏛️ بكالوريوس تجارة — محاسبة ومراجعة</div>
-          <div class="edu-inst">كلية التجارة</div>
-          <div class="edu-date">2012</div>
+      <!-- Stage 1 -->
+      <div class="wf-stage">
+        <div class="wf-stage-label">مرحلة الوصول</div>
+        <div class="wf-stage-content">
+          <div class="wf-node r"><div class="ico">🔐</div><div class="lbl">بوابة الأمن</div><div class="sub">تسجيل اللوحة والجواز</div></div>
+          <div class="wf-arrow">◄</div>
+          <div class="wf-node"><div class="ico">🚛</div><div class="lbl">وصول الشاحنة</div><div class="sub">Truck / Ship Arrival</div></div>
+          <div class="wf-arrow">◄</div>
+          <div class="wf-node y"><div class="ico">⚖️</div><div class="lbl">الميزان المبدئي</div><div class="sub">الوزن الفارغ</div></div>
         </div>
       </div>
+      <div class="wf-down">▼</div>
 
-      <div>
-        <div class="section-title">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
-          الدورات والشهادات المهنية
-        </div>
-        <div class="cert-item">
-          <div class="cert-icon">AI</div>
-          منحة وزارة الاتصالات (MCIT) بالتعاون مع مايكروسوفت العالمية في استخدام أدوات الذكاء الاصطناعي
-        </div>
-        <div class="cert-item">
-          <div class="cert-icon">DT</div>
-          شهادة التحول الرقمي المعتمدة من المجلس الأعلى للجامعات المصرية
-        </div>
-        <div class="cert-item">
-          <div class="cert-icon">PY</div>
-          شهادة في برمجة Java & Python من المجلس الأمريكي للدراسات المهنية
-        </div>
-        <div class="cert-item">
-          <div class="cert-icon">☁</div>
-          شهادة في الحوسبة السحابية IC3 من المجلس الأمريكي للدراسات المهنية
+      <!-- Stage 2 -->
+      <div class="wf-stage">
+        <div class="wf-stage-label">مرحلة الجودة</div>
+        <div class="wf-stage-content" style="justify-content:center;">
+          <div class="wf-node g"><div class="ico">🧪</div><div class="lbl">قسم الجودة والمعمل</div><div class="sub">نسبة النقاء · الرطوبة · الشوائب</div></div>
+          <div class="wf-arrow">◄►</div>
+          <div class="wf-node center"><div class="ico">🏛️</div><div class="lbl">تفريغ وتخزين في الصومعة</div><div class="sub">Cell Assignment & Storage</div></div>
         </div>
       </div>
+      <div class="wf-down">▼</div>
+
+      <!-- Stage 3 -->
+      <div class="wf-stage">
+        <div class="wf-stage-label">مرحلة الصرف</div>
+        <div class="wf-stage-content">
+          <div class="wf-node y"><div class="ico">⚖️</div><div class="lbl">الميزان النهائي</div><div class="sub">الوزن الصافي الرسمي</div></div>
+          <div class="wf-arrow">◄</div>
+          <div class="wf-node p"><div class="ico">💰</div><div class="lbl">الشئون المالية</div><div class="sub">أذن الصرف وحساب المورد</div></div>
+          <div class="wf-arrow">◄</div>
+          <div class="wf-node"><div class="ico">📋</div><div class="lbl">إصدار المستند الرسمي</div><div class="sub">Receipt & Invoice</div></div>
+        </div>
+      </div>
+      <div class="wf-down">▼</div>
+
+      <!-- Stage 4 -->
+      <div class="wf-stage">
+        <div class="wf-stage-label">الإدارة العليا</div>
+        <div class="wf-stage-content" style="justify-content:center; gap:20px;">
+          <div class="wf-node" style="background:linear-gradient(135deg,#0f172a,#1e293b); min-width:110px;">
+            <div class="ico">📊</div><div class="lbl">لوحة القيادة</div><div class="sub">تقارير لحظية للإدارة</div>
+          </div>
+          <div class="wf-node g" style="min-width:110px;">
+            <div class="ico">🗂️</div><div class="lbl">التقارير الشهرية</div><div class="sub">Monthly & Annual Reports</div>
+          </div>
+          <div class="wf-node p" style="min-width:110px;">
+            <div class="ico">🔍</div><div class="lbl">سجل المراجعة</div><div class="sub">Audit Trail & Logs</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="section-title">
-      <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-      المهارات التقنية
-    </div>
-    <div style="display:flex; flex-wrap:wrap; gap:8px;">
-      <span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">Power BI</span>
-      <span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">SQL</span>
-      <span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">Python</span>
-      <span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">Advanced Excel</span>
-      <span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">Power Query</span>
-      <span style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">JavaScript / HTML / CSS</span>
-      <span style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">Firebase / LocalStorage</span>
-      <span style="background:#fefce8;border:1px solid #fde68a;color:#92400e;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">IFRS / معايير دولية</span>
-      <span style="background:#fefce8;border:1px solid #fde68a;color:#92400e;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">مراجعة داخلية وتدقيق</span>
+    <!-- Legend -->
+    <div style="display:flex; gap:14px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#991b1b;border-radius:3px;display:inline-block;"></span>الأمن</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#92400e;border-radius:3px;display:inline-block;"></span>الميزان</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#065f46;border-radius:3px;display:inline-block;"></span>الجودة</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#4c1d95;border-radius:3px;display:inline-block;"></span>المحاسبة</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:#64748b;"><span style="width:12px;height:12px;background:#1e40af;border-radius:3px;display:inline-block;"></span>الإدارة / النظام</div>
     </div>
   </div>
 
-  <div class="page-footer">
-    <span class="footer-company">الشركة المصرية القابضة للصوامع والتخزين — EHCSS</span>
-    <span class="footer-conf">🔴 سري للاستخدام الداخلي</span>
-    <span class="footer-page">صفحة 2 من 6</span>
+  <div class="pfooter">
+    <span>EHCSS — ISS 1.0</span>
+    <span class="conf">🔴 سري للاستخدام الداخلي</span>
+    <span>صفحة 2 من 4</span>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     PAGE 3: SYSTEM WORKFLOW
-════════════════════════════════════ -->
-<div class="page flow-page">
-  <div class="page-header-strip">
+<!-- ═══════ PAGE 3: DATABASE ═══════ -->
+<div class="page">
+  <div class="page-head">
     <div class="page-num">٣</div>
     <div>
-      <h2>خريطة سير العمل — النظام الموحد ISS 1.0</h2>
-      <span>System Workflow Diagram</span>
+      <h2>هيكل قاعدة البيانات ومعمارية الخادم</h2>
+      <p>Database Schema & Server Architecture</p>
     </div>
   </div>
 
-  <div class="flow-container">
-    <div class="flow-intro">
-      يوضح المخطط التالي الرحلة الكاملة لكل شحنة قمح من لحظة وصولها حتى تسويتها نهائياً في السجلات المحاسبية،
-      مع ربط كل خطوة بالقسم المسؤول عنها والمستند الرقمي المرتبط بها.
-    </div>
+  <div class="page-content">
 
-    <!-- Row 1: Entry -->
-    <div style="display:flex; justify-content:center; margin-bottom:0;">
-      <div class="wf-node" style="min-width:160px; padding:14px 20px; text-align:center; margin-bottom:0;">
-        <div class="wf-node-icon">🚛</div>
-        <div class="wf-node-title">وصول الشاحنة / الشحنة</div>
-        <div class="wf-node-sub">Arrival of Truck / Shipment</div>
-      </div>
-    </div>
-    <div class="wf-arrow-down">▼</div>
+    <!-- Architecture -->
+    <div class="sec-title">🏗️ معمارية النظام ثلاثية الطبقات (3-Tier)</div>
 
-    <!-- Row 2: Security -->
-    <div class="wf-row">
-      <div class="wf-node red" style="min-width:150px;">
-        <div class="wf-node-icon">🔐</div>
-        <div class="wf-node-title">بوابة الأمن</div>
-        <div class="wf-node-sub">تسجيل اللوحة ومطابقة الجواز</div>
+    <div class="arch-tier">
+      <div class="arch-tier-label">الطبقة الأولى — المستخدمون</div>
+      <div class="arch-tier-boxes">
+        <div class="arch-box blue"><div class="aico">🏛️</div><div class="atitle">مدير الصومعة</div></div>
+        <div class="arch-box blue"><div class="aico">⚖️</div><div class="atitle">قسم الميزان</div></div>
+        <div class="arch-box blue"><div class="aico">🧪</div><div class="atitle">قسم الجودة</div></div>
+        <div class="arch-box blue"><div class="aico">💰</div><div class="atitle">الشئون المالية</div></div>
+        <div class="arch-box blue"><div class="aico">🔐</div><div class="atitle">إدارة الأمن</div></div>
+        <div class="arch-box blue"><div class="aico">📊</div><div class="atitle">الإدارة العليا</div></div>
       </div>
     </div>
-    <div class="wf-arrow-down">▼</div>
+    <div class="arch-connect">⬇ HTTPS / Browser</div>
 
-    <!-- Row 3: Reception Scale -->
-    <div class="wf-row" style="gap:8px;">
-      <div class="wf-node gold" style="min-width:140px;">
-        <div class="wf-node-icon">⚖️</div>
-        <div class="wf-node-title">ميزان الاستلام</div>
-        <div class="wf-node-sub">الوزن المبدئي الفارغ</div>
-      </div>
-      <div style="color:#94a3b8; font-size:24px; align-self:center;">↔</div>
-      <div class="wf-node green" style="min-width:140px;">
-        <div class="wf-node-icon">🧪</div>
-        <div class="wf-node-title">قسم الجودة والمعمل</div>
-        <div class="wf-node-sub">نسبة النقاء والرطوبة والشوائب</div>
+    <div class="arch-tier">
+      <div class="arch-tier-label">الطبقة الثانية — التطبيق (App Layer)</div>
+      <div class="arch-tier-boxes">
+        <div class="arch-box green" style="min-width:130px;"><div class="aico">🌐</div><div class="atitle">واجهة HTML/JS/CSS</div><div class="asub">Role-Based Access Control</div></div>
+        <div class="arch-box green" style="min-width:130px;"><div class="aico">⚙️</div><div class="atitle">محرك منطق الأعمال</div><div class="asub">app.js · data.js · auth.js</div></div>
+        <div class="arch-box green" style="min-width:130px;"><div class="aico">🖨️</div><div class="atitle">محرك التقارير</div><div class="asub">Print / Export PDF</div></div>
       </div>
     </div>
-    <div class="wf-arrow-down">▼</div>
+    <div class="arch-connect">⬇ Firebase SDK / LocalStorage API</div>
 
-    <!-- Center Node -->
-    <div style="display:flex; justify-content:center; margin: 5px 0;">
-      <div class="wf-center-node">
-        <div style="font-size:22px; margin-bottom:5px;">🏛️</div>
-        <div>تفريغ الشحنة في الصومعة</div>
-        <div style="font-size:10px; font-weight:600; color:#1e3a5f; margin-top:4px;">Silo Storage & Assignment</div>
-      </div>
-    </div>
-    <div class="wf-arrow-down">▼</div>
-
-    <!-- Row 5: Final Scale -->
-    <div class="wf-row">
-      <div class="wf-node gold" style="min-width:150px;">
-        <div class="wf-node-icon">⚖️</div>
-        <div class="wf-node-title">ميزان الصرف النهائي</div>
-        <div class="wf-node-sub">الوزن الصافي الرسمي</div>
-      </div>
-    </div>
-    <div class="wf-arrow-down">▼</div>
-
-    <!-- Row 6: Finance + Reports -->
-    <div class="wf-row" style="gap:8px;">
-      <div class="wf-node purple" style="min-width:140px;">
-        <div class="wf-node-icon">💰</div>
-        <div class="wf-node-title">الشئون المالية</div>
-        <div class="wf-node-sub">إصدار أذن الصرف وحسابات المورد</div>
-      </div>
-      <div style="color:#94a3b8; font-size:24px; align-self:center;">↔</div>
-      <div class="wf-node" style="background: linear-gradient(135deg, #1e3a5f, #0f172a); min-width:140px;">
-        <div class="wf-node-icon">📊</div>
-        <div class="wf-node-title">لوحة القيادة المركزية</div>
-        <div class="wf-node-sub">تقارير فورية للإدارة العليا</div>
+    <div class="arch-tier">
+      <div class="arch-tier-label">الطبقة الثالثة — البيانات (Data Layer)</div>
+      <div class="arch-tier-boxes">
+        <div class="arch-box gold" style="min-width:120px;"><div class="aico">☁️</div><div class="atitle">Firebase Realtime DB</div><div class="asub">بيانات سحابية لحظية</div></div>
+        <div class="arch-box gold" style="min-width:120px;"><div class="aico">💾</div><div class="atitle">LocalStorage</div><div class="asub">عمل بدون إنترنت Offline</div></div>
+        <div class="arch-box gold" style="min-width:120px;"><div class="aico">🔒</div><div class="atitle">Auth & Encryption</div><div class="asub">تشفير وتحقق هوية</div></div>
       </div>
     </div>
 
-    <div class="wf-legend">
-      <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#1e40af;"></div> إدارة النظام</div>
-      <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#991b1b;"></div> الأمن</div>
-      <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#b45309;"></div> الميزان</div>
-      <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#065f46;"></div> الجودة</div>
-      <div class="wf-legend-item"><div class="wf-legend-dot" style="background:#4c1d95;"></div> المحاسبة</div>
+    <!-- ER Tables -->
+    <div class="sec-title" style="margin-top:18px;">🗃️ مخطط العلاقات بين الجداول (Entity Relationship)</div>
+
+    <div class="er-wrap">
+
+      <div class="er-table">
+        <div class="er-head">🏛️ SILOS — الصوامع</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> silo_id <span class="ftype">INT PK</span></div>
+        <div class="er-field">name <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">region <span class="ftype">ENUM</span></div>
+        <div class="er-field">capacity <span class="ftype">DECIMAL</span></div>
+        <div class="er-field">current_stock <span class="ftype">DECIMAL</span></div>
+        <div class="er-field">status <span class="ftype">ENUM</span></div>
+      </div>
+
+      <div class="er-table green">
+        <div class="er-head">👤 USERS — المستخدمون</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> user_id <span class="ftype">INT PK</span></div>
+        <div class="er-field">username <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">password_hash <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">role <span class="ftype">ENUM</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+        <div class="er-field">last_login <span class="ftype">DATETIME</span></div>
+      </div>
+
+      <div class="er-table gold">
+        <div class="er-head">📦 CELLS — الخلايا</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> cell_id <span class="ftype">INT PK</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+        <div class="er-field">cell_name <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">capacity <span class="ftype">DECIMAL</span></div>
+        <div class="er-field">current_stock <span class="ftype">DECIMAL</span></div>
+        <div class="er-field">status <span class="ftype">ENUM</span></div>
+      </div>
+
+      <div class="er-table red">
+        <div class="er-head">🚛 TRANSACTIONS — الحركات</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> tx_id <span class="ftype">INT PK</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+        <div class="er-field">date <span class="ftype">DATE</span></div>
+        <div class="er-field">weight_gross <span class="ftype">DECIMAL</span></div>
+        <div class="er-field">weight_net <span class="ftype">DECIMAL</span></div>
+        <div class="er-field">quality_pct <span class="ftype">DECIMAL</span></div>
+      </div>
+
+      <div class="er-table purple">
+        <div class="er-head">📋 REPORTS — التقارير</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> report_id <span class="ftype">INT PK</span></div>
+        <div class="er-field">report_type <span class="ftype">ENUM</span></div>
+        <div class="er-field">period <span class="ftype">VARCHAR</span></div>
+        <div class="er-field fk">🔗 silo_id <span class="ftype">INT FK</span></div>
+        <div class="er-field fk">🔗 created_by <span class="ftype">INT FK</span></div>
+        <div class="er-field">data_json <span class="ftype">JSON</span></div>
+      </div>
+
+      <div class="er-table gray">
+        <div class="er-head">🔍 AUDIT_LOG — سجل المراجعة</div>
+        <div class="er-field pk"><span class="er-key">🔑</span> log_id <span class="ftype">INT PK</span></div>
+        <div class="er-field fk">🔗 user_id <span class="ftype">INT FK</span></div>
+        <div class="er-field">action <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">timestamp <span class="ftype">DATETIME</span></div>
+        <div class="er-field">record_type <span class="ftype">VARCHAR</span></div>
+        <div class="er-field">details <span class="ftype">TEXT</span></div>
+      </div>
+
+    </div>
+    <div style="display:flex;gap:14px;margin-top:10px;font-size:10px;color:#64748b;">
+      <span>🔑 = مفتاح أساسي (PK)</span>
+      <span style="color:#166534;">🔗 = مفتاح خارجي (FK)</span>
+      <span style="background:#fefce8;padding:1px 6px;border-radius:3px;">خلفية صفراء = ربط بين جدولين</span>
     </div>
   </div>
 
-  <div class="page-footer">
-    <span class="footer-company">النظام الموحد ISS 1.0 — EHCSS</span>
-    <span class="footer-conf">🔴 سري للاستخدام الداخلي</span>
-    <span class="footer-page">صفحة 3 من 6</span>
+  <div class="pfooter">
+    <span>EHCSS — ISS 1.0</span>
+    <span class="conf">🔴 سري للاستخدام الداخلي</span>
+    <span>صفحة 3 من 4</span>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     PAGE 4: DATABASE ARCHITECTURE
-════════════════════════════════════ -->
-<div class="page flow-page">
-  <div class="page-header-strip">
+<!-- ═══════ PAGE 4: PROGRAM DESCRIPTION ═══════ -->
+<div class="page">
+  <div class="page-head">
     <div class="page-num">٤</div>
     <div>
-      <h2>معمارية قاعدة البيانات والخادم</h2>
-      <span>Database & Server Architecture</span>
+      <h2>شرح البرنامج والملخص التنفيذي</h2>
+      <p>Program Description & Executive Summary</p>
     </div>
   </div>
 
-  <div class="db-container">
-    <div class="flow-intro">
-      يعتمد النظام على هيكل ثلاثي الطبقات (3-Tier Architecture) يضمن الفصل الكامل بين واجهة المستخدم وطبقة المنطق وقاعدة البيانات، مما يحقق الأمان والقابلية للتوسع.
-    </div>
+  <div class="page-content">
 
-    <!-- Architecture Diagram -->
-    <div class="db-arch">
+    <div class="sec-title">📌 وحدات النظام الرئيسية</div>
+    <div class="module-grid">
 
-      <!-- Tier 1: Users -->
-      <div class="db-tier">
-        <div class="db-tier-label">المستخدمون</div>
-        <div style="display:flex; gap:8px; flex:1; justify-content:center; flex-wrap:wrap;">
-          <div class="db-box primary"><div class="db-box-icon">🏛️</div><div class="db-box-title">مدير الموقع</div><div class="db-box-sub">Silo Manager</div></div>
-          <div class="db-box primary"><div class="db-box-icon">⚖️</div><div class="db-box-title">قسم الميزان</div><div class="db-box-sub">Reception</div></div>
-          <div class="db-box primary"><div class="db-box-icon">💰</div><div class="db-box-title">الشئون المالية</div><div class="db-box-sub">Finance</div></div>
-          <div class="db-box primary"><div class="db-box-icon">🔐</div><div class="db-box-title">إدارة الأمن</div><div class="db-box-sub">Security</div></div>
-          <div class="db-box primary"><div class="db-box-icon">📊</div><div class="db-box-title">الإدارة العليا</div><div class="db-box-sub">Dashboard</div></div>
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-ico" style="background:#eff6ff;">🏛️</div>
+          <div><div class="module-name">بوابة الصومعة</div><div class="module-role">مدير الموقع</div></div>
         </div>
+        <div class="module-feat">عرض حالة الخلايا ونسب المخزون لحظياً</div>
+        <div class="module-feat">إدخال حركات الاستلام اليومية</div>
+        <div class="module-feat">طباعة تقارير اليوم والشهر</div>
       </div>
 
-      <div class="db-connect-line"></div>
-
-      <!-- Tier 2: App Layer -->
-      <div class="db-tier">
-        <div class="db-tier-label">طبقة التطبيق</div>
-        <div style="display:flex; gap:8px; flex:1; justify-content:center;">
-          <div class="db-box secondary" style="max-width:250px; padding:14px 20px;">
-            <div class="db-box-icon">🌐</div>
-            <div class="db-box-title">واجهة المستخدم (HTML/JS/CSS)</div>
-            <div class="db-box-sub">نظام تسجيل دخول متعدد الأدوار — Role-Based Access Control (RBAC)</div>
-          </div>
-          <div class="db-box secondary" style="max-width:200px; padding:14px 20px;">
-            <div class="db-box-icon">⚙️</div>
-            <div class="db-box-title">محرك منطق الأعمال</div>
-            <div class="db-box-sub">App.js — data.js — auth.js</div>
-          </div>
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-ico" style="background:#fef9c3;">⚖️</div>
+          <div><div class="module-name">قسم الاستلام والميزان</div><div class="module-role">موظف الميزان</div></div>
         </div>
+        <div class="module-feat">تسجيل الوزن المبدئي والنهائي</div>
+        <div class="module-feat">احتساب الوزن الصافي آلياً</div>
+        <div class="module-feat">ربط النتائج بنسب الجودة</div>
       </div>
 
-      <div class="db-connect-line"></div>
-
-      <!-- Tier 3: Data Layer -->
-      <div class="db-tier">
-        <div class="db-tier-label">طبقة البيانات</div>
-        <div style="display:flex; gap:8px; flex:1; justify-content:center;">
-          <div class="db-box tertiary" style="max-width:180px;">
-            <div class="db-box-icon">☁️</div>
-            <div class="db-box-title">Firebase Cloud</div>
-            <div class="db-box-sub">قاعدة بيانات سحابية لحظية (Real-time)</div>
-          </div>
-          <div class="db-box tertiary" style="max-width:180px;">
-            <div class="db-box-icon">💾</div>
-            <div class="db-box-title">LocalStorage</div>
-            <div class="db-box-sub">تخزين محلي للعمل دون إنترنت (Offline)</div>
-          </div>
-          <div class="db-box tertiary" style="max-width:180px;">
-            <div class="db-box-icon">🔒</div>
-            <div class="db-box-title">Auth Layer</div>
-            <div class="db-box-sub">تشفير وتحقق من الهوية لكل مستخدم</div>
-          </div>
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-ico" style="background:#f0fdf4;">💰</div>
+          <div><div class="module-name">الشئون المالية</div><div class="module-role">المحاسب المالي</div></div>
         </div>
+        <div class="module-feat">إصدار أذونات الصرف وتتبعها</div>
+        <div class="module-feat">حسابات الموردين والفواتير</div>
+        <div class="module-feat">تقارير مالية شهرية وسنوية</div>
       </div>
-    </div>
 
-    <!-- Key Tables -->
-    <div style="margin-top:20px;">
-      <div class="section-title" style="font-size:13px;">
-        <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:#2563eb;"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-        الجداول والكيانات الرئيسية في قاعدة البيانات
-      </div>
-      <div class="db-table-list">
-        <div class="db-table-card">
-          <div class="db-table-name"><span>🏛️</span> SILOS (الصوامع)</div>
-          <div class="db-field">🔑 silo_id, name, region</div>
-          <div class="db-field">📦 capacity, stock, status</div>
-          <div class="db-field">📍 location, manager</div>
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-ico" style="background:#fef3c7;">🔐</div>
+          <div><div class="module-name">إدارة الأمن</div><div class="module-role">ضابط الأمن</div></div>
         </div>
-        <div class="db-table-card">
-          <div class="db-table-name"><span>👤</span> USERS (المستخدمون)</div>
-          <div class="db-field">🔑 user_id, username</div>
-          <div class="db-field">🔐 password_hash, role</div>
-          <div class="db-field">🏛️ silo_id, last_login</div>
+        <div class="module-feat">تسجيل دخول وخروج الشاحنات</div>
+        <div class="module-feat">التحقق من الجوازات والتراخيص</div>
+        <div class="module-feat">سجل كامل للزيارات اليومية</div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-ico" style="background:#fdf4ff;">📊</div>
+          <div><div class="module-name">لوحة القيادة المركزية</div><div class="module-role">الإدارة العليا</div></div>
         </div>
-        <div class="db-table-card">
-          <div class="db-table-name"><span>🚛</span> TRANSACTIONS (الحركات)</div>
-          <div class="db-field">🔑 tx_id, date, silo_id</div>
-          <div class="db-field">⚖️ weight_in, weight_out</div>
-          <div class="db-field">🌾 quality_pct, source</div>
+        <div class="module-feat">رؤية شاملة لـ 48 صومعة دفعة واحدة</div>
+        <div class="module-feat">مؤشرات أداء لحظية (KPIs)</div>
+        <div class="module-feat">خرائط المناطق والطاقة الاستيعابية</div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-head">
+          <div class="module-ico" style="background:#ecfdf5;">🔧</div>
+          <div><div class="module-name">الصيانة والتشغيل</div><div class="module-role">مسئول الصيانة</div></div>
         </div>
-        <div class="db-table-card">
-          <div class="db-table-name"><span>📦</span> CELLS (الخلايا)</div>
-          <div class="db-field">🔑 cell_id, silo_id</div>
-          <div class="db-field">📦 capacity, current_stock</div>
-          <div class="db-field">🏷️ cell_type, status</div>
-        </div>
-        <div class="db-table-card">
-          <div class="db-table-name"><span>📋</span> REPORTS (التقارير)</div>
-          <div class="db-field">🔑 report_id, type</div>
-          <div class="db-field">📅 period, silo_id</div>
-          <div class="db-field">📊 data_json, created_by</div>
-        </div>
-        <div class="db-table-card">
-          <div class="db-table-name"><span>🔐</span> AUDIT_LOG (السجل)</div>
-          <div class="db-field">🔑 log_id, user_id</div>
-          <div class="db-field">📅 timestamp, action</div>
-          <div class="db-field">🔍 record_type, details</div>
-        </div>
+        <div class="module-feat">جدولة أوامر الصيانة الوقائية</div>
+        <div class="module-feat">تتبع حالة المعدات والسيور</div>
+        <div class="module-feat">سجل تاريخ الأعطال والإصلاحات</div>
       </div>
-    </div>
-  </div>
 
-  <div class="page-footer">
-    <span class="footer-company">النظام الموحد ISS 1.0 — EHCSS</span>
-    <span class="footer-conf">🔴 سري للاستخدام الداخلي</span>
-    <span class="footer-page">صفحة 4 من 6</span>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════
-     PAGE 5: GOALS & OBJECTIVES
-════════════════════════════════════ -->
-<div class="page flow-page">
-  <div class="page-header-strip">
-    <div class="page-num">٥</div>
-    <div>
-      <h2>أهداف المشروع والمشكلة التي يحلها</h2>
-      <span>Project Goals & Problem Statement</span>
-    </div>
-  </div>
-
-  <div class="page-body">
-    <div class="summary-box" style="margin-bottom:20px;">
-      <strong>المشكلة الحالية:</strong> تعتمد الصوامع حالياً على الأوراق والملفات اليدوية في تسجيل وزن الشاحنات وإصدار مستندات الاستلام، مما يُسبب: تأخيراً في إعداد التقارير الإدارية، صعوبة في تتبع المخزون لحظياً، واحتمالية وقوع أخطاء بشرية أو تلاعب في البيانات.
     </div>
 
-    <div class="goal-card">
-      <div class="goal-num">١</div>
-      <div>
-        <div class="goal-title">🔗 توحيد جميع الإدارات في منصة رقمية واحدة</div>
-        <div class="goal-desc">ربط قسم الأمن والميزان والجودة والمحاسبة وإدارة الصومعة والإدارة العليا في بيئة عمل رقمية موحدة، بحيث تكون كل البيانات مترابطة ومتزامنة لحظياً دون الحاجة لتمرير الأوراق أو إعادة إدخال البيانات يدوياً.</div>
-      </div>
+    <div class="sec-title">📈 المؤشرات الرئيسية التي يحققها النظام</div>
+    <div class="kpi-row">
+      <div class="kpi-box"><div class="kpi-val">48</div><div class="kpi-lbl">صومعة تحت رقابة إلكترونية</div></div>
+      <div class="kpi-box"><div class="kpi-val">3.1M</div><div class="kpi-lbl">طن سعة تخزينية محوسبة</div></div>
+      <div class="kpi-box"><div class="kpi-val">60%+</div><div class="kpi-lbl">توفير في وقت المعالجة</div></div>
+      <div class="kpi-box"><div class="kpi-val">0</div><div class="kpi-lbl">أوراق — أرشفة رقمية كاملة</div></div>
     </div>
 
-    <div class="goal-card">
-      <div class="goal-num">٢</div>
-      <div>
-        <div class="goal-title">📊 توفير لوحة قيادة مركزية للإدارة العليا (Executive Dashboard)</div>
-        <div class="goal-desc">تمكين الإدارة من مراقبة المخزون الكلي في 48 صومعة عبر 3 مناطق جغرافية في الوقت الفعلي، وتتبع الشحنات اليومية (قطارات وسفن) واستعراض التقارير التفصيلية بضغطة زر واحدة.</div>
-      </div>
+    <div class="sec-title">🗓️ خارطة الطريق المستقبلية</div>
+    <div class="roadmap-item" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+      <div class="rm-badge" style="background:#10b981;color:#fff;">✅ منجز</div>
+      <div><strong>المرحلة الأولى:</strong> النظام الأساسي الكامل — تسجيل الدخول بأدوار متعددة، إدارة الصوامع والخلايا، الاستلام والميزان، الأمن، المحاسبة، لوحة القيادة المركزية.</div>
+    </div>
+    <div class="roadmap-item" style="background:#eff6ff; border:1px solid #bfdbfe;">
+      <div class="rm-badge" style="background:#2563eb;color:#fff;">🔄 التالي</div>
+      <div><strong>المرحلة الثانية:</strong> ربط قاعدة البيانات السحابية الكاملة، التوقيع الرقمي على المستندات، توليد الفواتير آلياً، وتحديثات لحظية عبر جميع الأجهزة.</div>
+    </div>
+    <div class="roadmap-item" style="background:#fefce8; border:1px solid #fde68a;">
+      <div class="rm-badge" style="background:#eab308;color:#1e293b;">📅 مستقبل</div>
+      <div><strong>المرحلة الثالثة:</strong> تطبيق ذكاء اصطناعي للتنبؤ بالمخزون، ربط بمنظومة ERP الشركة، تطبيق جوال، وتعميم النظام على جميع الوحدات التابعة.</div>
     </div>
 
-    <div class="goal-card">
-      <div class="goal-num">٣</div>
-      <div>
-        <div class="goal-title">🔐 إحكام الرقابة ومنع التلاعب (Audit Trail)</div>
-        <div class="goal-desc">تسجيل كل إجراء يقوم به أي مستخدم داخل النظام مع التوقيت والبصمة الرقمية، ومنع تعديل البيانات بعد اعتمادها، مما يرفع مستوى الشفافية ويُصفر احتمالية التلاعب في الأوزان أو المستندات.</div>
-      </div>
-    </div>
-
-    <div class="goal-card">
-      <div class="goal-num">٤</div>
-      <div>
-        <div class="goal-title">⚡ تسريع دورة العمل وتقليل الأخطاء البشرية</div>
-        <div class="goal-desc">أتمتة الحسابات التلقائية (الوزن الصافي، نسبة الخصم، قيمة الفاتورة) التي كانت تُجرى يدوياً، مما يُقلل وقت معالجة كل شحنة ويرفع كفاءة الفريق بنسبة تتجاوز 60%.</div>
-      </div>
-    </div>
-
-    <div class="goal-card">
-      <div class="goal-num">٥</div>
-      <div>
-        <div class="goal-title">📱 القابلية للتوسع والتشغيل عبر الإنترنت والأجهزة المتنوعة</div>
-        <div class="goal-desc">النظام مُصمَّم ليعمل على أي متصفح وأي جهاز (حاسوب أو تابلت أو هاتف)، ويدعم العمل في حالة انقطاع الإنترنت مع مزامنة تلقائية عند استعادة الاتصال، وهو قابل للتوسع ليشمل باقي الوحدات والشركات التابعة مستقبلاً.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <span class="footer-company">النظام الموحد ISS 1.0 — EHCSS</span>
-    <span class="footer-conf">🔴 سري للاستخدام الداخلي</span>
-    <span class="footer-page">صفحة 5 من 6</span>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════
-     PAGE 6: VALUE & ROADMAP
-════════════════════════════════════ -->
-<div class="page flow-page">
-  <div class="page-header-strip">
-    <div class="page-num">٦</div>
-    <div>
-      <h2>الملخص التنفيذي وخارطة الطريق</h2>
-      <span>Executive Summary & Roadmap</span>
-    </div>
-  </div>
-
-  <div class="page-body">
-
-    <div class="section-title">
-      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-      المؤشرات الرئيسية التي يحققها النظام
-    </div>
-
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-value">48</div>
-        <div class="kpi-unit">صومعة</div>
-        <div class="kpi-label">تحت رقابة إلكترونية مباشرة</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value">3</div>
-        <div class="kpi-unit">مناطق جغرافية</div>
-        <div class="kpi-label">وجه بحري — قبلي — موانئ</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value">3.1M</div>
-        <div class="kpi-unit">طن</div>
-        <div class="kpi-label">سعة تخزينية إجمالية محوسبة</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value">6</div>
-        <div class="kpi-unit">أدوار</div>
-        <div class="kpi-label">نظام صلاحيات متعدد المستويات</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value">60%+</div>
-        <div class="kpi-unit">توفير في الوقت</div>
-        <div class="kpi-label">تقليل وقت معالجة كل شحنة</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-value">0</div>
-        <div class="kpi-unit">أوراق</div>
-        <div class="kpi-label">تحويل كامل للأرشفة الرقمية</div>
-      </div>
-    </div>
-
-    <div class="section-title">
-      <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
-      خارطة الطريق المستقبلية (Roadmap)
-    </div>
-
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      <div style="display:flex; gap:10px; align-items:center; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 16px;">
-        <div style="background:#10b981; color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; flex-shrink:0;">✅ منجز</div>
-        <div style="font-size:12.5px; color:#374151;"><strong>المرحلة الأولى:</strong> بناء النظام الأساسي — تسجيل الدخول، إدارة الصوامع، الاستلام، الأمن، المحاسبة، لوحة القيادة</div>
-      </div>
-      <div style="display:flex; gap:10px; align-items:center; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 16px;">
-        <div style="background:#2563eb; color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; flex-shrink:0;">🔄 قريباً</div>
-        <div style="font-size:12.5px; color:#374151;"><strong>المرحلة الثانية:</strong> ربط قاعدة البيانات السحابية الكاملة، إضافة التوقيع الرقمي، وتوليد الفواتير والمستندات آلياً</div>
-      </div>
-      <div style="display:flex; gap:10px; align-items:center; background:#fefce8; border:1px solid #fde68a; border-radius:10px; padding:12px 16px;">
-        <div style="background:#eab308; color:#1e293b; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; flex-shrink:0;">📅 مستقبل</div>
-        <div style="font-size:12.5px; color:#374151;"><strong>المرحلة الثالثة:</strong> تطبيق الذكاء الاصطناعي للتنبؤ بالمخزون، وربط النظام بمنظومة ERPالشركة، وإنشاء تطبيق جوال</div>
-      </div>
-    </div>
-
-    <div style="margin-top:22px; background:linear-gradient(135deg, #1e3a5f, #0f172a); border-radius:14px; padding:20px 25px; color:#fff; text-align:center;">
-      <div style="font-size:15px; font-weight:800; color:#eab308; margin-bottom:8px;">خلاصة واستدعاء للإجراء</div>
-      <div style="font-size:12.5px; color:#cbd5e1; line-height:2;">
-        لقد أثبت هذا المشروع أن الطاقات البشرية الداخلية للشركة قادرة على بناء منظومة تقنية متكاملة
-        تُرشّد العمل وتحكم الرقابة وتحقق التحول الرقمي الكامل. <br>
-        نطلب دعم سيادتكم لتطوير النظام وتعميمه على جميع الوحدات التابعة للشركة.
+    <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);border-radius:10px;padding:16px 20px;color:#fff;text-align:center;margin-top:14px;">
+      <div style="color:#eab308;font-size:14px;font-weight:800;margin-bottom:6px;">الخلاصة واستدعاء للإجراء</div>
+      <div style="font-size:11.5px;color:#cbd5e1;line-height:1.9;">
+        أثبت هذا المشروع أن الكفاءات البشرية الداخلية قادرة على بناء منظومة تقنية متكاملة توفر التحكم والرقابة والكفاءة التشغيلية. نطلب دعم سيادتكم لتطوير النظام وتعميمه على جميع وحدات الشركة.
       </div>
     </div>
 
   </div>
 
-  <div class="page-footer">
-    <span class="footer-company">تصميم وبرمجة: أكرم محمد محمود / EHCSS — ISS 1.0</span>
-    <span class="footer-conf">🔴 سري للاستخدام الداخلي</span>
-    <span class="footer-page">صفحة 6 من 6</span>
+  <div class="pfooter">
+    <span>تصميم وبرمجة: أكرم محمد محمود — EHCSS ISS 1.0</span>
+    <span class="conf">🔴 سري للاستخدام الداخلي</span>
+    <span>صفحة 4 من 4</span>
   </div>
 </div>
 
