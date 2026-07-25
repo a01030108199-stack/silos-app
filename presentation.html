@@ -39,15 +39,16 @@
     position: relative;
   }
   @media print {
+    @page { margin: 0; size: A4; }
     body { background: #fff; }
-    .page { margin: 0; width: 100%; }
+    .page { margin: 0; width: 100%; height: 296mm; }
   }
 
   /* ══════════════════════════════════
      PAGE 1: PREMIUM COVER
   ══════════════════════════════════ */
   .cover {
-    height: 297mm;
+    height: 296mm;
     background: #fff;
     display: flex;
     flex-direction: column;
@@ -508,7 +509,7 @@
           <div class="party-tag gray">مُعدَّ من &nbsp;·&nbsp; Prepared By</div>
           <div class="party-name">أكرم محمد محمود محمد</div>
           <div class="party-title">
-            محاسب مالي أول ومحلل بيانات<br>
+            محاسب مالي ومحلل بيانات على مواقع Freelance<br>
             باحث دكتوراه — جامعة الزقازيق<br>
             خبرة 18+ سنة في EHCSS
           </div>
