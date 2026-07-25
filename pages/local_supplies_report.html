@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -222,7 +222,7 @@ window.generateReport = function() {
   var localIncoming = [];
   for (var i = 0; i < tickets.length; i++) {
     var t = tickets[i];
-    if (t.silo_id === siloId && t.opType === 'وارد' && t.grainType === 'محلي' && t.net > 0) {
+    if (t.status === 'completed' && t.silo_id === siloId && t.opType === 'وارد' && t.grainType === 'محلي' && t.net > 0) {
       localIncoming.push(t);
     }
   }

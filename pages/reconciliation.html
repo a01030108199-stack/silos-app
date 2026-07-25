@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -270,7 +270,7 @@ try {
     }
 
     tickets.forEach(t => {
-      if (t.silo_id !== user.silo_id || t.opType !== 'صرف' || !t.destination) return;
+      if (t.status !== 'completed' || t.silo_id !== user.silo_id || t.opType !== 'صرف' || !t.destination) return;
       
       let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
       if (!tIsoDate.startsWith(monthVal)) return;

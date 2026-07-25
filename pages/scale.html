@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -614,6 +614,7 @@ function getLiveCellType(cellNum) {
   if (latestDate !== todayStr) {
     const tickets = getTickets().filter(t => t.silo_id === user.silo_id && t.cell == cellNum && t.dateStr === todayStr).reverse();
     for (const t of tickets) {
+      if (t.status === 'deleted') continue;
       let net = (t.net || 0) / 1000;
       if (t.opType === 'وارد') {
         balance += net;
@@ -918,19 +919,28 @@ function printSlip(t, isFirst) {
 }
 
 function deleteTicket(id) {
-  if (!confirm('هل أنت متأكد من مسح هذه الكارتة (الوزنة) بشكل نهائي؟')) return;
+  const reason = prompt('إجراء أمني: هل أنت متأكد من إلغاء هذه الكارتة؟\nيرجى إدخال "سبب الحذف" (إجباري):');
+  if (!reason || reason.trim() === '') {
+    showToast('تم إيقاف الإلغاء. يجب إدخال سبب للإلغاء لضمان الرقابة.', 'warning');
+    return;
+  }
   let tickets = getTickets();
-  tickets = tickets.filter(t => t.id !== id);
-  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  const idx = tickets.findIndex(t => t.id === id);
+  if (idx !== -1) {
+    tickets[idx].status = 'deleted';
+    tickets[idx].deleteReason = reason.trim();
+    tickets[idx].deletedBy = user.name;
+    tickets[idx].deletedAt = new Date().toLocaleString('ar-EG');
+    localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  }
   
-  // If the deleted ticket is currently being weighed, reset the form
   if (scaleMode === 'second' && pendingTicketId === id) {
     initForm();
   }
   
   renderTable();
   if (typeof calcOrderBalance === 'function') calcOrderBalance();
-  showToast('تم مسح الكارتة بنجاح', 'info');
+  showToast('تم وسم الكارتة كـ "ملغاة" بنجاح، ولن يتم ترحيلها للرصيد.', 'info');
 }
 
 function renderTable() {
@@ -949,14 +959,23 @@ function renderTable() {
   }
 
   tickets.forEach(t => {
-    const statusBadge = t.status === 'pending'
-      ? `<button class="btn btn-warning btn-sm" onclick="loadPendingTicket('${t.id}')"><i class="fa-solid fa-truck-moving"></i> استكمال الوزنة</button>
-         <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح"><i class="fa-solid fa-trash"></i></button>`
-      : `<span class="badge badge-success"><i class="fa-solid fa-check"></i> مكتملة</span>
+    let statusBadge = '';
+    let rowStyle = '';
+    
+    if (t.status === 'deleted') {
+       statusBadge = `<span class="badge" style="background:#dc2626;color:#fff;" title="سبب الحذف: ${t.deleteReason} (بواسطة ${t.deletedBy})"><i class="fa-solid fa-ban"></i> ملغاة</span>`;
+       rowStyle = 'background: rgba(220, 38, 38, 0.1); opacity: 0.85; text-decoration: line-through;';
+    } else if (t.status === 'pending') {
+       statusBadge = `<button class="btn btn-warning btn-sm" onclick="loadPendingTicket('${t.id}')"><i class="fa-solid fa-truck-moving"></i> استكمال الوزنة</button>
+         <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح"><i class="fa-solid fa-trash"></i></button>`;
+       rowStyle = 'background: rgba(255,193,7,0.1);';
+    } else {
+       statusBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> مكتملة</span>
          <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح" style="margin-right:5px;"><i class="fa-solid fa-trash"></i></button>`;
+    }
 
     tbody.innerHTML += `
-      <tr style="${t.status === 'pending' ? 'background:rgba(255,193,7,0.1)' : ''}">
+      <tr style="${rowStyle}">
         <td class="fw-bold text-info">${t.id}</td>
         <td style="font-size:0.85rem">${t.timestamp2 || t.timestamp}</td>
         <td class="fw-bold">${t.plate}</td>

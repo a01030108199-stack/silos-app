@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -520,7 +520,7 @@ function syncWithTickets() {
   });
 
   tickets.forEach(t => {
-    if (t.silo_id !== user.silo_id || t.grainType !== 'مستورد' || t.shipName !== currentShipName) return;
+    if (t.status !== 'completed' || t.silo_id !== user.silo_id || t.grainType !== 'مستورد' || t.shipName !== currentShipName) return;
     
     let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
     if (!tIsoDate) return;

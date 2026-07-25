@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -271,7 +271,7 @@ function fetchTicket() {
   if(!tId) { showToast('يرجى إدخال رقم الكارتة', 'error'); return; }
   
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-  const t = tickets.find(x => x.id === tId);
+  const t = tickets.find(x => x.id === tId && x.status === 'completed');
   
   if(!t) {
     showToast('رقم الكارتة غير موجود في البسكول', 'error');

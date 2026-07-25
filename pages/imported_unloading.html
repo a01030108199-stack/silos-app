@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -400,7 +400,7 @@ function fetchWeighbridgeTicket(index) {
   if (ticketsStr) {
     const tickets = JSON.parse(ticketsStr);
     const tk = tickets.find(t => t.id === ticketNo);
-    if (tk) {
+    if (tk && tk.status === 'completed') {
       reportData[index].driver = tk.driver;
       reportData[index].plate = tk.plate;
       reportData[index].received = (tk.net / 1000).toFixed(3);
@@ -434,7 +434,7 @@ function syncWithTickets() {
   let addedCount = 0;
   
   tickets.forEach(t => {
-    if (t.silo_id !== user.silo_id || t.opType !== 'وارد' || t.grainType !== 'مستورد' || t.shipName !== shipName) return;
+    if (t.status !== 'completed' || t.silo_id !== user.silo_id || t.opType !== 'وارد' || t.grainType !== 'مستورد' || t.shipName !== shipName) return;
     
     let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
     if (tIsoDate !== currentDate) return;
