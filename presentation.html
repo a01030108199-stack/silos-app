@@ -40,70 +40,185 @@
   }
 
   /* ══════════════════════════════════
-     PAGE 1: COVER (compact)
+     PAGE 1: PREMIUM COVER
   ══════════════════════════════════ */
   .cover {
-    background: linear-gradient(160deg, #0a1628 0%, #1a3a6e 55%, #0a1628 100%);
-    padding: 35px 45px;
+    height: 297mm;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Gold top bar */
+  .cover-topbar {
+    height: 8px;
+    background: linear-gradient(90deg, #eab308, #f59e0b, #d97706, #eab308);
+  }
+
+  /* Dark header with company identity */
+  .cover-header {
+    background: linear-gradient(135deg, #0f1e35 0%, #1a3a6e 100%);
+    padding: 28px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+  .cover-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 0; right: 0;
+    height: 40px;
+    background: linear-gradient(135deg, #0f1e35 0%, #1a3a6e 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 30%, 0 100%);
+  }
+
+  .cover-company-block { display: flex; align-items: center; gap: 16px; }
+  .cover-emblem {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid rgba(234,179,8,0.6);
+    box-shadow: 0 4px 20px rgba(37,99,235,0.5);
+    flex-shrink: 0;
+  }
+  .cover-emblem svg { width: 40px; height: 40px; fill: #fff; }
+  .cover-company-ar { color: #fff; font-size: 14px; font-weight: 800; line-height: 1.5; }
+  .cover-company-en { color: #93c5fd; font-size: 10px; font-weight: 600; letter-spacing: 1px; }
+  .cover-ref-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; padding: 10px 16px;
+    text-align: left; direction: ltr;
+  }
+  .cover-ref-label { color: #94a3b8; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .cover-ref-val { color: #eab308; font-size: 12px; font-weight: 800; margin-top: 3px; }
+
+  /* Hero center area */
+  .cover-hero {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding: 30px 55px 20px;
     text-align: center;
-    gap: 16px;
+    position: relative;
   }
 
-  .cover-logo {
-    width: 80px; height: 80px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  /* Decorative circle bg */
+  .cover-hero::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -55%);
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cover-doc-type {
+    background: #eab308;
+    color: #1e293b;
+    font-size: 11px; font-weight: 800;
+    padding: 5px 20px; border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+
+  .cover-main-title {
+    font-size: 26px; font-weight: 900;
+    color: #0f172a; line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .cover-main-title span { color: #2563eb; }
+
+  .cover-main-sub {
+    font-size: 14px; color: #64748b; font-weight: 600;
+    margin-bottom: 30px;
+    direction: ltr;
+  }
+
+  /* Divider with icon */
+  .cover-divider-fancy {
+    display: flex; align-items: center; gap: 15px;
+    width: 100%; margin: 8px 0 28px;
+  }
+  .cover-divider-fancy hr {
+    flex: 1; border: none;
+    height: 1px; background: #e2e8f0;
+  }
+  .cover-divider-fancy .icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    border: 3px solid #eab308;
-    box-shadow: 0 0 25px rgba(37,99,235,0.5);
-  }
-  .cover-logo svg { width: 44px; height: 44px; fill: #fff; }
-
-  .cover-title {
-    color: #fff; font-size: 22px; font-weight: 900; line-height: 1.5;
-  }
-  .cover-sub { color: #eab308; font-size: 14px; font-weight: 700; }
-
-  .cover-hr { width: 80px; height: 2px; background: linear-gradient(90deg, transparent, #eab308, transparent); }
-
-  .cover-name { color: #fff; font-size: 20px; font-weight: 900; }
-  .cover-jobtitle { color: #93c5fd; font-size: 13px; font-weight: 600; }
-  .cover-company { color: #64748b; font-size: 11.5px; }
-
-  .qual-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    width: 100%; margin-top: 4px;
-  }
-  .qual-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 10px; padding: 12px 14px; text-align: right;
-  }
-  .qual-label { color: #94a3b8; font-size: 9.5px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-  .qual-item { color: #e2e8f0; font-size: 11px; padding: 3px 0; display: flex; align-items: center; gap: 6px; }
-  .qual-item::before { content: '▸'; color: #eab308; flex-shrink: 0; }
-
-  .cert-strip {
-    display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; width: 100%;
-  }
-  .cert-badge {
-    background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.4);
-    color: #fde68a; font-size: 10.5px; font-weight: 700;
-    padding: 5px 13px; border-radius: 20px;
+    font-size: 16px; flex-shrink: 0;
   }
 
-  .cover-footer {
-    color: #475569; font-size: 10px; border-top: 1px solid rgba(255,255,255,0.1);
-    padding-top: 12px; width: 100%; text-align: center;
+  /* Two column: To / From */
+  .cover-parties {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    width: 100%;
   }
-  .cover-to {
-    background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
-    border-radius: 10px; padding: 10px 20px; width: 100%;
-    color: #fde68a; font-size: 12px; font-weight: 700;
+  .cover-party-card {
+    border-radius: 14px; padding: 18px 20px;
+    border: 1.5px solid #e2e8f0;
   }
+  .cover-party-card.to {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-color: #93c5fd;
+  }
+  .cover-party-card.from {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-color: #cbd5e1;
+  }
+  .party-tag {
+    font-size: 9.5px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .party-tag.blue { color: #2563eb; }
+  .party-tag.gray { color: #64748b; }
+  .party-tag::before {
+    content: ''; display: inline-block;
+    width: 20px; height: 2px;
+    background: currentColor; border-radius: 2px;
+  }
+  .party-name { font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+  .party-title { font-size: 11px; color: #64748b; line-height: 1.7; }
+  .party-org { font-size: 11px; color: #2563eb; font-weight: 700; margin-top: 3px; }
+
+  /* Bottom info bar */
+  .cover-bottom {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 18px 50px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cover-bottom-item { text-align: center; }
+  .cover-bottom-item .lbl { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  .cover-bottom-item .val { font-size: 12px; color: #1e293b; font-weight: 800; margin-top: 3px; }
+
+  .cover-conf-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: #fee2e2; border: 1px solid #fca5a5;
+    padding: 6px 14px; border-radius: 20px;
+  }
+  .cover-conf-badge span { color: #dc2626; font-size: 11px; font-weight: 800; }
+
+  /* Gold bottom bar */
+  .cover-bottombar {
+    height: 6px;
+    background: linear-gradient(90deg, #d97706, #eab308, #f59e0b, #d97706);
+  }
+
 
   /* ══════════════════════════════════
      SHARED PAGE ELEMENTS
@@ -330,59 +445,99 @@
 <!-- ═══════ PAGE 1: COVER ═══════ -->
 <div class="page">
   <div class="cover">
-    <div class="cover-logo">
-      <svg viewBox="0 0 100 100">
-        <rect x="10" y="42" width="14" height="43" rx="3"/>
-        <rect x="28" y="28" width="14" height="57" rx="3"/>
-        <rect x="46" y="34" width="14" height="51" rx="3"/>
-        <rect x="64" y="22" width="14" height="63" rx="3"/>
-        <rect x="5" y="87" width="88" height="7" rx="3"/>
-        <polygon points="50,3 56,17 70,17 59,26 63,40 50,31 37,40 41,26 30,17 44,17" fill="#eab308"/>
-      </svg>
-    </div>
 
-    <div>
-      <div class="cover-title">النظام الموحد لإدارة الصوامع والاستلام</div>
-      <div class="cover-sub">Integrated Silos & Storage System — ISS V1.0</div>
-    </div>
+    <!-- Gold top bar -->
+    <div class="cover-topbar"></div>
 
-    <div class="cover-hr"></div>
-
-    <div>
-      <div class="cover-name">أكرم محمد محمود محمد</div>
-      <div class="cover-jobtitle" style="margin-top:4px;">محاسب مالي أول ومحلل بيانات | الشركة المصرية القابضة للصوامع والتخزين</div>
-      <div class="cover-company" style="margin-top:3px;">خبرة 18+ سنة — منذ 2007 حتى الآن</div>
-    </div>
-
-    <div class="qual-grid">
-      <div class="qual-card">
-        <div class="qual-label">📚 المؤهلات العلمية</div>
-        <div class="qual-item">باحث دكتوراه — جامعة الزقازيق</div>
-        <div class="qual-item">ماجستير محاسبة ومراجعة 2024</div>
-        <div class="qual-item">بكالوريوس تجارة — محاسبة 2012</div>
+    <!-- Header: Company Identity + Reference -->
+    <div class="cover-header">
+      <div class="cover-company-block">
+        <div class="cover-emblem">
+          <svg viewBox="0 0 100 100">
+            <rect x="10" y="42" width="14" height="43" rx="3"/>
+            <rect x="28" y="28" width="14" height="57" rx="3"/>
+            <rect x="46" y="34" width="14" height="51" rx="3"/>
+            <rect x="64" y="22" width="14" height="63" rx="3"/>
+            <rect x="5" y="87" width="88" height="7" rx="3"/>
+            <polygon points="50,3 56,17 70,17 59,26 63,40 50,31 37,40 41,26 30,17 44,17" fill="#eab308"/>
+          </svg>
+        </div>
+        <div>
+          <div class="cover-company-ar">الشركة المصرية القابضة للصوامع والتخزين</div>
+          <div class="cover-company-en">Egyptian Holding Company for Silos & Storage — EHCSS</div>
+        </div>
       </div>
-      <div class="qual-card">
-        <div class="qual-label">🛠️ المهارات التقنية</div>
-        <div class="qual-item">Power BI · SQL · Python</div>
-        <div class="qual-item">JavaScript · HTML · CSS</div>
-        <div class="qual-item">Firebase · Excel · Power Query</div>
+      <div class="cover-ref-box">
+        <div class="cover-ref-label">Document Ref.</div>
+        <div class="cover-ref-val">EHCSS / ISS / 2026 / 001</div>
+        <div class="cover-ref-label" style="margin-top:6px;">Version</div>
+        <div class="cover-ref-val">V 1.0</div>
       </div>
     </div>
 
-    <div class="cert-strip">
-      <div class="cert-badge">🤖 AI — مايكروسوفت + MCIT</div>
-      <div class="cert-badge">🐍 Python & Java — المجلس الأمريكي</div>
-      <div class="cert-badge">☁️ IC3 الحوسبة السحابية</div>
-      <div class="cert-badge">🎓 التحول الرقمي — المجلس الأعلى للجامعات</div>
+    <!-- Hero: Title -->
+    <div class="cover-hero">
+      <div class="cover-doc-type">مقترح فني رسمي &nbsp;·&nbsp; Official Technical Proposal</div>
+
+      <div class="cover-main-title">
+        مقترح بتطوير<br>
+        <span>النظام الرقمي الموحد</span><br>
+        لإدارة الصوامع والاستلام
+      </div>
+      <div class="cover-main-sub">Integrated Silos & Storage System — ISS V1.0</div>
+
+      <div class="cover-divider-fancy">
+        <hr>
+        <div class="icon">🌾</div>
+        <hr>
+      </div>
+
+      <!-- Presented To / Prepared By -->
+      <div class="cover-parties">
+        <div class="cover-party-card to">
+          <div class="party-tag blue">مُقدَّم إلى &nbsp;·&nbsp; Presented To</div>
+          <div class="party-name">السيد الدكتور</div>
+          <div class="party-title">العضو المنتدب والرئيس التنفيذي</div>
+          <div class="party-org">الشركة المصرية القابضة للصوامع والتخزين</div>
+        </div>
+        <div class="cover-party-card from">
+          <div class="party-tag gray">مُعدَّ من &nbsp;·&nbsp; Prepared By</div>
+          <div class="party-name">أكرم محمد محمود محمد</div>
+          <div class="party-title">
+            محاسب مالي أول ومحلل بيانات<br>
+            باحث دكتوراه — جامعة الزقازيق<br>
+            خبرة 18+ سنة في EHCSS
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="cover-to">
-      مُقدَّم إلى سيادة السيد الدكتور / العضو المنتدب والرئيس التنفيذي
+    <!-- Bottom info bar -->
+    <div class="cover-bottom">
+      <div class="cover-bottom-item">
+        <div class="lbl">التاريخ</div>
+        <div class="val">يوليو 2026</div>
+      </div>
+      <div class="cover-bottom-item">
+        <div class="lbl">الإصدار</div>
+        <div class="val">الأول — V1.0</div>
+      </div>
+      <div class="cover-conf-badge">
+        <span>🔴 سري — للاستخدام الداخلي فقط</span>
+      </div>
+      <div class="cover-bottom-item">
+        <div class="lbl">عدد الصفحات</div>
+        <div class="val">4 صفحات</div>
+      </div>
+      <div class="cover-bottom-item">
+        <div class="lbl">القسم</div>
+        <div class="val">المحاسبة والمعلومات</div>
+      </div>
     </div>
 
-    <div class="cover-footer">
-      الشركة المصرية القابضة للصوامع والتخزين — EHCSS &nbsp;|&nbsp; يوليو 2026 &nbsp;|&nbsp; 🔴 سري للاستخدام الداخلي
-    </div>
+    <!-- Gold bottom bar -->
+    <div class="cover-bottombar"></div>
+
   </div>
 </div>
 
