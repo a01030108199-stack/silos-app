@@ -223,9 +223,17 @@
       if (!_db) throw new Error('Firebase init failed');
 
       overrideLocalStorage();
+      
+      // Failsafe: Hide overlay after 3 seconds even if Firebase is stuck
+      const failsafeTimer = setTimeout(() => {
+        hideSyncOverlay();
+        console.warn('Firebase sync timeout - continuing in local mode');
+      }, 3000);
+
       await pullFromFirebase();
       listenForChanges();
 
+      clearTimeout(failsafeTimer);
       hideSyncOverlay();
       console.log('🔥 Firebase sync active!');
 
