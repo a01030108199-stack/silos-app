@@ -483,6 +483,8 @@ select.form-input { cursor: pointer; }
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ── Header ──────────────────────────────────────────────────── */
@@ -536,7 +538,7 @@ select.form-input { cursor: pointer; }
 }
 
 /* ── Page Content ────────────────────────────────────────────── */
-.page-content { padding: 16px 20px; flex: 1; }
+.page-content { padding: 16px 20px; flex: 1; min-width: 0; max-width: 100%; }
 
 /* ── Stat Cards ──────────────────────────────────────────────── */
 .stats-grid {
@@ -614,6 +616,9 @@ select.form-input { cursor: pointer; }
   padding: 20px;
   animation: fadeInUp 0.6s ease backwards;
 }
+
+.gate-panel { min-width: 0; max-width: 100%; }
+.card { min-width: 0; max-width: 100%; }
 
 .card-header {
   display: flex;
