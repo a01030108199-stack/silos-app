@@ -92,7 +92,16 @@
           <div class="entry-form">
             <div><label>رقم السيارة *</label><input type="text" id="ii_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
             <div><label>اسم السائق *</label><input type="text" id="ii_driver" class="inp" placeholder="الاسم الثلاثي"></div>
-            <div><label>الميناء الشاحن *</label><input type="text" id="ii_supplier" class="inp" placeholder="اسم الميناء"></div>
+            <div><label>الميناء الشاحن *</label>
+              <input type="text" id="ii_supplier" class="inp" placeholder="اسم الميناء" list="ports_list">
+              <datalist id="ports_list">
+                <option value="الاسكندرية"></option>
+                <option value="الدخيلة"></option>
+                <option value="دمياط"></option>
+                <option value="بورسعيد"></option>
+                <option value="سفاجا"></option>
+              </datalist>
+            </div>
             <div><label>نوع القمح</label>
               <select id="ii_wheat" class="inp">
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
@@ -297,6 +306,22 @@
         if (tickets[idx].status !== 'completed') {
           return showToast('لا يمكن خروج السيارة قبل اكتمال أوزانها في الميزان!', 'error');
         }
+        
+        let t = tickets[idx];
+        if (t.opType === 'وارد' && t.grainType === 'مستورد' && t.shippedWeight > 0 && t.net > 0) {
+          let netTons = t.net / 1000;
+          if (netTons > t.shippedWeight) {
+            let diff = (netTons - t.shippedWeight).toFixed(3);
+            return showConfirm(`تحذير: يوجد عجز فعلي (المستلم أكبر من المشحون بـ ${diff} طن). هل تم تسوية العجز وتأكيد خروج السيارة؟`, () => {
+              tickets[idx].status = 'gate_out';
+              tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
+              localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+              showToast('تم إثبات خروج السيارة بسلام', 'success');
+              renderGateTables();
+            });
+          }
+        }
+
         tickets[idx].status = 'gate_out'; 
         tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
         localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
@@ -348,11 +373,16 @@
         let netTons = t.net ? (t.net / 1000) : 0;
         if (netTons > 0 && t.shippedWeight > 0) {
           deficit = t.shippedWeight - netTons;
-          if (deficit > 0) defClass = 'deficit-alert';
-          else if (deficit < 0) defClass = 'text-success fw-bold'; // الزيادة
+          if (deficit > 0) {
+            defClass = 'text-success fw-bold'; 
+            defStr = deficit.toFixed(3) + ' (مسموح)';
+          } else if (deficit < 0) {
+            defClass = 'deficit-alert';
+            defStr = 'عجز: ' + Math.abs(deficit).toFixed(3);
+          }
         }
         const sDate = t.shippingDate || '-';
-        const defStr = netTons > 0 ? (deficit > 0 ? deficit.toFixed(3) : (deficit < 0 ? 'زيادة ' + Math.abs(deficit).toFixed(3) : '0')) : '-';
+        if (netTons === 0) defStr = '-';
         hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td>${sDate}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${shippedStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td class="${defClass}">${defStr}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {

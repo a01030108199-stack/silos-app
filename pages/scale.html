@@ -600,6 +600,35 @@ function calcNet() {
       dedRow.style.display = 'none';
     }
   }
+
+  // Deficit Calculation for Imported Incoming
+  const shippedEl = document.getElementById('s_shipped_weight');
+  const rowDeficit = document.getElementById('row_deficit');
+  if (opType && opType.value === 'وارد' && grainType && grainType.value === 'مستورد' && shippedEl && shippedEl.value) {
+    let shipped = parseFloat(shippedEl.value) || 0;
+    if (net > 0 && shipped > 0) {
+      let deficit = shipped - (net / 1000);
+      if (deficit > 0) {
+        document.getElementById('lbl_deficit').textContent = deficit.toFixed(3) + ' طن (مسموح)';
+        rowDeficit.className = 'calc-row text-success fw-bold';
+        rowDeficit.querySelector('span').textContent = 'الفرق:';
+      } else if (deficit < 0) {
+        document.getElementById('lbl_deficit').textContent = Math.abs(deficit).toFixed(3) + ' طن (عجز فعلي)';
+        rowDeficit.className = 'calc-row text-danger fw-bold';
+        rowDeficit.querySelector('span').textContent = 'عجز:';
+      } else {
+        document.getElementById('lbl_deficit').textContent = '0 طن';
+        rowDeficit.className = 'calc-row';
+        rowDeficit.querySelector('span').textContent = 'الفرق:';
+      }
+      rowDeficit.style.display = 'flex';
+    } else {
+      if(rowDeficit) rowDeficit.style.display = 'none';
+    }
+  } else if (rowDeficit) {
+    rowDeficit.style.display = 'none';
+  }
+
   document.getElementById('lbl_net').textContent = net.toLocaleString('ar-EG') + ' كجم';
   return net;
 }
