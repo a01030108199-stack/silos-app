@@ -312,7 +312,7 @@
           let netTons = t.net / 1000;
           if (netTons > t.shippedWeight) {
             let diff = (netTons - t.shippedWeight).toFixed(3);
-            return showConfirm(`تحذير: يوجد عجز فعلي (المستلم أكبر من المشحون بـ ${diff} طن). هل تم تسوية العجز وتأكيد خروج السيارة؟`, () => {
+            return showConfirm(`<span style="color:#ef4444; font-weight:bold; font-size:1.3rem;">تحذير: يوجد عجز فعلي (المستلم أكبر من المشحون بـ ${diff} طن). هل تم تسوية العجز وتأكيد خروج السيارة؟</span>`, () => {
               tickets[idx].status = 'gate_out';
               tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
               localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
