@@ -475,13 +475,20 @@ let pendingTicketId = null;
 function renderActionButtons() {
   const actionsDiv = document.getElementById('formActions');
   if (scaleMode === 'first') {
-    actionsDiv.innerHTML = `
-      <button class="btn btn-outline" onclick="resetForm()"><i class="fa-solid fa-rotate-right"></i> إعادة ضبط</button>
-      <button class="btn btn-primary" onclick="saveFirstWeight()"><i class="fa-solid fa-print"></i> حفظ الوزنة الأولى وطباعة</button>
-    `;
+    if (!pendingTicketId) {
+      actionsDiv.innerHTML = `
+        <button class="btn btn-outline" onclick="resetForm()"><i class="fa-solid fa-rotate-right"></i> تفريغ الحقول</button>
+        <button class="btn btn-secondary" disabled title="يرجى سحب بيانات سيارة من الجدول بالأسفل للبدء"><i class="fa-solid fa-print"></i> حفظ الوزنة الأولى وطباعة</button>
+      `;
+    } else {
+      actionsDiv.innerHTML = `
+        <button class="btn btn-outline" onclick="resetForm()"><i class="fa-solid fa-rotate-right"></i> إلغاء التحديد</button>
+        <button class="btn btn-primary" onclick="saveFirstWeight()"><i class="fa-solid fa-print"></i> حفظ الوزنة الأولى وطباعة</button>
+      `;
+    }
   } else {
     actionsDiv.innerHTML = `
-      <button class="btn btn-danger" onclick="cancelSecondWeight()"><i class="fa-solid fa-xmark"></i> إلغاء</button>
+      <button class="btn btn-danger" onclick="cancelSecondWeight()"><i class="fa-solid fa-xmark"></i> إلغاء التحديد</button>
       <button class="btn btn-success" onclick="saveSecondWeight()"><i class="fa-solid fa-print"></i> حفظ الوزنة الثانية وطباعة</button>
     `;
   }
@@ -490,7 +497,14 @@ function renderActionButtons() {
 function initForm(keepSettings = false) {
   scaleMode = 'first';
   pendingTicketId = null;
-  ['s_plate', 's_driver', 's_op_type', 's_grain_type', 's_cell', 's_order_no', 's_order_qty', 's_order_bonus', 's_order_expiry'].forEach(id => {
+  ['s_plate', 's_driver', 's_op_type', 's_grain_type'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.disabled = true;
+      el.title = "يجب تسجيل هذه البيانات من بوابة الدخول أولاً";
+    }
+  });
+  ['s_cell', 's_order_no', 's_order_qty', 's_order_bonus', 's_order_expiry'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = false;
   });
@@ -855,6 +869,8 @@ function loadGateTicket(id) {
     const el = document.getElementById(elId);
     if (el) el.disabled = true;
   });
+  
+  renderActionButtons();
   
   showToast('تم استدعاء السيارة من البوابة، يرجى تسجيل الوزن القائم (الوزنة الأولى)', 'info');
 }
