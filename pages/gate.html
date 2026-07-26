@@ -106,9 +106,17 @@
               <select id="ii_wheat" class="inp">
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
               </select>
-            </div>
             <div><label>الكمية المشحونة (طن) *</label><input type="number" id="ii_shipped" class="inp" placeholder="المسجل بالبوليصة"></div>
             <div><label>تاريخ الشحن *</label><input type="date" id="ii_ship_date" class="inp"></div>
+            <div><label>الشركة الناقلة *</label>
+              <input type="text" id="ii_transport" class="inp" placeholder="اسم الشركة" list="transport_companies_list">
+              <datalist id="transport_companies_list">
+                <option value="الجمعية التعاونية لنقل البضائع"></option>
+                <option value="النيل للنقل"></option>
+                <option value="أمان للنقل"></option>
+                <option value="المصرية للنقل البري"></option>
+              </datalist>
+            </div>
             <div style="display:flex; align-items:flex-end;">
               <button class="btn btn-primary w-100" onclick="registerGateIn('مستورد', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
             </div>
@@ -118,7 +126,7 @@
             <input type="date" id="ii_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الميناء</th><th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>المشحون</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>العجز (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الشركة الناقلة</th><th>الميناء</th><th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>المشحون</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>العجز (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
             <tbody id="ii_tbody"></tbody>
           </table></div>
         </div>
@@ -233,7 +241,8 @@
       wheatType = document.getElementById('ii_wheat').value;
       shippedWeight = document.getElementById('ii_shipped').value.trim();
       let shipDate = document.getElementById('ii_ship_date').value;
-      if(!plate || !driver || !supplier || !shippedWeight || !shipDate) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      let transport = document.getElementById('ii_transport').value.trim();
+      if(!plate || !driver || !supplier || !shippedWeight || !shipDate || !transport) return showToast('يرجى تعبئة جميع الحقول', 'error');
       
     } else if (opType === 'صرف' && grainType === 'محلي') {
       plate = document.getElementById('lo_plate').value.trim();
@@ -271,7 +280,7 @@
 
     if (opType === 'وارد') {
       if (grainType === 'مستورد') {
-        t.supplierName = supplier; t.wheatType = wheatType; t.shippedWeight = parseFloat(shippedWeight);
+        t.supplierName = supplier; t.wheatType = wheatType; t.shippedWeight = parseFloat(shippedWeight); t.transportCompany = document.getElementById('ii_transport').value.trim();
       } else {
         t.supplierName = supplier; t.grade = grade;
       }
@@ -383,7 +392,7 @@
         }
         const sDate = t.shippingDate || '-';
         if (netTons === 0) defStr = '-';
-        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td>${sDate}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${shippedStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td class="${defClass}">${defStr}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.transportCompany||''}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td>${sDate}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${shippedStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td class="${defClass}">${defStr}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {
         hLo += `<tr><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;

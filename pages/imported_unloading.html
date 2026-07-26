@@ -427,14 +427,14 @@ function parseTicketDate(ts) {
 }
 
 function syncWithTickets() {
-  const shipName = document.getElementById('h_ship').value.trim();
-  if (!shipName) return showToast('الرجاء إدخال اسم الباخرة أولاً', 'error');
+  const portName = document.getElementById('h_port').value.trim();
+  if (!portName) return showToast('الرجاء إدخال اسم الميناء أولاً لفلترة سياراته', 'error');
   
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
   let addedCount = 0;
   
   tickets.forEach(t => {
-    if (t.status !== 'completed' || t.silo_id !== user.silo_id || t.opType !== 'وارد' || t.grainType !== 'مستورد' || t.shipName !== shipName) return;
+    if (t.status !== 'completed' || t.silo_id !== user.silo_id || t.opType !== 'وارد' || t.grainType !== 'مستورد' || t.supplierName !== portName) return;
     
     let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
     if (tIsoDate !== currentDate) return;
@@ -450,6 +450,9 @@ function syncWithTickets() {
       row.rec_date = tIsoDate;
       row.driver = t.driver;
       row.plate = t.plate;
+      row.company = t.transportCompany || '';
+      row.shipped = t.shippedWeight || '';
+      row.ship_date = t.shippingDate || '';
       row.received = (t.net / 1000).toFixed(3);
       addedCount++;
     }
@@ -458,8 +461,8 @@ function syncWithTickets() {
   reportData.forEach((r, i) => calculateRow(i));
   renderRows();
   
-  if (addedCount > 0) showToast(`تم جلب ${addedCount} تذكرة آلياً من الميزان!`, 'success');
-  else showToast('لا توجد تذاكر جديدة مطابقة للباخرة وتاريخ اليوم.', 'info');
+  if (addedCount > 0) showToast(`تم جلب ${addedCount} سيارة آلياً!`, 'success');
+  else showToast('لا توجد سيارات مطابقة للميناء وتاريخ اليوم.', 'info');
 }
 
 function updateRow(index, field, val) {
