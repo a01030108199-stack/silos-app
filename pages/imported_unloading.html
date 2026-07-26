@@ -205,6 +205,7 @@
         </div>
         <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الكشف</button>
         <button class="btn btn-success" onclick="saveData()"><i class="fa-solid fa-floppy-disk"></i> حفظ البيانات</button>
+        <button class="btn btn-warning" style="background:#3b82f6; color:#fff; border:none;" onclick="syncWithTickets()"><i class="fa-solid fa-rotate"></i> جلب آلي من الميزان</button>
         <a href="reception.html" class="btn btn-outline btn-sm">عودة <i class="fa-solid fa-arrow-left"></i></a>
       </div>
     </header>
@@ -308,7 +309,6 @@
         </table>
         <div class="no-print" style="margin-top: 15px; display: flex; gap: 10px;">
           <button class="btn-add-row" style="flex:1" onclick="addRow()"><i class="fa-solid fa-plus"></i> إضافة سطر يدوي</button>
-          <button class="btn-add-row" style="flex:1; background: rgba(59, 130, 246, 0.1); color: var(--blue); border: 1px solid var(--blue);" onclick="syncWithTickets()"><i class="fa-solid fa-rotate"></i> جلب تذاكر الميزان آلياً</button>
         </div>
       </div>
       </div> <!-- End print area -->
