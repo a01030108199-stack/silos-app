@@ -268,7 +268,16 @@
 
           <div class="hg-item" style="grid-column: 1 / 3">
             <div class="hg-label">اسم الميناء</div>
-            <div class="hg-val"><input type="text" id="h_port"></div>
+            <div class="hg-val">
+              <input type="text" id="h_port" list="ports_list">
+              <datalist id="ports_list">
+                <option value="الاسكندرية"></option>
+                <option value="الدخيلة"></option>
+                <option value="دمياط"></option>
+                <option value="بورسعيد"></option>
+                <option value="سفاجا"></option>
+              </datalist>
+            </div>
           </div>
           <div class="hg-item" style="grid-column: 3 / 5; visibility:hidden"></div>
         </div>
