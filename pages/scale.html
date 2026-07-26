@@ -306,6 +306,8 @@
               <th>الوقت</th>
               <th>رقم السيارة</th>
               <th>السائق</th>
+              <th>العملية</th>
+              <th>الجهة</th>
               <th>نوع الحبوب</th>
               <th>الوزن القائم</th>
               <th>الوزن الفارغ</th>
@@ -1083,6 +1085,8 @@ function renderTable() {
         <td style="font-size:0.85rem">${t.timestamp2 || t.timestamp}</td>
         <td class="fw-bold">${t.plate}</td>
         <td>${t.driver}</td>
+        <td><span class="badge ${t.opType === 'صرف' ? 'badge-warning' : 'badge-info'}">${t.opType}</span></td>
+        <td style="font-size:0.85rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${t.opType === 'صرف' ? (t.destination || '-') : (t.supplierName || '-')}">${t.opType === 'صرف' ? (t.destination || '-') : (t.supplierName || '-')}</td>
         <td>${t.grainType === 'مستورد' ? t.wheatType || 'مستورد' : (t.grade ? t.grade + ' قيراط' : 'محلي')}</td>
         <td class="${t.gross ? 'text-primary' : 'text-muted'}">${t.gross ? t.gross.toLocaleString('en-US') : '-'}</td>
         <td class="${t.tare ? 'text-danger' : 'text-muted'}">${t.tare ? t.tare.toLocaleString('en-US') : '-'}</td>
