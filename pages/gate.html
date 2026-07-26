@@ -98,6 +98,7 @@
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
               </select>
             </div>
+            <div><label>الكمية المشحونة (طن) *</label><input type="number" id="ii_shipped" class="inp" placeholder="المسجل بالبوليصة"></div>
             <div style="display:flex; align-items:flex-end;">
               <button class="btn btn-primary w-100" onclick="registerGateIn('مستورد', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
             </div>
@@ -107,7 +108,7 @@
             <input type="date" id="ii_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الميناء</th><th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الميناء</th><th>النوع</th><th>دخول البوابة</th><th>المشحون</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
             <tbody id="ii_tbody"></tbody>
           </table></div>
         </div>
@@ -220,7 +221,8 @@
       driver = document.getElementById('ii_driver').value.trim();
       supplier = document.getElementById('ii_supplier').value.trim();
       wheatType = document.getElementById('ii_wheat').value;
-      if(!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      shippedWeight = document.getElementById('ii_shipped').value.trim();
+      if(!plate || !driver || !supplier || !shippedWeight) return showToast('يرجى تعبئة جميع الحقول', 'error');
       
     } else if (opType === 'صرف' && grainType === 'محلي') {
       plate = document.getElementById('lo_plate').value.trim();
@@ -255,7 +257,7 @@
 
     if (opType === 'وارد') {
       if (grainType === 'مستورد') {
-        t.supplierName = supplier; t.wheatType = wheatType;
+        t.supplierName = supplier; t.wheatType = wheatType; t.shippedWeight = parseFloat(shippedWeight);
       } else {
         t.supplierName = supplier; t.grade = grade;
       }
@@ -336,7 +338,8 @@
         hLi += `<tr><td>${cLi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'وارد' && t.grainType === 'مستورد' && (tD === dIi || (!t.dateStr && t.timestamp.includes(dIi.split('-')[0])))) {
-        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        const shippedStr = t.shippedWeight ? t.shippedWeight.toFixed(3) : '-';
+        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${shippedStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {
         hLo += `<tr><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;

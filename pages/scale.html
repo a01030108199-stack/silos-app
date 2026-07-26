@@ -176,6 +176,10 @@
             </select>
           </div>
 
+          <div class="form-group-inner" id="div_shipped_weight" style="display:none;">
+            <label>الكمية المشحونة بالبوليصة (طن) *</label>
+            <input type="text" class="form-control" id="s_shipped_weight" readonly style="background: rgba(255,255,255,0.05); color: #fff; cursor: not-allowed;" title="مسجلة تلقائياً من البوابة">
+          </div>
 
           <!-- Dynamic: Destination (For Outgoing) -->
           <div class="form-group-inner" id="div_destination" style="display:none;">
@@ -279,6 +283,10 @@
             <span>خصم الأجولة:</span>
             <span id="lbl_deduction">0 كجم</span>
           </div>
+          <div class="calc-row text-danger" id="row_deficit" style="display:none;">
+            <span>العجز الفعلي:</span>
+            <span id="lbl_deficit">0 طن</span>
+          </div>
           <div class="calc-row calc-total text-success">
             <span>الوزن الصافي للحمولة:</span>
             <span id="lbl_net">0 كجم</span>
@@ -354,6 +362,7 @@ function toggleDynamicFields() {
   document.getElementById('div_sacks_count').style.display = 'none';
 
   document.getElementById('div_wheat_type').style.display = 'none';
+  document.getElementById('div_shipped_weight').style.display = 'none';
   document.getElementById('div_destination').style.display = 'none';
   if (document.getElementById('div_order_no')) document.getElementById('div_order_no').style.display = 'none';
   document.getElementById('div_cell').style.display = 'block';
@@ -366,6 +375,7 @@ function toggleDynamicFields() {
   if (opType === 'وارد') {
     if (grainType === 'مستورد') {
       document.getElementById('div_wheat_type').style.display = 'block';
+      document.getElementById('div_shipped_weight').style.display = 'block';
     } else {
       // Local Incoming
       document.getElementById('div_supplier_name').style.display = 'block';
@@ -518,6 +528,7 @@ function initForm(keepSettings = false) {
   document.getElementById('s_driver').value = '';
   document.getElementById('s_gross').value = '';
   document.getElementById('s_tare').value = '';
+  if (document.getElementById('s_shipped_weight')) document.getElementById('s_shipped_weight').value = '';
   if (document.getElementById('s_packaging')) document.getElementById('s_packaging').value = 'bulk';
   if (document.getElementById('s_sacks')) document.getElementById('s_sacks').value = '';
   if (document.getElementById('s_order_no')) document.getElementById('s_order_no').value = '';
@@ -864,6 +875,7 @@ function loadGateTicket(id) {
   if (t.grade) document.getElementById('s_grade').value = t.grade;
   if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
   if (t.destination) document.getElementById('s_destination').value = t.destination;
+  if (t.shippedWeight && document.getElementById('s_shipped_weight')) document.getElementById('s_shipped_weight').value = t.shippedWeight;
   
   toggleDynamicFields();
   
