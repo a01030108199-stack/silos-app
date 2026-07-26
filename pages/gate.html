@@ -22,6 +22,14 @@
   
   .entry-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
   .deficit-alert { color: #ef4444; font-weight: bold; }
+  
+  @media print {
+    .gate-tabs, .entry-form, .card-header { display: none !important; }
+    .data-table th:last-child, .data-table td:last-child { display: none !important; }
+    .card { border: none !important; background: transparent !important; box-shadow: none !important; }
+    body, .main-content { background: #fff !important; }
+    input[type="date"] { border: none; background: transparent; appearance: none; color: #000; font-weight: bold; }
+  }
 </style>
 </head>
 <body>
