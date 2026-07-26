@@ -84,7 +84,7 @@
           <div class="entry-form">
             <div><label>رقم السيارة *</label><input type="text" id="ii_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
             <div><label>اسم السائق *</label><input type="text" id="ii_driver" class="inp" placeholder="الاسم الثلاثي"></div>
-            <div><label>المركب / المورد *</label><input type="text" id="ii_supplier" class="inp" placeholder="اسم المركب"></div>
+            <div><label>الميناء الشاحن *</label><input type="text" id="ii_supplier" class="inp" placeholder="اسم الميناء"></div>
             <div><label>نوع القمح</label>
               <select id="ii_wheat" class="inp">
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
@@ -99,7 +99,7 @@
             <input type="date" id="ii_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المركب</th><th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الميناء</th><th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
             <tbody id="ii_tbody"></tbody>
           </table></div>
         </div>
@@ -141,7 +141,7 @@
             <div><label>رقم السيارة *</label><input type="text" id="io_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
             <div><label>اسم السائق *</label><input type="text" id="io_driver" class="inp" placeholder="الاسم الثلاثي"></div>
             <div><label>المطحن / جهة الصرف *</label><input type="text" id="io_dest" class="inp" placeholder="اسم المطحن"></div>
-            <div><label>من رصيد مركب</label><input type="text" id="io_supplier" class="inp" placeholder="اسم المركب"></div>
+            <div><label>من رصيد ميناء</label><input type="text" id="io_supplier" class="inp" placeholder="اسم الميناء"></div>
             <div><label>نوع القمح</label>
               <select id="io_wheat" class="inp">
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
@@ -156,7 +156,7 @@
             <input type="date" id="io_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المطحن</th><th>المركب / النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المطحن</th><th>الميناء / النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
             <tbody id="io_tbody"></tbody>
           </table></div>
         </div>
@@ -247,7 +247,7 @@
 
     if (opType === 'وارد') {
       if (grainType === 'مستورد') {
-        t.shipName = supplier; t.wheatType = wheatType;
+        t.supplierName = supplier; t.wheatType = wheatType;
       } else {
         t.supplierName = supplier; t.grade = grade;
       }
@@ -256,7 +256,7 @@
       if (grainType === 'محلي') {
         t.grade = grade;
       } else {
-        t.wheatType = wheatType; t.shipName = supplier; 
+        t.wheatType = wheatType; t.supplierName = supplier; 
       }
     }
 
@@ -328,13 +328,13 @@
         hLi += `<tr><td>${cLi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'وارد' && t.grainType === 'مستورد' && (tD === dIi || (!t.dateStr && t.timestamp.includes(dIi.split('-')[0])))) {
-        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.shipName||''}</td><td>${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {
         hLo += `<tr><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'مستورد' && (tD === dIo || (!t.dateStr && t.timestamp.includes(dIo.split('-')[0])))) {
-        hIo += `<tr><td>${cIo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.shipName||''} / ${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hIo += `<tr><td>${cIo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.supplierName||''} / ${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
     });
 

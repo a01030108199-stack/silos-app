@@ -928,7 +928,7 @@ function printSlip(t, isFirst) {
   let detailsHtml = '';
   if (t.opType === 'وارد') {
     if (t.grainType === 'مستورد') {
-      detailsHtml += `<div class="slip-row"><span>المورد:</span> <strong>${t.supplierName || 'مستورد'}</strong></div>`;
+      detailsHtml += `<div class="slip-row"><span>الميناء الشاحن:</span> <strong>${t.supplierName || 'مستورد'}</strong></div>`;
       detailsHtml += `<div class="slip-row"><span>نوع القمح:</span> <strong>${t.wheatType || ''}</strong></div>`;
     } else {
       detailsHtml += `<div class="slip-row"><span>اسم المورد:</span> <strong>${t.supplierName || ''}</strong></div>`;
