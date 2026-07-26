@@ -268,6 +268,38 @@ function showToast(msg, type = 'success') {
   setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 3500);
 }
 
+// ── Custom Confirm Modal ──────────────────────────────────────
+function showConfirm(msg, onConfirm) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99999;
+    display:flex; align-items:center; justify-content:center;
+    animation:fadeIn 0.2s ease;
+  `;
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    background:#1e293b; padding:24px; border-radius:12px; min-width:320px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.5); border:1px solid #334155;
+    text-align:center; font-family:'Cairo',sans-serif;
+    transform:scale(0.95); animation:scaleUp 0.2s ease forwards;
+  `;
+  modal.innerHTML = `
+    <div style="font-size:1.2rem; color:#fff; margin-bottom:20px;">${msg}</div>
+    <div style="display:flex; justify-content:center; gap:12px;">
+      <button id="btn-confirm-yes" class="btn btn-primary" style="padding:8px 24px;">نعم، متأكد</button>
+      <button id="btn-confirm-no" class="btn btn-danger" style="padding:8px 24px; background:#475569; border-color:#475569;">إلغاء</button>
+    </div>
+  `;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  document.getElementById('btn-confirm-yes').onclick = () => {
+    overlay.remove();
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+  document.getElementById('btn-confirm-no').onclick = () => overlay.remove();
+}
+
 // ── Init clock ───────────────────────────────────────────────
 function initClock(el) {
   if (!el) return;

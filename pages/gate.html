@@ -277,19 +277,20 @@
   }
 
   function registerGateOut(id) {
-    if (!confirm('هل أنت متأكد من تسجيل خروج هذه السيارة من البوابة النهائية؟')) return;
-    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-    const idx = tickets.findIndex(x => x.id === id);
-    if (idx > -1) {
-      if (tickets[idx].status !== 'completed') {
-        return showToast('لا يمكن خروج السيارة قبل اكتمال أوزانها في الميزان!', 'error');
+    showConfirm('هل أنت متأكد من تسجيل خروج هذه السيارة من البوابة النهائية؟', () => {
+      const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+      const idx = tickets.findIndex(x => x.id === id);
+      if (idx > -1) {
+        if (tickets[idx].status !== 'completed') {
+          return showToast('لا يمكن خروج السيارة قبل اكتمال أوزانها في الميزان!', 'error');
+        }
+        tickets[idx].status = 'gate_out'; 
+        tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
+        localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+        showToast('تم إثبات خروج السيارة بسلام', 'success');
+        renderGateTables();
       }
-      tickets[idx].status = 'gate_out'; 
-      tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
-      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
-      showToast('تم إثبات خروج السيارة بسلام', 'success');
-      renderGateTables();
-    }
+    });
   }
 
   function renderGateTables() {
