@@ -6,13 +6,17 @@
 <title>أمن البوابة — نظام إدارة الصوامع</title>
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="../js/firebase-db.js"></script>
 <style>
-  .gate-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-  .gate-tab { padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); transition: all 0.3s; }
+  .gate-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; flex-wrap: wrap; }
+  .gate-tab { padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
   .gate-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  
+  /* Color coding tabs */
+  .gate-tab[data-tab="local-in"].active { background: #3b82f6; border-color: #3b82f6; }
+  .gate-tab[data-tab="import-in"].active { background: #06b6d4; border-color: #06b6d4; }
+  .gate-tab[data-tab="local-out"].active { background: #f59e0b; border-color: #f59e0b; }
+  .gate-tab[data-tab="import-out"].active { background: #eab308; border-color: #eab308; }
+
   .gate-panel { display: none; }
   .gate-panel.active { display: block; }
   
@@ -37,105 +41,125 @@
 
     <div class="page-content">
       <div class="gate-tabs">
-        <div class="gate-tab active" onclick="switchTab('local')"><i class="fa-solid fa-wheat-awn"></i> يومية القمح المحلي</div>
-        <div class="gate-tab" onclick="switchTab('imported')"><i class="fa-solid fa-ship"></i> يومية القمح المستورد</div>
+        <div class="gate-tab active" data-tab="local-in" onclick="switchTab('local-in')"><i class="fa-solid fa-arrow-down"></i> وارد محلي</div>
+        <div class="gate-tab" data-tab="import-in" onclick="switchTab('import-in')"><i class="fa-solid fa-ship"></i> وارد مستورد</div>
+        <div class="gate-tab" data-tab="local-out" onclick="switchTab('local-out')"><i class="fa-solid fa-arrow-up"></i> صرف محلي</div>
+        <div class="gate-tab" data-tab="import-out" onclick="switchTab('import-out')"><i class="fa-solid fa-truck-fast"></i> صرف مستورد</div>
       </div>
 
-      <!-- Local Wheat Panel -->
-      <div id="panel-local" class="gate-panel active">
+      <!-- 1) Local Incoming -->
+      <div id="panel-local-in" class="gate-panel active">
         <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> تسجيل دخول سيارة (محلي)</div></div>
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - وارد محلي</div></div>
           <div class="entry-form">
-            <div><label>رقم السيارة *</label><input type="text" id="l_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
-            <div><label>اسم السائق *</label><input type="text" id="l_driver" class="inp" placeholder="اسم السائق الثلاثي"></div>
-            <div><label>جهة الوارد *</label><input type="text" id="l_supplier" class="inp" placeholder="الجمعية أو المورد"></div>
+            <div><label>رقم السيارة *</label><input type="text" id="li_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
+            <div><label>اسم السائق *</label><input type="text" id="li_driver" class="inp" placeholder="الاسم الثلاثي"></div>
+            <div><label>جهة الوارد *</label><input type="text" id="li_supplier" class="inp" placeholder="الجمعية أو المورد"></div>
             <div><label>الدرجة (النوع)</label>
-              <select id="l_grade" class="inp">
+              <select id="li_grade" class="inp">
                 <option value="23.5">23.5 قيراط</option>
                 <option value="23">23 قيراط</option>
                 <option value="22.5">22.5 قيراط</option>
               </select>
             </div>
             <div style="display:flex; align-items:flex-end;">
-              <button class="btn btn-primary w-100" onclick="registerGateIn('محلي')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+              <button class="btn btn-primary w-100" onclick="registerGateIn('محلي', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
             </div>
           </div>
-
           <div class="table-header mt-4">
-            <div class="card-title">دفتر يومية وارد بوابة (محلي)</div>
-            <input type="date" id="l_date_filter" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
+            <div class="card-title">دفتر بوابة - وارد محلي</div>
+            <input type="date" id="li_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
-          <div style="overflow-x:auto">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>م</th>
-                  <th>رقم السيارة</th>
-                  <th>اسم السائق</th>
-                  <th>جهة الوارد</th>
-                  <th>النوع</th>
-                  <th>دخول البوابة</th>
-                  <th>الوزن القائم</th>
-                  <th>الوزن الفارغ</th>
-                  <th>الصافي (طن)</th>
-                  <th>حالة الميزان</th>
-                  <th>إجراءات</th>
-                </tr>
-              </thead>
-              <tbody id="l_tbody"></tbody>
-            </table>
-          </div>
+          <div style="overflow-x:auto"><table class="data-table">
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>جهة الوارد</th><th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <tbody id="li_tbody"></tbody>
+          </table></div>
         </div>
       </div>
 
-      <!-- Imported Wheat Panel -->
-      <div id="panel-imported" class="gate-panel">
+      <!-- 2) Imported Incoming -->
+      <div id="panel-import-in" class="gate-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> تسجيل دخول سيارة (مستورد)</div></div>
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - وارد مستورد</div></div>
           <div class="entry-form">
-            <div><label>رقم السيارة *</label><input type="text" id="i_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
-            <div><label>اسم السائق *</label><input type="text" id="i_driver" class="inp" placeholder="اسم السائق الثلاثي"></div>
-            <div><label>المركب / جهة الوارد *</label><input type="text" id="i_supplier" class="inp" placeholder="اسم المركب"></div>
+            <div><label>رقم السيارة *</label><input type="text" id="ii_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
+            <div><label>اسم السائق *</label><input type="text" id="ii_driver" class="inp" placeholder="الاسم الثلاثي"></div>
+            <div><label>المركب / المورد *</label><input type="text" id="ii_supplier" class="inp" placeholder="اسم المركب"></div>
             <div><label>نوع القمح</label>
-              <select id="i_wheat_type" class="inp">
-                <option value="روسي">روسي</option>
-                <option value="أوكراني">أوكراني</option>
-                <option value="روماني">روماني</option>
-                <option value="فرنسي">فرنسي</option>
-                <option value="أسترالي">أسترالي</option>
-                <option value="أمريكي">أمريكي</option>
+              <select id="ii_wheat" class="inp">
+                <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
               </select>
             </div>
-            <div><label>الوزن المشحون (طن) *</label><input type="number" id="i_shipped_weight" class="inp" placeholder="المسجل بالبوليصة"></div>
+            <div><label>الوزن المشحون (طن) *</label><input type="number" id="ii_shipped" class="inp" placeholder="المسجل بالبوليصة"></div>
             <div style="display:flex; align-items:flex-end;">
-              <button class="btn btn-primary w-100" onclick="registerGateIn('مستورد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+              <button class="btn btn-primary w-100" onclick="registerGateIn('مستورد', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
             </div>
           </div>
-
           <div class="table-header mt-4">
-            <div class="card-title">دفتر يومية وارد بوابة (مستورد)</div>
-            <input type="date" id="i_date_filter" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
+            <div class="card-title">دفتر بوابة - وارد مستورد</div>
+            <input type="date" id="ii_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
-          <div style="overflow-x:auto">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>م</th>
-                  <th>رقم السيارة</th>
-                  <th>اسم السائق</th>
-                  <th>المركب</th>
-                  <th>النوع</th>
-                  <th>دخول البوابة</th>
-                  <th>المشحون (طن)</th>
-                  <th>الصافي الفعلي (طن)</th>
-                  <th>العجز (طن)</th>
-                  <th>حالة الميزان</th>
-                  <th>إجراءات</th>
-                </tr>
-              </thead>
-              <tbody id="i_tbody"></tbody>
-            </table>
+          <div style="overflow-x:auto"><table class="data-table">
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المركب</th><th>النوع</th><th>دخول البوابة</th><th>المشحون (طن)</th><th>الصافي الفعلي (طن)</th><th>العجز (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <tbody id="ii_tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- 3) Local Outgoing -->
+      <div id="panel-local-out" class="gate-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - صرف محلي</div></div>
+          <div class="entry-form">
+            <div><label>رقم السيارة *</label><input type="text" id="lo_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
+            <div><label>اسم السائق *</label><input type="text" id="lo_driver" class="inp" placeholder="الاسم الثلاثي"></div>
+            <div><label>المطحن / جهة الصرف *</label><input type="text" id="lo_dest" class="inp" placeholder="اسم المطحن"></div>
+            <div><label>الدرجة المنصرفة</label>
+              <select id="lo_grade" class="inp">
+                <option value="23.5">23.5 قيراط</option><option value="23">23 قيراط</option><option value="22.5">22.5 قيراط</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-warning w-100" style="color:#000" onclick="registerGateIn('محلي', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
+            </div>
           </div>
+          <div class="table-header mt-4">
+            <div class="card-title">دفتر بوابة - صرف محلي</div>
+            <input type="date" id="lo_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
+          </div>
+          <div style="overflow-x:auto"><table class="data-table">
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المطحن</th><th>الدرجة</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <tbody id="lo_tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- 4) Imported Outgoing -->
+      <div id="panel-import-out" class="gate-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - صرف مستورد</div></div>
+          <div class="entry-form">
+            <div><label>رقم السيارة *</label><input type="text" id="io_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
+            <div><label>اسم السائق *</label><input type="text" id="io_driver" class="inp" placeholder="الاسم الثلاثي"></div>
+            <div><label>المطحن / جهة الصرف *</label><input type="text" id="io_dest" class="inp" placeholder="اسم المطحن"></div>
+            <div><label>من رصيد مركب</label><input type="text" id="io_supplier" class="inp" placeholder="اسم المركب"></div>
+            <div><label>نوع القمح</label>
+              <select id="io_wheat" class="inp">
+                <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-warning w-100" style="color:#000" onclick="registerGateIn('مستورد', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
+            </div>
+          </div>
+          <div class="table-header mt-4">
+            <div class="card-title">دفتر بوابة - صرف مستورد</div>
+            <input type="date" id="io_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
+          </div>
+          <div style="overflow-x:auto"><table class="data-table">
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المطحن</th><th>المركب / النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <tbody id="io_tbody"></tbody>
+          </table></div>
         </div>
       </div>
 
@@ -143,6 +167,9 @@
   </main>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script>
 <script src="../js/data.js"></script>
 <script src="../js/app.js"></script>
 <script>
@@ -150,21 +177,19 @@
   buildSidebar('gate');
   initClock(document.getElementById('clockEl'));
 
-  let currentTab = 'local';
-  
   function switchTab(tab) {
-    currentTab = tab;
     document.querySelectorAll('.gate-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.gate-panel').forEach(p => p.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    document.querySelector(`.gate-tab[data-tab="${tab}"]`).classList.add('active');
     document.getElementById(`panel-${tab}`).classList.add('active');
   }
 
   // Set default dates
   const today = new Date();
   const tStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-  document.getElementById('l_date_filter').value = tStr;
-  document.getElementById('i_date_filter').value = tStr;
+  ['li_date', 'ii_date', 'lo_date', 'io_date'].forEach(id => {
+    document.getElementById(id).value = tStr;
+  });
 
   function generateTicketId() {
     let lastId = parseInt(localStorage.getItem('LAST_TICKET_ID') || '1000');
@@ -173,46 +198,68 @@
     return 'CRT-' + lastId;
   }
 
-  function registerGateIn(type) {
-    let plate, driver, supplier, grade, wheatType, shippedWeight;
+  function registerGateIn(grainType, opType) {
+    let plate, driver, supplier='', dest='', grade='', wheatType='', shippedWeight=0;
     
-    if (type === 'محلي') {
-      plate = document.getElementById('l_plate').value.trim();
-      driver = document.getElementById('l_driver').value.trim();
-      supplier = document.getElementById('l_supplier').value.trim();
-      grade = document.getElementById('l_grade').value;
-      if(!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول الإلزامية', 'error');
-    } else {
-      plate = document.getElementById('i_plate').value.trim();
-      driver = document.getElementById('i_driver').value.trim();
-      supplier = document.getElementById('i_supplier').value.trim(); // Ship name
-      wheatType = document.getElementById('i_wheat_type').value;
-      shippedWeight = document.getElementById('i_shipped_weight').value.trim();
-      if(!plate || !driver || !supplier || !shippedWeight) return showToast('يرجى تعبئة جميع الحقول الإلزامية', 'error');
+    if (opType === 'وارد' && grainType === 'محلي') {
+      plate = document.getElementById('li_plate').value.trim();
+      driver = document.getElementById('li_driver').value.trim();
+      supplier = document.getElementById('li_supplier').value.trim();
+      grade = document.getElementById('li_grade').value;
+      if(!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      
+    } else if (opType === 'وارد' && grainType === 'مستورد') {
+      plate = document.getElementById('ii_plate').value.trim();
+      driver = document.getElementById('ii_driver').value.trim();
+      supplier = document.getElementById('ii_supplier').value.trim();
+      wheatType = document.getElementById('ii_wheat').value;
+      shippedWeight = document.getElementById('ii_shipped').value.trim();
+      if(!plate || !driver || !supplier || !shippedWeight) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      
+    } else if (opType === 'صرف' && grainType === 'محلي') {
+      plate = document.getElementById('lo_plate').value.trim();
+      driver = document.getElementById('lo_driver').value.trim();
+      dest = document.getElementById('lo_dest').value.trim();
+      grade = document.getElementById('lo_grade').value;
+      if(!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      
+    } else if (opType === 'صرف' && grainType === 'مستورد') {
+      plate = document.getElementById('io_plate').value.trim();
+      driver = document.getElementById('io_driver').value.trim();
+      dest = document.getElementById('io_dest').value.trim();
+      supplier = document.getElementById('io_supplier').value.trim();
+      wheatType = document.getElementById('io_wheat').value;
+      if(!plate || !driver || !dest || !supplier) return showToast('يرجى تعبئة جميع الحقول', 'error');
     }
 
     const t = {
       id: generateTicketId(),
       silo_id: user.silo_id,
-      opType: 'وارد',
-      grainType: type,
+      opType: opType,
+      grainType: grainType,
       plate: plate,
       driver: driver,
-      status: 'gate_in', // Waiting for scale
+      status: 'gate_in',
       timestamp: new Date().toLocaleString('ar-EG'),
-      dateStr: tStr, // ISO date for filtering
+      dateStr: tStr,
       gross: 0,
       tare: 0,
       net: 0,
     };
 
-    if (type === 'محلي') {
-      t.supplierName = supplier;
-      t.grade = grade;
-    } else {
-      t.shipName = supplier;
-      t.wheatType = wheatType;
-      t.shippedWeight = parseFloat(shippedWeight);
+    if (opType === 'وارد') {
+      if (grainType === 'محلي') {
+        t.supplierName = supplier; t.grade = grade;
+      } else {
+        t.shipName = supplier; t.wheatType = wheatType; t.shippedWeight = parseFloat(shippedWeight);
+      }
+    } else { // صرف
+      t.destination = dest;
+      if (grainType === 'محلي') {
+        t.grade = grade;
+      } else {
+        t.wheatType = wheatType; t.shipName = supplier; 
+      }
     }
 
     const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
@@ -222,14 +269,9 @@
     showToast('تم تسجيل دخول السيارة بنجاح وتوجيهها للميزان', 'success');
     
     // Clear inputs
-    if (type === 'محلي') {
-      document.getElementById('l_plate').value = '';
-      document.getElementById('l_driver').value = '';
-    } else {
-      document.getElementById('i_plate').value = '';
-      document.getElementById('i_driver').value = '';
-      document.getElementById('i_shipped_weight').value = '';
-    }
+    ['li_plate','li_driver','li_supplier','ii_plate','ii_driver','ii_supplier','ii_shipped',
+     'lo_plate','lo_driver','lo_dest','io_plate','io_driver','io_dest','io_supplier']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
     
     renderGateTables();
   }
@@ -242,7 +284,7 @@
       if (tickets[idx].status !== 'completed') {
         return showToast('لا يمكن خروج السيارة قبل اكتمال أوزانها في الميزان!', 'error');
       }
-      tickets[idx].status = 'gate_out'; // Completely finished
+      tickets[idx].status = 'gate_out'; 
       tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
       localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
       showToast('تم إثبات خروج السيارة بسلام', 'success');
@@ -252,21 +294,23 @@
 
   function renderGateTables() {
     const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-    const lDate = document.getElementById('l_date_filter').value;
-    const iDate = document.getElementById('i_date_filter').value;
+    const dLi = document.getElementById('li_date').value;
+    const dIi = document.getElementById('ii_date').value;
+    const dLo = document.getElementById('lo_date').value;
+    const dIo = document.getElementById('io_date').value;
     
-    let lHtml = '', iHtml = '';
-    let lCount = 1, iCount = 1;
+    let hLi='', hIi='', hLo='', hIo='';
+    let cLi=1, cIi=1, cLo=1, cIo=1;
 
     tickets.forEach(t => {
-      if (t.silo_id !== user.silo_id || t.opType !== 'وارد' || t.status === 'deleted') return;
+      if (t.silo_id !== user.silo_id || t.status === 'deleted') return;
 
       let statBadge = '';
       let actionBtn = '';
       if (t.status === 'gate_in') {
-        statBadge = '<span class="badge badge-warning">تنتظر الميزان (قائم)</span>';
+        statBadge = `<span class="badge badge-warning">تنتظر الميزان (${t.opType==='صرف'?'فارغ':'قائم'})</span>`;
       } else if (t.status === 'pending') {
-        statBadge = '<span class="badge badge-info">تنتظر الميزان (فارغ)</span>';
+        statBadge = `<span class="badge badge-info">تنتظر الميزان (${t.opType==='صرف'?'قائم':'فارغ'})</span>`;
       } else if (t.status === 'completed') {
         statBadge = '<span class="badge badge-success">تم الوزن - جاهزة للخروج</span>';
         actionBtn = `<button class="btn btn-primary btn-sm" onclick="registerGateOut('${t.id}')">تسجيل خروج</button>`;
@@ -275,56 +319,42 @@
         actionBtn = `<span style="font-size:0.8rem;color:var(--text-sec)">${t.exitTimestamp}</span>`;
       }
 
-      if (t.grainType === 'محلي' && (t.dateStr === lDate || (!t.dateStr && t.timestamp.includes(lDate.split('-')[0])))) {
-        lHtml += `
-          <tr>
-            <td>${lCount++}</td>
-            <td class="fw-bold">${t.plate}</td>
-            <td>${t.driver}</td>
-            <td>${t.supplierName || ''}</td>
-            <td>${t.grade ? t.grade + ' قيراط' : ''}</td>
-            <td style="font-size:0.85rem">${t.timestamp}</td>
-            <td>${t.gross ? (t.gross/1000).toFixed(3) : '-'}</td>
-            <td>${t.tare ? (t.tare/1000).toFixed(3) : '-'}</td>
-            <td class="fw-bold text-success">${t.net ? (t.net/1000).toFixed(3) : '-'}</td>
-            <td>${statBadge}</td>
-            <td>${actionBtn}</td>
-          </tr>
-        `;
+      // Check dates (fallback to timestamp year parsing if dateStr missing)
+      const tD = t.dateStr || t.timestamp.split(',')[0].trim();
+      const nGross = t.gross ? (t.gross/1000).toFixed(3) : '-';
+      const nTare = t.tare ? (t.tare/1000).toFixed(3) : '-';
+      const nNet = t.net ? (t.net/1000).toFixed(3) : '-';
+
+      if (t.opType === 'وارد' && t.grainType === 'محلي' && (tD === dLi || (!t.dateStr && t.timestamp.includes(dLi.split('-')[0])))) {
+        hLi += `<tr><td>${cLi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       } 
-      else if (t.grainType === 'مستورد' && (t.dateStr === iDate || (!t.dateStr && t.timestamp.includes(iDate.split('-')[0])))) {
+      else if (t.opType === 'وارد' && t.grainType === 'مستورد' && (tD === dIi || (!t.dateStr && t.timestamp.includes(dIi.split('-')[0])))) {
         let netTons = t.net ? (t.net/1000) : 0;
         let shipped = t.shippedWeight || 0;
-        let deficit = 0;
-        let defClass = '';
+        let deficit = 0, defClass = '';
         if (netTons > 0 && shipped > 0) {
           deficit = shipped - netTons;
           if (deficit > 0) defClass = 'deficit-alert';
         }
-        
-        iHtml += `
-          <tr>
-            <td>${iCount++}</td>
-            <td class="fw-bold">${t.plate}</td>
-            <td>${t.driver}</td>
-            <td>${t.shipName || ''}</td>
-            <td>${t.wheatType || ''}</td>
-            <td style="font-size:0.85rem">${t.timestamp}</td>
-            <td class="text-primary">${shipped.toFixed(3)}</td>
-            <td class="fw-bold text-success">${netTons ? netTons.toFixed(3) : '-'}</td>
-            <td class="${defClass}">${netTons > 0 ? deficit.toFixed(3) : '-'}</td>
-            <td>${statBadge}</td>
-            <td>${actionBtn}</td>
-          </tr>
-        `;
+        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.shipName||''}</td><td>${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${shipped.toFixed(3)}</td><td class="fw-bold text-success">${netTons?netTons.toFixed(3):'-'}</td><td class="${defClass}">${netTons>0?deficit.toFixed(3):'-'}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+      }
+      else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {
+        hLo += `<tr><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+      }
+      else if (t.opType === 'صرف' && t.grainType === 'مستورد' && (tD === dIo || (!t.dateStr && t.timestamp.includes(dIo.split('-')[0])))) {
+        hIo += `<tr><td>${cIo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.shipName||''} / ${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
       }
     });
 
-    document.getElementById('l_tbody').innerHTML = lHtml || '<tr><td colspan="11" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
-    document.getElementById('i_tbody').innerHTML = iHtml || '<tr><td colspan="11" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
+    const noData = '<tr><td colspan="11" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
+    document.getElementById('li_tbody').innerHTML = hLi || noData;
+    document.getElementById('ii_tbody').innerHTML = hIi || noData;
+    document.getElementById('lo_tbody').innerHTML = hLo || noData;
+    document.getElementById('io_tbody').innerHTML = hIo || noData;
   }
 
   renderGateTables();
+  window.addEventListener('firebase-data-updated', () => renderGateTables());
   window.addEventListener('storage', (e) => {
     if (e.key === 'WEIGHBRIDGE_TICKETS') renderGateTables();
   });
