@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أمن البوابة — نظام إدارة الصوامع</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../js/firebase-db.js"></script>
+<style>
+  .gate-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+  .gate-tab { padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); transition: all 0.3s; }
+  .gate-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .gate-panel { display: none; }
+  .gate-panel.active { display: block; }
+  
+  .entry-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+  .deficit-alert { color: #ef4444; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="app-sidebar"></aside>
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <div class="header-title">يومية أمن البوابة</div>
+        <div class="header-sub">تسجيل حركة دخول وخروج السيارات وتوجيهها للميزان</div>
+      </div>
+      <div class="header-actions">
+        <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الدفتر</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="gate-tabs">
+        <div class="gate-tab active" onclick="switchTab('local')"><i class="fa-solid fa-wheat-awn"></i> يومية القمح المحلي</div>
+        <div class="gate-tab" onclick="switchTab('imported')"><i class="fa-solid fa-ship"></i> يومية القمح المستورد</div>
+      </div>
+
+      <!-- Local Wheat Panel -->
+      <div id="panel-local" class="gate-panel active">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> تسجيل دخول سيارة (محلي)</div></div>
+          <div class="entry-form">
+            <div><label>رقم السيارة *</label><input type="text" id="l_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
+            <div><label>اسم السائق *</label><input type="text" id="l_driver" class="inp" placeholder="اسم السائق الثلاثي"></div>
+            <div><label>جهة الوارد *</label><input type="text" id="l_supplier" class="inp" placeholder="الجمعية أو المورد"></div>
+            <div><label>الدرجة (النوع)</label>
+              <select id="l_grade" class="inp">
+                <option value="23.5">23.5 قيراط</option>
+                <option value="23">23 قيراط</option>
+                <option value="22.5">22.5 قيراط</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary w-100" onclick="registerGateIn('محلي')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+            </div>
+          </div>
+
+          <div class="table-header mt-4">
+            <div class="card-title">دفتر يومية وارد بوابة (محلي)</div>
+            <input type="date" id="l_date_filter" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>م</th>
+                  <th>رقم السيارة</th>
+                  <th>اسم السائق</th>
+                  <th>جهة الوارد</th>
+                  <th>النوع</th>
+                  <th>دخول البوابة</th>
+                  <th>الوزن القائم</th>
+                  <th>الوزن الفارغ</th>
+                  <th>الصافي (طن)</th>
+                  <th>حالة الميزان</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="l_tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Imported Wheat Panel -->
+      <div id="panel-imported" class="gate-panel">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> تسجيل دخول سيارة (مستورد)</div></div>
+          <div class="entry-form">
+            <div><label>رقم السيارة *</label><input type="text" id="i_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
+            <div><label>اسم السائق *</label><input type="text" id="i_driver" class="inp" placeholder="اسم السائق الثلاثي"></div>
+            <div><label>المركب / جهة الوارد *</label><input type="text" id="i_supplier" class="inp" placeholder="اسم المركب"></div>
+            <div><label>نوع القمح</label>
+              <select id="i_wheat_type" class="inp">
+                <option value="روسي">روسي</option>
+                <option value="أوكراني">أوكراني</option>
+                <option value="روماني">روماني</option>
+                <option value="فرنسي">فرنسي</option>
+                <option value="أسترالي">أسترالي</option>
+                <option value="أمريكي">أمريكي</option>
+              </select>
+            </div>
+            <div><label>الوزن المشحون (طن) *</label><input type="number" id="i_shipped_weight" class="inp" placeholder="المسجل بالبوليصة"></div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary w-100" onclick="registerGateIn('مستورد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+            </div>
+          </div>
+
+          <div class="table-header mt-4">
+            <div class="card-title">دفتر يومية وارد بوابة (مستورد)</div>
+            <input type="date" id="i_date_filter" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>م</th>
+                  <th>رقم السيارة</th>
+                  <th>اسم السائق</th>
+                  <th>المركب</th>
+                  <th>النوع</th>
+                  <th>دخول البوابة</th>
+                  <th>المشحون (طن)</th>
+                  <th>الصافي الفعلي (طن)</th>
+                  <th>العجز (طن)</th>
+                  <th>حالة الميزان</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="i_tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/app.js"></script>
+<script>
+  let currentTab = 'local';
+  
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.gate-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.gate-panel').forEach(p => p.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById(`panel-${tab}`).classList.add('active');
+  }
+
+  // Set default dates
+  const today = new Date();
+  const tStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  document.getElementById('l_date_filter').value = tStr;
+  document.getElementById('i_date_filter').value = tStr;
+
+  function generateTicketId() {
+    let lastId = parseInt(localStorage.getItem('LAST_TICKET_ID') || '1000');
+    lastId++;
+    localStorage.setItem('LAST_TICKET_ID', lastId.toString());
+    return 'CRT-' + lastId;
+  }
+
+  function registerGateIn(type) {
+    let plate, driver, supplier, grade, wheatType, shippedWeight;
+    
+    if (type === 'محلي') {
+      plate = document.getElementById('l_plate').value.trim();
+      driver = document.getElementById('l_driver').value.trim();
+      supplier = document.getElementById('l_supplier').value.trim();
+      grade = document.getElementById('l_grade').value;
+      if(!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول الإلزامية', 'error');
+    } else {
+      plate = document.getElementById('i_plate').value.trim();
+      driver = document.getElementById('i_driver').value.trim();
+      supplier = document.getElementById('i_supplier').value.trim(); // Ship name
+      wheatType = document.getElementById('i_wheat_type').value;
+      shippedWeight = document.getElementById('i_shipped_weight').value.trim();
+      if(!plate || !driver || !supplier || !shippedWeight) return showToast('يرجى تعبئة جميع الحقول الإلزامية', 'error');
+    }
+
+    const t = {
+      id: generateTicketId(),
+      silo_id: user.silo_id,
+      opType: 'وارد',
+      grainType: type,
+      plate: plate,
+      driver: driver,
+      status: 'gate_in', // Waiting for scale
+      timestamp: new Date().toLocaleString('ar-EG'),
+      dateStr: tStr, // ISO date for filtering
+      gross: 0,
+      tare: 0,
+      net: 0,
+    };
+
+    if (type === 'محلي') {
+      t.supplierName = supplier;
+      t.grade = grade;
+    } else {
+      t.shipName = supplier;
+      t.wheatType = wheatType;
+      t.shippedWeight = parseFloat(shippedWeight);
+    }
+
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    tickets.unshift(t);
+    localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+    
+    showToast('تم تسجيل دخول السيارة بنجاح وتوجيهها للميزان', 'success');
+    
+    // Clear inputs
+    if (type === 'محلي') {
+      document.getElementById('l_plate').value = '';
+      document.getElementById('l_driver').value = '';
+    } else {
+      document.getElementById('i_plate').value = '';
+      document.getElementById('i_driver').value = '';
+      document.getElementById('i_shipped_weight').value = '';
+    }
+    
+    renderGateTables();
+  }
+
+  function registerGateOut(id) {
+    if (!confirm('هل أنت متأكد من تسجيل خروج هذه السيارة من البوابة النهائية؟')) return;
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    const idx = tickets.findIndex(x => x.id === id);
+    if (idx > -1) {
+      if (tickets[idx].status !== 'completed') {
+        return showToast('لا يمكن خروج السيارة قبل اكتمال أوزانها في الميزان!', 'error');
+      }
+      tickets[idx].status = 'gate_out'; // Completely finished
+      tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
+      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+      showToast('تم إثبات خروج السيارة بسلام', 'success');
+      renderGateTables();
+    }
+  }
+
+  function renderGateTables() {
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    const lDate = document.getElementById('l_date_filter').value;
+    const iDate = document.getElementById('i_date_filter').value;
+    
+    let lHtml = '', iHtml = '';
+    let lCount = 1, iCount = 1;
+
+    tickets.forEach(t => {
+      if (t.silo_id !== user.silo_id || t.opType !== 'وارد' || t.status === 'deleted') return;
+
+      let statBadge = '';
+      let actionBtn = '';
+      if (t.status === 'gate_in') {
+        statBadge = '<span class="badge badge-warning">تنتظر الميزان (قائم)</span>';
+      } else if (t.status === 'pending') {
+        statBadge = '<span class="badge badge-info">تنتظر الميزان (فارغ)</span>';
+      } else if (t.status === 'completed') {
+        statBadge = '<span class="badge badge-success">تم الوزن - جاهزة للخروج</span>';
+        actionBtn = `<button class="btn btn-primary btn-sm" onclick="registerGateOut('${t.id}')">تسجيل خروج</button>`;
+      } else if (t.status === 'gate_out') {
+        statBadge = '<span class="badge" style="background:var(--bg-dark);color:var(--text-sec)">غادرت البوابة</span>';
+        actionBtn = `<span style="font-size:0.8rem;color:var(--text-sec)">${t.exitTimestamp}</span>`;
+      }
+
+      if (t.grainType === 'محلي' && (t.dateStr === lDate || (!t.dateStr && t.timestamp.includes(lDate.split('-')[0])))) {
+        lHtml += `
+          <tr>
+            <td>${lCount++}</td>
+            <td class="fw-bold">${t.plate}</td>
+            <td>${t.driver}</td>
+            <td>${t.supplierName || ''}</td>
+            <td>${t.grade ? t.grade + ' قيراط' : ''}</td>
+            <td style="font-size:0.85rem">${t.timestamp}</td>
+            <td>${t.gross ? (t.gross/1000).toFixed(3) : '-'}</td>
+            <td>${t.tare ? (t.tare/1000).toFixed(3) : '-'}</td>
+            <td class="fw-bold text-success">${t.net ? (t.net/1000).toFixed(3) : '-'}</td>
+            <td>${statBadge}</td>
+            <td>${actionBtn}</td>
+          </tr>
+        `;
+      } 
+      else if (t.grainType === 'مستورد' && (t.dateStr === iDate || (!t.dateStr && t.timestamp.includes(iDate.split('-')[0])))) {
+        let netTons = t.net ? (t.net/1000) : 0;
+        let shipped = t.shippedWeight || 0;
+        let deficit = 0;
+        let defClass = '';
+        if (netTons > 0 && shipped > 0) {
+          deficit = shipped - netTons;
+          if (deficit > 0) defClass = 'deficit-alert';
+        }
+        
+        iHtml += `
+          <tr>
+            <td>${iCount++}</td>
+            <td class="fw-bold">${t.plate}</td>
+            <td>${t.driver}</td>
+            <td>${t.shipName || ''}</td>
+            <td>${t.wheatType || ''}</td>
+            <td style="font-size:0.85rem">${t.timestamp}</td>
+            <td class="text-primary">${shipped.toFixed(3)}</td>
+            <td class="fw-bold text-success">${netTons ? netTons.toFixed(3) : '-'}</td>
+            <td class="${defClass}">${netTons > 0 ? deficit.toFixed(3) : '-'}</td>
+            <td>${statBadge}</td>
+            <td>${actionBtn}</td>
+          </tr>
+        `;
+      }
+    });
+
+    document.getElementById('l_tbody').innerHTML = lHtml || '<tr><td colspan="11" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
+    document.getElementById('i_tbody').innerHTML = iHtml || '<tr><td colspan="11" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
+  }
+
+  renderGateTables();
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'WEIGHBRIDGE_TICKETS') renderGateTables();
+  });
+</script>
+</body>
+</html>

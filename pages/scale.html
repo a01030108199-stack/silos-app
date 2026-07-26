@@ -740,14 +740,43 @@ function saveFirstWeight() {
   };
 
   const tickets = getTickets();
-  tickets.unshift(newTicket);
-  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
-
-  if (newTicket.supplierCode && newTicket.supplierName) {
-    saveSupplier(newTicket.supplierCode, newTicket.supplierName);
+  
+  let ticketToSave = null;
+  if (pendingTicketId && scaleMode === 'first') {
+    const idx = tickets.findIndex(t => t.id === pendingTicketId);
+    if (idx !== -1) {
+      ticketToSave = tickets[idx];
+      ticketToSave.dateStr = localIsoDate;
+      ticketToSave.opType = opType;
+      ticketToSave.grainType = document.getElementById('s_grain_type').value;
+      ticketToSave.supplierName = document.getElementById('s_supplier_name').value.trim();
+      ticketToSave.supplierCode = document.getElementById('s_supplier_code').value.trim();
+      ticketToSave.grade = document.getElementById('s_grade').value;
+      ticketToSave.wheatType = document.getElementById('s_wheat_type').value;
+      ticketToSave.destination = document.getElementById('s_destination').value.trim();
+      ticketToSave.orderNo = document.getElementById('s_order_no') ? document.getElementById('s_order_no').value.trim() : '';
+      ticketToSave.cell = document.getElementById('s_cell').value;
+      ticketToSave.packaging = pack ? pack.value : 'bulk';
+      ticketToSave.sacksCount = parseInt(document.getElementById('s_sacks').value) || 0;
+      ticketToSave.gross = gross;
+      ticketToSave.tare = tare;
+      ticketToSave.deduction = deduction;
+      ticketToSave.status = 'pending';
+    }
   }
 
-  printSlip(newTicket, true);
+  if (!ticketToSave) {
+    ticketToSave = newTicket;
+    tickets.unshift(ticketToSave);
+  }
+
+  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+
+  if (ticketToSave.supplierCode && ticketToSave.supplierName) {
+    saveSupplier(ticketToSave.supplierCode, ticketToSave.supplierName);
+  }
+
+  printSlip(ticketToSave, true);
   renderTable();
   initForm(true); 
   showToast('تم حفظ الوزنة الأولى بنجاح', 'success');
@@ -793,6 +822,35 @@ function loadPendingTicket(id) {
   });
   
   showToast('تم استدعاء بيانات السيارة لإكمال الوزنة الثانية', 'info');
+}
+
+function loadGateTicket(id) {
+  const tickets = getTickets();
+  const t = tickets.find(x => x.id === id);
+  if (!t) return;
+  
+  scaleMode = 'first';
+  pendingTicketId = t.id;
+  
+  document.getElementById('ticketIdDisplay').textContent = t.id;
+  document.getElementById('s_plate').value = t.plate;
+  document.getElementById('s_driver').value = t.driver;
+  document.getElementById('s_op_type').value = t.opType;
+  document.getElementById('s_grain_type').value = t.grainType;
+  
+  if (t.supplierName) document.getElementById('s_supplier_name').value = t.supplierName;
+  if (t.grade) document.getElementById('s_grade').value = t.grade;
+  if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
+  if (t.destination) document.getElementById('s_destination').value = t.destination;
+  
+  toggleDynamicFields();
+  
+  ['s_plate', 's_driver', 's_op_type', 's_grain_type'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (el) el.disabled = true;
+  });
+  
+  showToast('تم استدعاء السيارة من البوابة، يرجى تسجيل الوزن القائم (الوزنة الأولى)', 'info');
 }
 
 function cancelSecondWeight() {
@@ -982,12 +1040,18 @@ function renderTable() {
        statusBadge = `<span class="badge" style="background:#dc2626;color:#fff;" title="سبب الحذف: ${t.deleteReason} (بواسطة ${t.deletedBy})"><i class="fa-solid fa-ban"></i> ملغاة</span>
        <button class="btn btn-primary btn-sm" onclick="restoreTicket('${t.id}')" title="استرجاع الكارتة" style="margin-right:5px; padding:3px 8px;"><i class="fa-solid fa-rotate-left"></i></button>`;
        rowStyle = 'background: rgba(220, 38, 38, 0.1); opacity: 0.85; text-decoration: line-through;';
+    } else if (t.status === 'gate_in') {
+       statusBadge = `<button class="btn btn-warning btn-sm" onclick="loadGateTicket('${t.id}')" style="background:#8b5cf6; border-color:#8b5cf6;"><i class="fa-solid fa-truck-fast"></i> بدء الوزنة 1</button>
+         <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح"><i class="fa-solid fa-trash"></i></button>`;
+       rowStyle = 'background: rgba(139, 92, 246, 0.1);';
     } else if (t.status === 'pending') {
-       statusBadge = `<button class="btn btn-warning btn-sm" onclick="loadPendingTicket('${t.id}')"><i class="fa-solid fa-truck-moving"></i> استكمال الوزنة</button>
+       statusBadge = `<button class="btn btn-warning btn-sm" onclick="loadPendingTicket('${t.id}')"><i class="fa-solid fa-truck-moving"></i> استكمال الوزنة 2</button>
          <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح"><i class="fa-solid fa-trash"></i></button>`;
        rowStyle = 'background: rgba(255,193,7,0.1);';
+    } else if (t.status === 'gate_out') {
+       statusBadge = `<span class="badge" style="background:var(--bg-dark);color:var(--text-sec)"><i class="fa-solid fa-right-from-bracket"></i> غادرت البوابة</span>`;
     } else {
-       statusBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> مكتملة</span>
+       statusBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> مكتملة (بالموقع)</span>
          <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')" title="مسح" style="margin-right:5px;"><i class="fa-solid fa-trash"></i></button>`;
     }
 

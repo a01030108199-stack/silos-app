@@ -95,6 +95,7 @@ function buildSidebar(activePage) {
   } else if (role === 'manager') {
     navItems = [
       { label:'لوحة التحكم',             icon:'fa-gauge',           page:'dashboard' },
+      { label:'بوابة الصومعة',           icon:'fa-door-open',       page:'gate' },
       { label:'الاستلام والتخزين',       icon:'fa-scale-balanced',  page:'reception' },
       { label:'إدارة الأمن',             icon:'fa-shield-halved',   page:'security' },
       { label:'الشئون المالية والإدارية', icon:'fa-money-bill-wave', page:'finance' },
@@ -106,6 +107,7 @@ function buildSidebar(activePage) {
     ];
   } else if (role === 'security') {
     navItems = [
+      { label:'بوابة الصومعة',           icon:'fa-door-open',       page:'gate' },
       { label:'إدارة الأمن',             icon:'fa-shield-halved',   page:'security' },
     ];
   } else if (role === 'finance') {
