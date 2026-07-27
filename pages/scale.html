@@ -322,6 +322,8 @@
               <th>العملية</th>
               <th>الجهة</th>
               <th>نوع الحبوب</th>
+              <th>الخلية</th>
+              <th>الباخرة</th>
               <th>الوزن القائم</th>
               <th>الوزن الفارغ</th>
               <th>الصافي (كجم)</th>
@@ -1191,6 +1193,8 @@ function renderTable() {
         <td><span class="badge ${t.opType === 'صرف' ? 'badge-warning' : 'badge-info'}">${t.opType}</span></td>
         <td style="font-size:0.85rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${t.opType === 'صرف' ? (t.destination || '-') : (t.supplierName || '-')}">${t.opType === 'صرف' ? (t.destination || '-') : (t.supplierName || '-')}</td>
         <td>${t.grainType === 'مستورد' ? t.wheatType || 'مستورد' : (t.grade ? t.grade + ' قيراط' : 'محلي')}</td>
+        <td style="font-size:0.9rem; font-weight:bold;">${t.cell ? t.cell : '-'}</td>
+        <td style="font-size:0.85rem; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${t.shipName || '-'}">${t.shipName || '-'}</td>
         <td class="${t.gross ? 'text-primary' : 'text-muted'}">${t.gross ? t.gross.toLocaleString('en-US') : '-'}</td>
         <td class="${t.tare ? 'text-danger' : 'text-muted'}">${t.tare ? t.tare.toLocaleString('en-US') : '-'}</td>
         <td class="fw-bold text-success">${t.net ? t.net.toLocaleString('en-US') : '-'}</td>
