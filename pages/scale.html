@@ -178,7 +178,7 @@
 
           <div class="form-group-inner" id="div_ship_name" style="display:none;">
             <label>اسم الباخرة *</label>
-            <input type="text" class="form-control" id="s_ship_name" placeholder="مثال: وادي النيل">
+            <input type="text" class="form-control" id="s_ship_name" placeholder="اسم الباخرة *">
           </div>
 
           <div class="form-group-inner" id="div_shipped_weight" style="display:none;">
@@ -937,11 +937,17 @@ function cancelSecondWeight() {
 
 function saveSecondWeight() {
   const opType = document.getElementById('s_op_type').value;
+  const grainType = document.getElementById('s_grain_type').value;
   const gross = parseFloat(document.getElementById('s_gross').value) || 0;
   const tare = parseFloat(document.getElementById('s_tare').value) || 0;
   const net = calcNet();
   const cell = document.getElementById('s_cell').value;
+  const shipName = document.getElementById('s_ship_name').value.trim();
 
+  if (opType === 'وارد' && grainType === 'مستورد' && !shipName) {
+    showToast('يرجى إدخال اسم الباخرة', 'error');
+    return;
+  }
   if (!cell) { showToast('يرجى اختيار رقم الخلية', 'error'); return; }
 
   if (opType === 'صرف') {
