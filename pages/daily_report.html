@@ -798,7 +798,7 @@ function deleteShip(i) {
 // ═══════════════════════════════════════════════════════════════
 function loadReport() {
   currentDate = document.getElementById('reportDate').value;
-  document.getElementById('reportTitle').textContent = بيان يوم ;
+  document.getElementById('reportTitle').textContent = `بيان يوم ${fmtDate(currentDate)}`;
   let data = loadData(currentDate);
   
   if (!data) {
