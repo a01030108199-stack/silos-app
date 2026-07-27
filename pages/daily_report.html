@@ -205,6 +205,8 @@ window.onerror = function(msg, url, line, col, err) {
       </div>
 
       <!-- TABLE 3: LOCAL WHEAT SPLIT -->
+      <datalist id="dl_mills"></datalist>
+      <datalist id="dl_wheat_types"></datalist>
       <div class="section-title"><i class="fa-solid fa-wheat-awn"></i> الجدول الثالث: حركة القمح المحلي (وارد وصرف للمطاحن)</div>
       <div style="display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start;" class="split-grid">
 
@@ -671,7 +673,7 @@ function renderLocalOut(data) {
 
     tbody.innerHTML += `
       <tr>
-        <td><input type="text" class="inp inp-md" value="${r.name||''}" placeholder="اسم المطحن" onchange="updateLocalOut(${i},'name',this.value)"></td>
+        <td><input type="text" class="inp inp-md" value="${r.name||''}" placeholder="اسم المطحن" list="dl_mills" onchange="updateLocalOut(${i},'name',this.value)"></td>
         <td><input type="number" class="inp" value="${r.permit||''}" placeholder="0" onchange="updateLocalOut(${i},'permit',+this.value)"></td>
         <td class="val-outgoing">${fmt(r.d235)}</td>
         <td class="val-outgoing">${fmt(r.d230)}</td>
@@ -721,8 +723,8 @@ function renderShips(data) {
     tbody.innerHTML += `
       <tr>
         <td class="cell-num">${i+1}</td>
-        <td><input type="text" class="inp inp-lg" value="${s.name||''}" placeholder="اسم المطحن" onchange="updateShip(${i},'name',this.value)"></td>
-        <td><input type="text" class="inp text-info fw-bold text-center" value="${s.ship_name||''}" placeholder="نوع القمح" onchange="updateShip(${i},'ship_name',this.value)"></td>
+        <td><input type="text" class="inp inp-lg" value="${s.name||''}" placeholder="اسم المطحن" list="dl_mills" onchange="updateShip(${i},'name',this.value)"></td>
+        <td><input type="text" class="inp text-info fw-bold text-center" value="${s.ship_name||''}" placeholder="نوع القمح" list="dl_wheat_types" onchange="updateShip(${i},'ship_name',this.value)"></td>
         <td><input type="number" class="inp" value="${s.permit||''}" placeholder="0" onchange="updateShip(${i},'permit',+this.value)"></td>
         <td><input type="number" class="inp" value="${s.opening||0}" placeholder="0" onchange="updateShip(${i},'opening',+this.value)"></td>
         <td><span class="val-outgoing">${fmt(s.dispatched||0)}</span></td>
@@ -848,6 +850,18 @@ function loadReport() {
   if (!data.localOut) data.localOut = [];
   
   currentData = data;
+  
+  const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  const mills = [...new Set(tickets.map(t => t.destination).filter(Boolean))];
+  const wheats = [...new Set(tickets.map(t => t.wheatType).filter(Boolean))];
+  
+  if (document.getElementById('dl_mills')) {
+    document.getElementById('dl_mills').innerHTML = mills.map(m => `<option value="${m}">`).join('');
+  }
+  if (document.getElementById('dl_wheat_types')) {
+    document.getElementById('dl_wheat_types').innerHTML = wheats.map(w => `<option value="${w}">`).join('');
+  }
+  
   // NEW AUTOMATION: Sync with Weighbridge Tickets
   syncWithTickets();
 
