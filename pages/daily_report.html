@@ -871,6 +871,9 @@ function parseTicketDate(ts) {
 function syncWithTickets() {
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
 
+  // Diagnostic log
+  let diag = [];
+
   // Reset all automated fields for today
   currentData.cells.forEach(c => { c.incoming = 0; c.outgoing = 0; });
   currentData.localOut.forEach(r => { r.d235 = 0; r.d230 = 0; r.d225 = 0; });
@@ -879,7 +882,7 @@ function syncWithTickets() {
   // Aggregate from tickets
   tickets.forEach(t => {
     if (t.silo_id !== user.silo_id) return;
-    if (t.status !== 'completed') return;
+    if (t.status !== 'completed' && t.status !== 'gate_out') return;
     
     let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
     if (tIsoDate !== currentDate) return;
@@ -892,6 +895,7 @@ function syncWithTickets() {
       if (cellIdx >= 0 && cellIdx < 12) {
         if (t.opType === 'وارد') {
           currentData.cells[cellIdx].incoming += netTons;
+          diag.push('Ticket: ' + t.id + ', Date: ' + tIsoDate + ', Cell: ' + t.cell + ', Op: ' + t.opType + ', Net: ' + netTons);
           currentData.cells[cellIdx].type = t.grainType;
           if (t.grainType === 'مستورد') {
             const cmap = {'روسي':'روسيا','أوكراني':'أوكرانيا','فرنسي':'فرنسا','روماني':'رومانيا','أسترالي':'أستراليا','أمريكي':'أمريكا'};
@@ -934,7 +938,7 @@ function syncWithTickets() {
       else if (t.grade === '22.5') destRow.d225 += netTons;
     }
     
-    // 3. Update Imported Dispatch to Mills
+    // 3. Update Imported Dispatch
     if (t.opType === 'صرف' && t.grainType === 'مستورد' && t.destination) {
       let shipRow = currentData.ships.find(r => r.name === t.destination && r.ship_name === t.wheatType);
       if (!shipRow) {
@@ -946,7 +950,9 @@ function syncWithTickets() {
       }
     }
   });
+  
 }
+
 
 function saveReport() {
   currentData.cells.forEach((c,i) => {
