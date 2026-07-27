@@ -538,24 +538,40 @@ function handleApproval(reqId, isApproved) {
     var dest = t.destination ? t.destination : '';
     var editDesc = req.editDesc ? req.editDesc : '';
     var reason = req.reason ? req.reason : '';
-    var fHtml = '<div style="background:rgba(234,179,8,0.1);border:1px solid #ca8a04;border-radius:8px;padding:10px;margin-bottom:14px;font-size:0.85rem;">' +
+
+    var allTix = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    var uShips = [...new Set(allTix.map(x => x.shipName).filter(Boolean))];
+    var uSupp = [...new Set(allTix.map(x => x.supplierName).filter(Boolean))];
+    var uDest = [...new Set(allTix.map(x => x.destination).filter(Boolean))];
+    var uTrans = [...new Set(allTix.map(x => x.transportCompany).filter(Boolean))];
+    var uWheat = [...new Set(allTix.map(x => x.wheatType).filter(Boolean))];
+    var uDrivers = [...new Set(allTix.map(x => x.driver).filter(Boolean))];
+
+    var datalists = '<datalist id="dl_ships">' + uShips.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
+                    '<datalist id="dl_supp">' + uSupp.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
+                    '<datalist id="dl_dest">' + uDest.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
+                    '<datalist id="dl_trans">' + uTrans.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
+                    '<datalist id="dl_wheat">' + uWheat.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
+                    '<datalist id="dl_drivers">' + uDrivers.map(s => '<option value="'+s+'">').join('') + '</datalist>';
+
+    var fHtml = datalists + '<div style="background:rgba(234,179,8,0.1);border:1px solid #ca8a04;border-radius:8px;padding:10px;margin-bottom:14px;font-size:0.85rem;">' +
       '<b>الطلب المقدم:</b> ' + editDesc + '<br><b>السبب:</b> ' + reason +
     '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-height:60vh;overflow-y:auto;padding-right:5px;">';
     fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم السيارة</label><input type="text" id="eq_plate" class="inp" value="' + plate + '"></div>';
-    fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم السائق</label><input type="text" id="eq_driver" class="inp" value="' + driver + '"></div>';
+    fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم السائق</label><input type="text" id="eq_driver" class="inp" list="dl_drivers" value="' + driver + '"></div>';
     if (t.opType === 'وارد' && t.grainType === 'محلي') {
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">جهة الوارد</label><input type="text" id="eq_supplier" class="inp" value="' + supplier + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">جهة الوارد</label><input type="text" id="eq_supplier" class="inp" list="dl_supp" value="' + supplier + '"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">درجة القمح</label><input type="text" id="eq_grade" class="inp" value="' + (t.grade||'') + '"></div>';
     }
     if (t.opType === 'وارد' && t.grainType === 'مستورد') {
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء الشاحن</label><input type="text" id="eq_supplier" class="inp" value="' + supplier + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء الشاحن</label><input type="text" id="eq_supplier" class="inp" list="dl_supp" value="' + supplier + '"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم الكارتة</label><input type="text" id="eq_ticket" class="inp" value="' + ticketNum + '"></div>';
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الشركة الناقلة</label><input type="text" id="eq_transport" class="inp" value="' + transport + '"></div>';
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">نوع القمح (منشأ)</label><input type="text" id="eq_wheat_type" class="inp" value="' + (t.wheatType||'') + '"></div>';
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم الباخرة</label><input type="text" id="eq_ship_name" class="inp" value="' + (t.shipName||'') + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الشركة الناقلة</label><input type="text" id="eq_transport" class="inp" list="dl_trans" value="' + transport + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">نوع القمح (منشأ)</label><input type="text" id="eq_wheat_type" class="inp" list="dl_wheat" value="' + (t.wheatType||'') + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم الباخرة</label><input type="text" id="eq_ship_name" class="inp" list="dl_ships" value="' + (t.shipName||'') + '"></div>';
     }
     if (t.opType === 'صرف') {
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" value="' + dest + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" list="dl_dest" value="' + dest + '"></div>';
     }
     
     // Additional weighbridge fields
