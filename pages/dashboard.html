@@ -575,7 +575,7 @@ function handleApproval(reqId, isApproved) {
     if (t.opType === 'صرف') {
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" list="dl_dest" value="' + dest + '"></div>';
       if (t.grainType === 'مستورد') {
-        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء / المورد</label><input type="text" id="eq_supplier" class="inp" list="dl_supp" value="' + supplier + '"></div>';
+        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم الباخرة</label><input type="text" id="eq_ship_name" class="inp" list="dl_ships" value="' + (t.shipName||'') + '"></div>';
         fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">نوع القمح (منشأ)</label><input type="text" id="eq_wheat_type" class="inp" list="dl_wheat" value="' + (t.wheatType||'') + '"></div>';
       } else if (t.grainType === 'محلي') {
         fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">درجة القمح</label><input type="text" id="eq_grade" class="inp" value="' + (t.grade||'') + '"></div>';

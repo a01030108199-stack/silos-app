@@ -299,8 +299,8 @@
               <input type="text" id="io_dest" class="inp" placeholder="اسم الجهة">
             </div>
             <div>
-              <label>الميناء / المورد</label>
-              <input type="text" id="io_supplier" class="inp" placeholder="الميناء الأصلي">
+              <label>اسم الباخرة</label>
+              <input type="text" id="io_ship_name" class="inp" placeholder="اسم الباخرة">
             </div>
             <div>
               <label>نوع القمح</label>
@@ -354,7 +354,7 @@
           <div style="overflow-x:auto"><table class="data-table">
             <thead><tr>
               <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الجهة المنصرف</th>
-              <th>الميناء/النوع</th><th>وقت الدخول</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>الباخرة/النوع</th><th>وقت الدخول</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
               <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
             </tr></thead>
             <tbody id="io_tbody"></tbody>
@@ -446,7 +446,7 @@
       plate     = document.getElementById('io_plate').value.trim();
       driver    = document.getElementById('io_driver').value.trim();
       dest      = document.getElementById('io_dest').value.trim();
-      supplier  = document.getElementById('io_supplier').value.trim();
+      shipName  = document.getElementById('io_ship_name').value.trim();
       wheatType = document.getElementById('io_wheat').value;
       if (!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
     }
@@ -481,7 +481,7 @@
       t.destination = dest; t.grade = grade;
     } else if (opType === 'صرف' && grainType === 'مستورد') {
       t.destination  = dest;
-      t.supplierName = supplier;
+      t.shipName     = shipName;
       t.wheatType    = wheatType;
       t.orderNo      = orderNo;
     }
@@ -688,7 +688,7 @@
           '<td class="fw-bold">' + t.plate + '</td>' +
           '<td>' + t.driver + '</td>' +
           '<td>' + (t.destination || '') + '</td>' +
-          '<td>' + (t.supplierName || '') + ' / ' + (t.wheatType || '') + '</td>' +
+          '<td>' + (t.shipName || '') + ' / ' + (t.wheatType || '') + '</td>' +
           '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
           '<td>' + nGross + '</td><td>' + nTare + '</td>' +
           '<td class="fw-bold text-warning">' + nNet + '</td>' +

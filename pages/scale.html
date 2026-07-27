@@ -395,6 +395,10 @@ function toggleDynamicFields() {
   } else { // منصرف
     document.getElementById('div_destination').style.display = 'block';
     if (document.getElementById('div_order_no')) document.getElementById('div_order_no').style.display = 'block';
+    if (grainType === 'مستورد') {
+      document.getElementById('div_wheat_type').style.display = 'block';
+      document.getElementById('div_ship_name').style.display = 'block';
+    }
     if (typeof refreshOrderList === 'function') refreshOrderList();
     if (typeof calcOrderBalance === 'function') calcOrderBalance();
   }
