@@ -391,8 +391,8 @@ function getLastAvailableData(dateStr) {
     currentData.cells.forEach(c => { c.closing = c.opening + c.incoming - c.outgoing; });
     if (currentData.ships) {
       currentData.ships.forEach(s => {
-         s.closing = (s.opening || 0) - (s.dispatched || 0);
-         s.remaining = (s.permit || 0) - (s.dispatched || 0);
+         s.closing = (s.opening || 0) + (s.dispatched || 0);
+         s.remaining = (s.permit || 0) - s.closing;
       });
     }
   }
@@ -412,7 +412,6 @@ function getLastAvailableData(dateStr) {
       currentData.ships.forEach(s => {
         s.opening = s.closing || 0;
         s.dispatched = 0;
-        s.permit = s.remaining || 0;
       });
     }
     
@@ -422,8 +421,8 @@ function getLastAvailableData(dateStr) {
       currentData.cells.forEach(c => { c.closing = c.opening + c.incoming - c.outgoing; });
       if (currentData.ships) {
         currentData.ships.forEach(s => {
-           s.closing = (s.opening || 0) - (s.dispatched || 0);
-           s.remaining = (s.permit || 0) - (s.dispatched || 0);
+           s.closing = (s.opening || 0) + (s.dispatched || 0);
+           s.remaining = (s.permit || 0) - s.closing;
         });
       }
     }
@@ -707,8 +706,14 @@ function renderShips(data) {
   }
 
   data.ships.forEach((s, i) => {
-    const closing   = (s.opening||0) - (s.dispatched||0);
-    const remaining = (s.permit||0)  - (s.dispatched||0);
+    if (s.orderNo) {
+       var ordersDb = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+       if (ordersDb[s.orderNo]) {
+           s.permit = (parseFloat(ordersDb[s.orderNo].qty) || 0) + (parseFloat(ordersDb[s.orderNo].bonus) || 0);
+       }
+    }
+    const closing   = (s.opening||0) + (s.dispatched||0);
+    const remaining = (s.permit||0)  - closing;
     data.ships[i].closing   = closing;
     data.ships[i].remaining = remaining;
     tPerm+=s.permit||0; tOpen+=s.opening||0; tDisp+=s.dispatched||0; tClose+=closing; tRem+=remaining;
@@ -942,11 +947,12 @@ function syncWithTickets() {
     if (t.opType === 'صرف' && t.grainType === 'مستورد' && t.destination) {
       let shipRow = currentData.ships.find(r => r.name === t.destination && r.ship_name === t.wheatType);
       if (!shipRow) {
-        shipRow = { name: t.destination, ship_name: t.wheatType, permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0 };
+        shipRow = { name: t.destination, ship_name: t.wheatType, permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0, orderNo: t.orderNo || '' };
         currentData.ships.push(shipRow);
       }
       if (shipRow) {
         shipRow.dispatched += netTons;
+        if (t.orderNo) shipRow.orderNo = t.orderNo;
       }
     }
   });
