@@ -540,7 +540,7 @@ function handleApproval(reqId, isApproved) {
     var reason = req.reason ? req.reason : '';
     var fHtml = '<div style="background:rgba(234,179,8,0.1);border:1px solid #ca8a04;border-radius:8px;padding:10px;margin-bottom:14px;font-size:0.85rem;">' +
       '<b>الطلب المقدم:</b> ' + editDesc + '<br><b>السبب:</b> ' + reason +
-    '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">';
+    '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-height:60vh;overflow-y:auto;padding-right:5px;">';
     fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم السيارة</label><input type="text" id="eq_plate" class="inp" value="' + plate + '"></div>';
     fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم السائق</label><input type="text" id="eq_driver" class="inp" value="' + driver + '"></div>';
     if (t.opType === 'وارد' && t.grainType === 'محلي') {
@@ -554,6 +554,18 @@ function handleApproval(reqId, isApproved) {
     if (t.opType === 'صرف') {
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" value="' + dest + '"></div>';
     }
+    
+    // Additional weighbridge fields
+    if (t.gross !== undefined) {
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الوزن القائم (كجم)</label><input type="number" id="eq_gross" class="inp" value="' + t.gross + '"></div>';
+    }
+    if (t.tare !== undefined) {
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الوزن الفارغ (كجم)</label><input type="number" id="eq_tare" class="inp" value="' + t.tare + '"></div>';
+    }
+    if (t.cell !== undefined) {
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم الخلية</label><input type="text" id="eq_cell" class="inp" value="' + t.cell + '"></div>';
+    }
+
     fHtml += '</div><div style="display:flex;justify-content:flex-end;gap:10px;">';
     fHtml += '<button class="btn btn-outline" onclick="closeModal(\'editApproveModal\')">إلغاء</button>';
     fHtml += '<button class="btn btn-success" onclick="applyEditApproval()"><i class="fa-solid fa-check"></i> حفظ وموافقة</button></div>';
@@ -573,12 +585,23 @@ function applyEditApproval() {
   var tk = document.getElementById('eq_ticket');
   var tr = document.getElementById('eq_transport');
   var dt = document.getElementById('eq_dest');
+  
+  var gr = document.getElementById('eq_gross');
+  var ta = document.getElementById('eq_tare');
+  var ce = document.getElementById('eq_cell');
+
   if (p  && p.value.trim())  t.plate            = p.value.trim();
   if (d  && d.value.trim())  t.driver           = d.value.trim();
   if (s  && s.value.trim())  t.supplierName     = s.value.trim();
   if (tk && tk.value.trim()) t.ticketNum        = tk.value.trim();
   if (tr && tr.value.trim()) t.transportCompany = tr.value.trim();
   if (dt && dt.value.trim()) t.destination      = dt.value.trim();
+  
+  if (gr && gr.value) { t.gross = parseFloat(gr.value); }
+  if (ta && ta.value) { t.tare = parseFloat(ta.value); }
+  if (ce && ce.value) { t.cell = ce.value.trim(); }
+  if (t.gross !== undefined && t.tare !== undefined) { t.net = t.gross - t.tare; }
+
   t.status = t.net > 0 ? 'completed' : 'gate_in';
   t.lastEditedAt = new Date().toLocaleString('ar-EG');
   t.lastEditedBy = user.name;
@@ -597,7 +620,6 @@ function applyEditApproval() {
   showToast('تم تطبيق التعديل والموافقة بنجاح', 'success');
   loadApprovals();
 }
-
 
 loadApprovals();
 </script>
