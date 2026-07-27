@@ -153,7 +153,8 @@
           </table>
         </div>
       </div>
-      </div>
+
+      </div>
 
       <!-- Approvals Section -->
       <div class="row mt-4">
@@ -483,47 +484,120 @@ function loadApprovals() {
   approvalsBody.innerHTML = html;
 }
 
+
 function handleApproval(reqId, isApproved) {
-  let approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
-  const idx = approvals.findIndex(a => a.id === reqId);
-  if (idx === -1) return;
-  
-  const req = approvals[idx];
-  
-  // Update tickets logic
-  let tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-  const tIdx = tickets.findIndex(t => t.id === req.ticketId);
-  
-  if (tIdx > -1) {
-    if (isApproved) {
-      if (req.type === 'delete') {
-        tickets[tIdx].status = 'stricken'; // effectively removed from gate/scale views entirely
-        tickets[tIdx].strikeReason = req.reason;
-        tickets[tIdx].strickenAt = new Date().toLocaleString('ar-EG');
-        tickets[tIdx].strickenBy = user.name;
-        showToast('تم الموافقة على الشطب بنجاح', 'success');
-      } else {
-        // Edit logic would require a more complex UI for the manager to actually apply the edits, 
-        // or just mark it as 'edit_approved' and let the user re-submit. 
-        // For simplicity, we'll revert to gate_in/completed and log the approval.
-        tickets[tIdx].status = tickets[tIdx].net > 0 ? 'completed' : 'gate_in'; 
-        showToast('تم الموافقة على التعديل (يجب إشعار المستخدم بتنفيذه يدوياً)', 'success');
-      }
-    } else {
-      // Revert status
-      tickets[tIdx].status = tickets[tIdx].net > 0 ? 'completed' : 'gate_in';
-      showToast('تم رفض الطلب وعادت السيارة لوضعها الطبيعي', 'info');
-    }
-    localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  var approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
+  var idx = -1;
+  for (var i = 0; i < approvals.length; i++) {
+    if (approvals[i].id === reqId) { idx = i; break; }
   }
-  
-  req.status = isApproved ? 'approved' : 'rejected';
-  req.resolvedAt = new Date().toLocaleString('ar-EG');
-  req.resolvedBy = user.name;
+  if (idx === -1) return;
+  var req = approvals[idx];
+  var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  var tIdx = -1;
+  for (var j = 0; j < tickets.length; j++) {
+    if (tickets[j].id === req.ticketId) { tIdx = j; break; }
+  }
+  if (!isApproved) {
+    if (tIdx > -1) {
+      tickets[tIdx].status = tickets[tIdx].net > 0 ? 'completed' : 'gate_in';
+      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+    }
+    approvals[idx].status = 'rejected';
+    approvals[idx].resolvedAt = new Date().toLocaleString('ar-EG');
+    approvals[idx].resolvedBy = user.name;
+    localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
+    showToast('تم رفض الطلب وعادت السيارة لوضعها الطبيعي', 'info');
+    loadApprovals();
+    return;
+  }
+  if (req.type === 'delete') {
+    if (tIdx > -1) {
+      tickets[tIdx].status = 'stricken';
+      tickets[tIdx].strikeReason = req.reason;
+      tickets[tIdx].strickenAt = new Date().toLocaleString('ar-EG');
+      tickets[tIdx].strickenBy = user.name;
+      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+    }
+    approvals[idx].status = 'approved';
+    approvals[idx].resolvedAt = new Date().toLocaleString('ar-EG');
+    approvals[idx].resolvedBy = user.name;
+    localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
+    showToast('تم الموافقة على الشطب بنجاح', 'success');
+    loadApprovals();
+  } else {
+    if (tIdx === -1) { showToast('لم يتم العثور على السجل!', 'error'); return; }
+    var t = tickets[tIdx];
+    window._editReqId = reqId;
+    window._editTIdx  = tIdx;
+    var plate = t.plate ? t.plate : '';
+    var driver = t.driver ? t.driver : '';
+    var supplier = t.supplierName ? t.supplierName : '';
+    var ticketNum = t.ticketNum ? t.ticketNum : '';
+    var transport = t.transportCompany ? t.transportCompany : '';
+    var dest = t.destination ? t.destination : '';
+    var editDesc = req.editDesc ? req.editDesc : '';
+    var reason = req.reason ? req.reason : '';
+    var fHtml = '<div style="background:rgba(234,179,8,0.1);border:1px solid #ca8a04;border-radius:8px;padding:10px;margin-bottom:14px;font-size:0.85rem;">' +
+      '<b>الطلب المقدم:</b> ' + editDesc + '<br><b>السبب:</b> ' + reason +
+    '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">';
+    fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم السيارة</label><input type="text" id="eq_plate" class="inp" value="' + plate + '"></div>';
+    fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم السائق</label><input type="text" id="eq_driver" class="inp" value="' + driver + '"></div>';
+    if (t.opType === 'وارد' && t.grainType === 'محلي') {
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">جهة الوارد</label><input type="text" id="eq_supplier" class="inp" value="' + supplier + '"></div>';
+    }
+    if (t.opType === 'وارد' && t.grainType === 'مستورد') {
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء الشاحن</label><input type="text" id="eq_supplier" class="inp" value="' + supplier + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم الكارتة</label><input type="text" id="eq_ticket" class="inp" value="' + ticketNum + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الشركة الناقلة</label><input type="text" id="eq_transport" class="inp" value="' + transport + '"></div>';
+    }
+    if (t.opType === 'صرف') {
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" value="' + dest + '"></div>';
+    }
+    fHtml += '</div><div style="display:flex;justify-content:flex-end;gap:10px;">';
+    fHtml += '<button class="btn btn-outline" onclick="closeModal(\'editApproveModal\')">إلغاء</button>';
+    fHtml += '<button class="btn btn-success" onclick="applyEditApproval()"><i class="fa-solid fa-check"></i> حفظ وموافقة</button></div>';
+    showModal('editApproveModal', 'تطبيق التعديل — سجل: ' + plate, fHtml);
+  }
+}
+
+function applyEditApproval() {
+  var approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
+  var tickets   = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  var tIdx = window._editTIdx;
+  var reqId = window._editReqId;
+  var t = tickets[tIdx];
+  var p  = document.getElementById('eq_plate');
+  var d  = document.getElementById('eq_driver');
+  var s  = document.getElementById('eq_supplier');
+  var tk = document.getElementById('eq_ticket');
+  var tr = document.getElementById('eq_transport');
+  var dt = document.getElementById('eq_dest');
+  if (p  && p.value.trim())  t.plate            = p.value.trim();
+  if (d  && d.value.trim())  t.driver           = d.value.trim();
+  if (s  && s.value.trim())  t.supplierName     = s.value.trim();
+  if (tk && tk.value.trim()) t.ticketNum        = tk.value.trim();
+  if (tr && tr.value.trim()) t.transportCompany = tr.value.trim();
+  if (dt && dt.value.trim()) t.destination      = dt.value.trim();
+  t.status = t.net > 0 ? 'completed' : 'gate_in';
+  t.lastEditedAt = new Date().toLocaleString('ar-EG');
+  t.lastEditedBy = user.name;
+  tickets[tIdx] = t;
+  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  for (var i = 0; i < approvals.length; i++) {
+    if (approvals[i].id === reqId) {
+      approvals[i].status = 'approved';
+      approvals[i].resolvedAt = new Date().toLocaleString('ar-EG');
+      approvals[i].resolvedBy = user.name;
+      break;
+    }
+  }
   localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
-  
+  closeModal('editApproveModal');
+  showToast('تم تطبيق التعديل والموافقة بنجاح', 'success');
   loadApprovals();
 }
+
 
 loadApprovals();
 </script>
