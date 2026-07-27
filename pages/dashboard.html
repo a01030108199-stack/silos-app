@@ -577,10 +577,23 @@ function handleApproval(reqId, isApproved) {
       if (t.grainType === 'مستورد') {
         fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء / المورد</label><input type="text" id="eq_supplier" class="inp" list="dl_supp" value="' + supplier + '"></div>';
         fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">نوع القمح (منشأ)</label><input type="text" id="eq_wheat_type" class="inp" list="dl_wheat" value="' + (t.wheatType||'') + '"></div>';
-        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم إذن الصرف</label><input type="text" id="eq_order_no" class="inp" list="dl_orders" value="' + (t.orderNo||'') + '"></div>';
       } else if (t.grainType === 'محلي') {
         fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">درجة القمح</label><input type="text" id="eq_grade" class="inp" value="' + (t.grade||'') + '"></div>';
       }
+      
+      var ordersDb = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+      var oData = t.orderNo ? (ordersDb[t.orderNo] || {}) : {};
+      
+      fHtml += '<div style="grid-column: 1 / -1; background: rgba(33,150,243,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(33,150,243,0.3); margin-top: 10px;">';
+      fHtml += '<div style="margin-bottom:15px; font-weight:bold; color:#90caf9;"><i class="fa-solid fa-file-invoice"></i> بيانات إذن الصرف</div>';
+      fHtml += '<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">';
+      
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم إذن الصرف</label><input type="text" id="eq_order_no" class="inp" list="dl_orders" value="' + (t.orderNo||'') + '" onblur="if(this.value){var db=JSON.parse(localStorage.getItem(\'DISPENSE_ORDERS\')||\'{}\');var d=db[this.value];if(d){var _ex=document.getElementById(\'eq_order_expiry\');if(_ex)_ex.value=d.expiry||\'\';var _q=document.getElementById(\'eq_order_qty\');if(_q)_q.value=d.qty||\'\';var _b=document.getElementById(\'eq_order_bonus\');if(_b)_b.value=d.bonus||\'\';}}"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">تاريخ الانتهاء</label><input type="date" id="eq_order_expiry" class="inp" value="' + (oData.expiry||'') + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الكمية الأساسية (بالطن)</label><input type="number" id="eq_order_qty" class="inp" value="' + (oData.qty||'') + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">التعزيز بالطن (إن وُجد)</label><input type="number" id="eq_order_bonus" class="inp" value="' + (oData.bonus||'') + '"></div>';
+      
+      fHtml += '</div></div>';
     }
     
     // Additional weighbridge fields
@@ -632,7 +645,18 @@ function applyEditApproval() {
   if (wt) t.wheatType = wt.value.trim();
   if (sn) t.shipName = sn.value.trim();
   if (gd) t.grade = gd.value.trim();
-  if (on) t.orderNo = on.value.trim();
+  if (on) {
+    t.orderNo = on.value.trim();
+    if (t.orderNo) {
+      var ordersDb = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+      ordersDb[t.orderNo] = {
+        expiry: document.getElementById('eq_order_expiry') ? document.getElementById('eq_order_expiry').value : '',
+        qty: parseFloat(document.getElementById('eq_order_qty') ? document.getElementById('eq_order_qty').value : 0) || 0,
+        bonus: parseFloat(document.getElementById('eq_order_bonus') ? document.getElementById('eq_order_bonus').value : 0) || 0
+      };
+      localStorage.setItem('DISPENSE_ORDERS', JSON.stringify(ordersDb));
+    }
+  }
 
   if (gr && gr.value) { t.gross = parseFloat(gr.value); }
   if (ta && ta.value) { t.tare = parseFloat(ta.value); }
