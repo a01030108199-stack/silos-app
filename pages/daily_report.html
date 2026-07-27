@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>
+window.onerror = function(msg, url, line, col, err) {
+  alert('Error: ' + msg + '\\nLine: ' + line);
+};
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>البيان اليومي للصومعة — نظام إدارة الصوامع</title>
@@ -832,6 +838,9 @@ function loadReport() {
       });
     }
   }
+  
+  if (!data.ships) data.ships = [];
+  if (!data.localOut) data.localOut = [];
   
   currentData = data;
   // NEW AUTOMATION: Sync with Weighbridge Tickets
