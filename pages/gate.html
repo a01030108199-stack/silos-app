@@ -245,7 +245,7 @@
             </div>
             <div>
               <label>الجهة / المحل المنصرف *</label>
-              <input type="text" id="lo_dest" class="inp" placeholder="اسم الجهة">
+              <input type="text" id="lo_dest" class="inp" placeholder="اسم الجهة" list="dl_dest">
             </div>
             <div>
               <label>الدرجة (النوع)</label>
@@ -296,11 +296,11 @@
             </div>
             <div>
               <label>الجهة / المحل المنصرف *</label>
-              <input type="text" id="io_dest" class="inp" placeholder="اسم الجهة">
+              <input type="text" id="io_dest" class="inp" placeholder="اسم الجهة" list="dl_dest">
             </div>
             <div>
               <label>اسم الباخرة</label>
-              <input type="text" id="io_ship_name" class="inp" placeholder="اسم الباخرة">
+              <input type="text" id="io_ship_name" class="inp" placeholder="اسم الباخرة" list="dl_ships">
             </div>
             <div>
               <label>نوع القمح</label>
@@ -703,6 +703,15 @@
     document.getElementById('ii_tbody').innerHTML = hIi || noData;
     document.getElementById('lo_tbody').innerHTML = hLo || noData;
     document.getElementById('io_tbody').innerHTML = hIo || noData;
+
+    var uDest = [...new Set(tickets.map(function(x) { return x.destination; }).filter(Boolean))];
+    var uShips = [...new Set(tickets.map(function(x) { return x.shipName; }).filter(Boolean))];
+    if (document.getElementById('dl_dest')) {
+       document.getElementById('dl_dest').innerHTML = uDest.map(function(m) { return '<option value="' + m + '">'; }).join('');
+    }
+    if (document.getElementById('dl_ships')) {
+       document.getElementById('dl_ships').innerHTML = uShips.map(function(s) { return '<option value="' + s + '">'; }).join('');
+    }
   }
 
   renderGateTables();
