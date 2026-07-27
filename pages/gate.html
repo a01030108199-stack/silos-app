@@ -70,8 +70,9 @@
                 <option value="22.5">22.5 قيراط</option>
               </select>
             </div>
-            <div style="display:flex; align-items:flex-end;">
-              <button class="btn btn-primary w-100" onclick="registerGateIn('محلي', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+            <div style="display:flex; align-items:flex-end; gap:10px;">
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-in')"><i class="fa-solid fa-eraser"></i> مسح</button>
+              <button class="btn btn-primary" style="flex:3" onclick="registerGateIn('محلي', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -107,7 +108,7 @@
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
               </select>
             </div>
-            <div><label>الكمية المشحونة (طن) *</label><input type="number" id="ii_shipped" class="inp" placeholder="المسجل بالبوليصة"></div>
+            <div><label>رقم كارتة المشحون *</label><input type="text" id="ii_ticket_num" class="inp" placeholder="رقم بوليصة الشحن"></div>
             <div><label>تاريخ الشحن *</label><input type="date" id="ii_ship_date" class="inp"></div>
             <div><label>الشركة الناقلة *</label>
               <input type="text" id="ii_transport" class="inp" placeholder="اسم الشركة" list="transport_companies_list">
@@ -118,8 +119,9 @@
                 <option value="المصرية للنقل البري"></option>
               </datalist>
             </div>
-            <div style="display:flex; align-items:flex-end;">
-              <button class="btn btn-primary w-100" onclick="registerGateIn('مستورد', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+            <div style="display:flex; align-items:flex-end; gap:10px;">
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-in')"><i class="fa-solid fa-eraser"></i> مسح</button>
+              <button class="btn btn-primary" style="flex:3" onclick="registerGateIn('مستورد', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -127,7 +129,7 @@
             <input type="date" id="ii_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الشركة الناقلة</th><th>الميناء</th><th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>المشحون</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>العجز (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الشركة الناقلة</th><th>الميناء</th><th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>رقم الكارتة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>العجز (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
             <tbody id="ii_tbody"></tbody>
           </table></div>
         </div>
@@ -146,8 +148,9 @@
                 <option value="23.5">23.5 قيراط</option><option value="23">23 قيراط</option><option value="22.5">22.5 قيراط</option>
               </select>
             </div>
-            <div style="display:flex; align-items:flex-end;">
-              <button class="btn btn-warning w-100" style="color:#000" onclick="registerGateIn('محلي', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
+            <div style="display:flex; align-items:flex-end; gap:10px;">
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-out')"><i class="fa-solid fa-eraser"></i> مسح</button>
+              <button class="btn btn-warning" style="flex:3; color:#000" onclick="registerGateIn('محلي', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -175,8 +178,9 @@
                 <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
               </select>
             </div>
-            <div style="display:flex; align-items:flex-end;">
-              <button class="btn btn-warning w-100" style="color:#000" onclick="registerGateIn('مستورد', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
+            <div style="display:flex; align-items:flex-end; gap:10px;">
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-out')"><i class="fa-solid fa-eraser"></i> مسح</button>
+              <button class="btn btn-warning" style="flex:3; color:#000" onclick="registerGateIn('مستورد', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -240,10 +244,10 @@
       driver = document.getElementById('ii_driver').value.trim();
       supplier = document.getElementById('ii_supplier').value.trim();
       wheatType = document.getElementById('ii_wheat').value;
-      shippedWeight = document.getElementById('ii_shipped').value.trim();
+      let ticketNum = document.getElementById('ii_ticket_num').value.trim();
       let shipDate = document.getElementById('ii_ship_date').value;
       let transport = document.getElementById('ii_transport').value.trim();
-      if(!plate || !driver || !supplier || !shippedWeight || !shipDate || !transport) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      if(!plate || !driver || !supplier || !ticketNum || !shipDate || !transport) return showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
       
     } else if (opType === 'صرف' && grainType === 'محلي') {
       plate = document.getElementById('lo_plate').value.trim();
@@ -277,11 +281,12 @@
     };
     if (opType === 'وارد' && grainType === 'مستورد') {
       t.shippingDate = document.getElementById('ii_ship_date').value;
+      t.ticketNum = document.getElementById('ii_ticket_num').value;
     }
 
     if (opType === 'وارد') {
       if (grainType === 'مستورد') {
-        t.supplierName = supplier; t.wheatType = wheatType; t.shippedWeight = parseFloat(shippedWeight); t.transportCompany = document.getElementById('ii_transport').value.trim();
+        t.supplierName = supplier; t.wheatType = wheatType; t.transportCompany = document.getElementById('ii_transport').value.trim();
       } else {
         t.supplierName = supplier; t.grade = grade;
       }
@@ -299,12 +304,6 @@
     localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
     
     showToast('تم تسجيل دخول السيارة بنجاح وتوجيهها للميزان', 'success');
-    
-    // Clear inputs
-    ['li_plate','li_driver','li_supplier','ii_plate','ii_driver','ii_supplier','ii_shipped',
-     'lo_plate','lo_driver','lo_dest','io_plate','io_driver','io_dest','io_supplier']
-      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-    
     renderGateTables();
   }
 
@@ -318,18 +317,6 @@
         }
         
         let t = tickets[idx];
-        if (t.opType === 'وارد' && t.grainType === 'مستورد' && t.shippedWeight > 0 && t.net > 0) {
-          let netTons = t.net / 1000;
-          if (netTons > t.shippedWeight) {
-            let diff = (netTons - t.shippedWeight).toFixed(3);
-            return showConfirm(`<span style="color:#ef4444; font-weight:bold; font-size:1.3rem;">تحذير: يوجد عجز فعلي (المستلم أكبر من المشحون بـ ${diff} طن). هل تم تسوية العجز وتأكيد خروج السيارة؟</span>`, () => {
-              tickets[idx].status = 'gate_out';
-              tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
-              localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
-              showToast('تم إثبات خروج السيارة بسلام', 'success');
-              renderGateTables();
-            });
-          }
         }
 
         tickets[idx].status = 'gate_out'; 
@@ -356,58 +343,159 @@
 
       let statBadge = '';
       let actionBtn = '';
+      let rowStyle = '';
+
       if (t.status === 'gate_in') {
         statBadge = `<span class="badge badge-warning">تنتظر الميزان (${t.opType==='صرف'?'فارغ':'قائم'})</span>`;
       } else if (t.status === 'pending') {
         statBadge = `<span class="badge badge-info">تنتظر الميزان (${t.opType==='صرف'?'قائم':'فارغ'})</span>`;
       } else if (t.status === 'completed') {
         statBadge = '<span class="badge badge-success">تم الوزن - جاهزة للخروج</span>';
-        actionBtn = `<button class="btn btn-primary btn-sm" onclick="registerGateOut('${t.id}')">تسجيل خروج</button>`;
+        actionBtn = `<button class="btn btn-primary btn-sm mb-1" onclick="registerGateOut('${t.id}')">تسجيل خروج</button><br>`;
       } else if (t.status === 'gate_out') {
         statBadge = '<span class="badge" style="background:var(--bg-dark);color:var(--text-sec)">غادرت البوابة</span>';
         actionBtn = `<span style="font-size:0.8rem;color:var(--text-sec)">${t.exitTimestamp}</span>`;
+      } else if (t.status === 'pending_delete') {
+        statBadge = '<span class="badge badge-warning">تنتظر الموافقة (شطب)</span>';
+      } else if (t.status === 'pending_edit') {
+        statBadge = '<span class="badge badge-warning">تنتظر الموافقة (تعديل)</span>';
+      } else if (t.status === 'stricken') {
+        rowStyle = 'text-decoration: line-through; opacity: 0.6;';
+        statBadge = '<span class="badge badge-danger">مشطوبة</span>';
       }
 
-      // Check dates (fallback to timestamp year parsing if dateStr missing)
+      // Action buttons for gate_in and completed
+      if (t.status === 'gate_in' || t.status === 'completed') {
+        actionBtn += `
+          <button class="btn btn-outline btn-sm mb-1" style="color:var(--warning);border-color:var(--warning);" onclick="openRequestModal('edit', '${t.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="openRequestModal('delete', '${t.id}')"><i class="fa-solid fa-strikethrough"></i> شطب</button>
+        `;
+      } else if (t.status === 'pending_delete' || t.status === 'pending_edit' || t.status === 'stricken') {
+        actionBtn = '-';
+      }
+
+      // Check dates
       const tD = t.dateStr || t.timestamp.split(',')[0].trim();
       const nGross = t.gross ? (t.gross/1000).toFixed(3) : '-';
       const nTare = t.tare ? (t.tare/1000).toFixed(3) : '-';
       const nNet = t.net ? (t.net/1000).toFixed(3) : '-';
 
       if (t.opType === 'وارد' && t.grainType === 'محلي' && (tD === dLi || (!t.dateStr && t.timestamp.includes(dLi.split('-')[0])))) {
-        hLi += `<tr><td>${cLi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hLi += `<tr style="${rowStyle}"><td>${cLi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'وارد' && t.grainType === 'مستورد' && (tD === dIi || (!t.dateStr && t.timestamp.includes(dIi.split('-')[0])))) {
-        const shippedStr = t.shippedWeight ? t.shippedWeight.toFixed(3) : '-';
-        let deficit = 0, defClass = '';
-        let netTons = t.net ? (t.net / 1000) : 0;
-        if (netTons > 0 && t.shippedWeight > 0) {
-          deficit = t.shippedWeight - netTons;
-          if (deficit > 0) {
-            defClass = 'text-success fw-bold'; 
-            defStr = deficit.toFixed(3) + ' (مسموح)';
-          } else if (deficit < 0) {
-            defClass = 'deficit-alert';
-            defStr = 'عجز: ' + Math.abs(deficit).toFixed(3);
-          }
-        }
+        const ticketNumStr = t.ticketNum || '-';
+        let defStr = '-';
         const sDate = t.shippingDate || '-';
-        if (netTons === 0) defStr = '-';
-        hIi += `<tr><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.transportCompany||''}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td>${sDate}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${shippedStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td class="${defClass}">${defStr}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hIi += `<tr style="${rowStyle}"><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.transportCompany||''}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td>${sDate}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${ticketNumStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${defStr}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {
-        hLo += `<tr><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hLo += `<tr style="${rowStyle}"><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
       }
       else if (t.opType === 'صرف' && t.grainType === 'مستورد' && (tD === dIo || (!t.dateStr && t.timestamp.includes(dIo.split('-')[0])))) {
-        hIo += `<tr><td>${cIo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.supplierName||''} / ${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td>${actionBtn}</td></tr>`;
+        hIo += `<tr style="${rowStyle}"><td>${cIo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.supplierName||''} / ${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
       }
     });
 
-    const noData = '<tr><td colspan="11" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
+    const noData = '<tr><td colspan="15" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
     document.getElementById('li_tbody').innerHTML = hLi || noData;
     document.getElementById('ii_tbody').innerHTML = hIi || noData;
     document.getElementById('lo_tbody').innerHTML = hLo || noData;
     document.getElementById('io_tbody').innerHTML = hIo || noData;
+  }
+
+  function clearForm(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    const inputs = panel.querySelectorAll('input, select');
+    inputs.forEach(inp => {
+      if (inp.type === 'text' || inp.type === 'number' || inp.type === 'date') {
+        inp.value = '';
+      }
+    });
+    showToast('تم مسح الحقول بنجاح', 'success');
+  }
+
+  function openRequestModal(type, ticketId) {
+    window.currentRequestType = type;
+    window.currentRequestTicketId = ticketId;
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    const t = tickets.find(x => x.id === ticketId);
+    if (!t) return;
+    
+    let content = '';
+    if (type === 'delete') {
+      content = `
+        <div class="mb-3" style="color:var(--danger)">
+          هل أنت متأكد من طلب شطب السيارة رقم (<b>${t.plate}</b>)؟<br>
+          سيتم تعليق السيارة لحين موافقة المدير.
+        </div>
+      `;
+    } else if (type === 'edit') {
+      content = `
+        <div class="mb-3">
+          طلب تعديل بيانات السيارة رقم (<b>${t.plate}</b>).
+        </div>
+        <div class="form-group mb-3">
+          <label>التعديلات المطلوبة بوضوح *</label>
+          <textarea id="edit_requested_changes" class="form-control" rows="3" placeholder="مثال: تعديل رقم السيارة من 1234 إلى 4321"></textarea>
+        </div>
+      `;
+    }
+    
+    content += `
+      <div class="form-group mb-3">
+        <label>سبب ${type === 'edit' ? 'التعديل' : 'الشطب'} (يظهر للمدير) *</label>
+        <input type="text" id="request_reason" class="form-control" placeholder="اكتب السبب بوضوح...">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeModal('requestModal')">إلغاء</button>
+        <button class="btn btn-primary" onclick="submitRequest()">إرسال الطلب للمدير</button>
+      </div>
+    `;
+    
+    showModal('requestModal', `طلب ${type === 'edit' ? 'تعديل' : 'شطب'} بيانات سيارة`, content);
+  }
+
+  function submitRequest() {
+    const reason = document.getElementById('request_reason').value.trim();
+    if (!reason) return showToast('يرجى إدخال السبب', 'error');
+    
+    const type = window.currentRequestType;
+    const tId = window.currentRequestTicketId;
+    
+    let editDesc = '';
+    if (type === 'edit') {
+      editDesc = document.getElementById('edit_requested_changes').value.trim();
+      if (!editDesc) return showToast('يرجى إدخال التعديلات المطلوبة', 'error');
+    }
+    
+    let tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    const idx = tickets.findIndex(x => x.id === tId);
+    if (idx > -1) {
+      tickets[idx].status = (type === 'edit') ? 'pending_edit' : 'pending_delete';
+      
+      let approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
+      approvals.push({
+        id: 'REQ-' + Math.floor(Math.random() * 10000),
+        ticketId: tId,
+        type: type,
+        silo_id: user.silo_id,
+        plate: tickets[idx].plate,
+        opType: tickets[idx].opType,
+        grainType: tickets[idx].grainType,
+        requestedBy: user.name,
+        reason: reason,
+        editDesc: editDesc,
+        timestamp: new Date().toLocaleString('ar-EG'),
+        status: 'pending'
+      });
+      localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
+      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+      renderGateTables();
+      closeModal('requestModal');
+      showToast('تم إرسال الطلب بنجاح وهو قيد مراجعة مدير الصومعة', 'success');
+    }
   }
 
   renderGateTables();

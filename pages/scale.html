@@ -176,9 +176,14 @@
             </select>
           </div>
 
+          <div class="form-group-inner" id="div_ship_name" style="display:none;">
+            <label>اسم الباخرة *</label>
+            <input type="text" class="form-control" id="s_ship_name" placeholder="مثال: وادي النيل">
+          </div>
+
           <div class="form-group-inner" id="div_shipped_weight" style="display:none;">
             <label>الكمية المشحونة بالبوليصة (طن) *</label>
-            <input type="text" class="form-control" id="s_shipped_weight" readonly style="background: rgba(255,255,255,0.05); color: #fff; cursor: not-allowed;" title="مسجلة تلقائياً من البوابة">
+            <input type="number" class="form-control" id="s_shipped_weight" placeholder="مثال: 55.400">
           </div>
 
           <!-- Dynamic: Destination (For Outgoing) -->
@@ -362,6 +367,7 @@ function toggleDynamicFields() {
   document.getElementById('div_sacks_count').style.display = 'none';
 
   document.getElementById('div_wheat_type').style.display = 'none';
+  document.getElementById('div_ship_name').style.display = 'none';
   document.getElementById('div_shipped_weight').style.display = 'none';
   document.getElementById('div_destination').style.display = 'none';
   if (document.getElementById('div_order_no')) document.getElementById('div_order_no').style.display = 'none';
@@ -375,6 +381,7 @@ function toggleDynamicFields() {
   if (opType === 'وارد') {
     if (grainType === 'مستورد') {
       document.getElementById('div_wheat_type').style.display = 'block';
+      document.getElementById('div_ship_name').style.display = 'block';
       document.getElementById('div_shipped_weight').style.display = 'block';
     } else {
       // Local Incoming
@@ -792,7 +799,9 @@ function saveFirstWeight() {
     gross,
     tare,
     net: 0,
-    deduction
+    deduction,
+    shippedWeight: parseFloat(document.getElementById('s_shipped_weight').value) || 0,
+    shipName: document.getElementById('s_ship_name').value.trim()
   };
 
   const tickets = getTickets();
@@ -817,6 +826,8 @@ function saveFirstWeight() {
       ticketToSave.gross = gross;
       ticketToSave.tare = tare;
       ticketToSave.deduction = deduction;
+      ticketToSave.shippedWeight = parseFloat(document.getElementById('s_shipped_weight').value) || 0;
+      ticketToSave.shipName = document.getElementById('s_ship_name').value.trim();
       ticketToSave.status = 'pending';
     }
   }
@@ -905,6 +916,8 @@ function loadGateTicket(id) {
   if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
   if (t.destination) document.getElementById('s_destination').value = t.destination;
   if (t.shippedWeight && document.getElementById('s_shipped_weight')) document.getElementById('s_shipped_weight').value = t.shippedWeight;
+  if (t.shipName && document.getElementById('s_ship_name')) document.getElementById('s_ship_name').value = t.shipName;
+  if (t.cellNum && document.getElementById('s_cell')) document.getElementById('s_cell').value = t.cellNum;
   
   toggleDynamicFields();
   
@@ -961,6 +974,9 @@ function saveSecondWeight() {
   tickets[idx].tare = tare;
   tickets[idx].net = net;
   tickets[idx].deduction = deduction;
+  tickets[idx].shippedWeight = parseFloat(document.getElementById('s_shipped_weight').value) || tickets[idx].shippedWeight;
+  tickets[idx].shipName = document.getElementById('s_ship_name').value.trim() || tickets[idx].shipName;
+  tickets[idx].cell = document.getElementById('s_cell').value || tickets[idx].cell;
   tickets[idx].status = 'completed';
   tickets[idx].timestamp2 = new Date().toLocaleString('ar-EG');
 
@@ -1091,6 +1107,9 @@ function renderTable() {
   if (filterDate && filterDate.value) {
     tickets = tickets.filter(t => t.dateStr === filterDate.value);
   }
+  
+  // Exclude tickets pending manager approval or stricken
+  tickets = tickets.filter(t => !['pending_delete', 'pending_edit', 'stricken'].includes(t.status));
 
   if (tickets.length === 0) {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px;">لا توجد كارتات مسجلة في هذا التاريخ</td></tr>';

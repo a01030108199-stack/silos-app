@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -150,6 +150,30 @@
               </tr>
             </thead>
             <tbody id="maintBody"></tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+
+      <!-- Approvals Section -->
+      <div class="row mt-4">
+        <div class="card w-100 border-warning">
+          <div class="card-header border-warning" style="background: rgba(245,158,11,0.1);">
+            <div class="card-title text-warning"><i class="fa-solid fa-code-pull-request"></i> طلبات التعديل والشطب المعلقة</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>رقم الطلب</th>
+                <th>رقم السيارة</th>
+                <th>نوع الطلب</th>
+                <th>مقدم الطلب</th>
+                <th>السبب / التفاصيل</th>
+                <th>الوقت</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="approvalsBody"></tbody>
           </table>
         </div>
       </div>
@@ -410,7 +434,98 @@ if (openMaint.length === 0) {
 function scrollToAlerts() {
   document.getElementById('alertsSection').scrollIntoView({behavior:'smooth'});
 }
+
+// --- Security Alert & Maintenance Handlers ---
+
+// --- Approvals Logic ---
+function loadApprovals() {
+  const approvalsBody = document.getElementById('approvalsBody');
+  if (!approvalsBody) return;
+  
+  let approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
+  approvals = approvals.filter(a => a.status === 'pending');
+  
+  if (!isGeneral) {
+    approvals = approvals.filter(a => a.silo_id === user.silo_id);
+  }
+  
+  if (approvals.length === 0) {
+    approvalsBody.innerHTML = '<tr><td colspan="7" class="text-center p-3 text-muted">لا توجد طلبات معلقة</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  approvals.forEach(a => {
+    const typeLabel = a.type === 'delete' 
+      ? '<span class="badge badge-danger">شطب</span>' 
+      : '<span class="badge badge-warning">تعديل</span>';
+      
+    const details = a.type === 'edit' 
+      ? `<b>السبب:</b> ${a.reason}<br><b>التعديلات:</b> ${a.editDesc}`
+      : `<b>السبب:</b> ${a.reason}`;
+      
+    html += `
+      <tr>
+        <td class="text-info fw-bold">${a.id}</td>
+        <td class="fw-bold">${a.plate} <span class="badge badge-info" style="font-size:0.7rem">${a.opType} ${a.grainType}</span></td>
+        <td>${typeLabel}</td>
+        <td>${a.requestedBy}</td>
+        <td style="font-size:0.85rem">${details}</td>
+        <td style="font-size:0.85rem">${a.timestamp}</td>
+        <td>
+          <button class="btn btn-sm btn-success mb-1" onclick="handleApproval('${a.id}', true)"><i class="fa-solid fa-check"></i> موافقة</button>
+          <button class="btn btn-sm btn-danger" onclick="handleApproval('${a.id}', false)"><i class="fa-solid fa-xmark"></i> رفض</button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  approvalsBody.innerHTML = html;
+}
+
+function handleApproval(reqId, isApproved) {
+  let approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
+  const idx = approvals.findIndex(a => a.id === reqId);
+  if (idx === -1) return;
+  
+  const req = approvals[idx];
+  
+  // Update tickets logic
+  let tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  const tIdx = tickets.findIndex(t => t.id === req.ticketId);
+  
+  if (tIdx > -1) {
+    if (isApproved) {
+      if (req.type === 'delete') {
+        tickets[tIdx].status = 'stricken'; // effectively removed from gate/scale views entirely
+        tickets[tIdx].strikeReason = req.reason;
+        tickets[tIdx].strickenAt = new Date().toLocaleString('ar-EG');
+        tickets[tIdx].strickenBy = user.name;
+        showToast('تم الموافقة على الشطب بنجاح', 'success');
+      } else {
+        // Edit logic would require a more complex UI for the manager to actually apply the edits, 
+        // or just mark it as 'edit_approved' and let the user re-submit. 
+        // For simplicity, we'll revert to gate_in/completed and log the approval.
+        tickets[tIdx].status = tickets[tIdx].net > 0 ? 'completed' : 'gate_in'; 
+        showToast('تم الموافقة على التعديل (يجب إشعار المستخدم بتنفيذه يدوياً)', 'success');
+      }
+    } else {
+      // Revert status
+      tickets[tIdx].status = tickets[tIdx].net > 0 ? 'completed' : 'gate_in';
+      showToast('تم رفض الطلب وعادت السيارة لوضعها الطبيعي', 'info');
+    }
+    localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  }
+  
+  req.status = isApproved ? 'approved' : 'rejected';
+  req.resolvedAt = new Date().toLocaleString('ar-EG');
+  req.resolvedBy = user.name;
+  localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
+  
+  loadApprovals();
+}
+
+loadApprovals();
 </script>
 </body>
 </html>
-
