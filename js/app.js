@@ -121,60 +121,55 @@ function buildSidebar(activePage) {
   }
 
   // filter counts by silo if not general admin
-  const siloAlerts = isGeneral ? SECURITY : SECURITY.filter(s => s.silo_id === user.silo_id);
-  const siloMaint  = isGeneral ? MAINTENANCE : MAINTENANCE.filter(m => m.silo_id === user.silo_id);
+  var _SEC   = (typeof SECURITY    !== 'undefined') ? SECURITY    : [];
+  var _MAINT = (typeof MAINTENANCE !== 'undefined') ? MAINTENANCE : [];
+  var siloAlerts = isGeneral ? _SEC   : _SEC.filter(function(s)   { return s.silo_id === user.silo_id; });
+  var siloMaint  = isGeneral ? _MAINT : _MAINT.filter(function(m) { return m.silo_id === user.silo_id; });
 
-  const alerts = siloAlerts.filter(s => s.status !== 'resolved').length;
-  const maintenance = siloMaint.filter(m => m.status === 'pending').length;
+  var alerts      = siloAlerts.filter(function(s) { return s.status !== 'resolved'; }).length;
+  var maintenance = siloMaint.filter(function(m)  { return m.status === 'pending';  }).length;
 
-  const items = navItems.map(n => {
-    let badge = '';
-    if (n.page === 'security' && alerts > 0) badge = `<span class="nav-badge">${alerts}</span>`;
-    if (n.page === 'maintenance' && maintenance > 0) badge = `<span class="nav-badge warn">${maintenance}</span>`;
-    const active = n.page === activePage ? 'active' : '';
-    const href = `${n.page === 'dashboard' ? '' : n.page + '.html'}`;
-    return `
-      <a href="${href || 'dashboard.html'}" class="nav-item ${active}" id="nav-${n.page}">
-        <i class="fa-solid ${n.icon}"></i>
-        ${n.label}
-        ${badge}
-      </a>`;
+  var items = navItems.map(function(n) {
+    var badge = '';
+    if (n.page === 'security'    && alerts      > 0) badge = '<span class="nav-badge">'      + alerts      + '</span>';
+    if (n.page === 'maintenance' && maintenance > 0) badge = '<span class="nav-badge warn">' + maintenance + '</span>';
+    var active = n.page === activePage ? 'active' : '';
+    var href   = n.page === 'dashboard' ? 'dashboard.html' : (n.page + '.html');
+    return '<a href="' + href + '" class="nav-item ' + active + '" id="nav-' + n.page + '">' +
+      '<i class="fa-solid ' + n.icon + '"></i> ' + n.label + ' ' + badge +
+    '</a>';
   }).join('');
 
-  const siloInfo = user.silo_id !== undefined ? SILOS.find(s => s.id === user.silo_id) : null;
-  const subTitle = isGeneral ? 'الإدارة العامة' : (siloInfo ? siloInfo.name : '');
+  var siloInfo = (user.silo_id !== undefined && typeof SILOS !== 'undefined') ? SILOS.find(function(s) { return s.id === user.silo_id; }) : null;
+  var subTitle = isGeneral ? 'الإدارة العامة' : (siloInfo ? siloInfo.name : '');
 
-  const portalBtn = (!isGeneral && role !== 'silo') 
-    ? `<button class="btn-logout" onclick="Auth.returnToPortal()" style="background:#475569; margin-bottom:10px">
-        <i class="fa-solid fa-arrow-right"></i> عودة للأقسام
-       </button>` 
+  var portalBtn = (!isGeneral && role !== 'silo')
+    ? '<button class="btn-logout" onclick="Auth.returnToPortal()" style="background:#475569;margin-bottom:10px"><i class="fa-solid fa-arrow-right"></i> عودة للأقسام</button>'
     : '';
 
-  document.getElementById('app-sidebar').innerHTML = `
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">🏭</div>
-      <div class="sidebar-logo-text">
-        <div class="title">الشركة المصرية القابضة</div>
-        <div class="sub">للصوامع والتخزين</div>
-      </div>
-    </div>
-    <div class="sidebar-user">
-      <div class="user-avatar"><i class="fa-solid fa-user" style="font-size:13px"></i></div>
-      <div class="user-info">
-        <div class="name">${user.name}</div>
-        <div class="role">${subTitle}</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">أقسام النظام</div>
-      ${items}
-    </nav>
-    <div class="sidebar-footer">
-      ${portalBtn}
-      <button class="btn-logout" onclick="Auth.logout()">
-        <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
-      </button>
-    </div>`;
+  document.getElementById('app-sidebar').innerHTML =
+    '<div class="sidebar-logo">' +
+      '<div class="sidebar-logo-icon">🏭</div>' +
+      '<div class="sidebar-logo-text">' +
+        '<div class="title">الشركة المصرية القابضة</div>' +
+        '<div class="sub">للصوامع والتخزين</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sidebar-user">' +
+      '<div class="user-avatar"><i class="fa-solid fa-user" style="font-size:13px"></i></div>' +
+      '<div class="user-info">' +
+        '<div class="name">' + user.name + '</div>' +
+        '<div class="role">' + subTitle + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<nav class="sidebar-nav">' +
+      '<div class="nav-section">أقسام النظام</div>' +
+      items +
+    '</nav>' +
+    '<div class="sidebar-footer">' +
+      portalBtn +
+      '<button class="btn-logout" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>' +
+    '</div>';
 }
 
 // ── Utilities ────────────────────────────────────────────────
@@ -248,7 +243,8 @@ function now() {
 }
 
 // ── Toast Notification ───────────────────────────────────────
-function showToast(msg, type = 'success') {
+function showToast(msg, type) {
+  if (!type) type = 'success';
   const colors = { success: '#22c55e', error: '#ef4444', warning: '#f59e0b', info: '#06b6d4' };
   const icons  = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
   const t = document.createElement('div');
@@ -308,19 +304,41 @@ function initClock(el) {
 }
 
 // ── Number counter animation ─────────────────────────────────
-function animateCount(el, target, suffix = '') {
-  const dur = 1200, steps = 40, inc = target / steps;
-  let cur = 0, i = 0;
-  const timer = setInterval(() => {
+function animateCount(el, target, suffix) {
+  if (!suffix) suffix = '';
+  var dur = 1200, steps = 40, inc = target / steps;
+  var cur = 0, i = 0;
+  var timer = setInterval(function() {
     i++; cur = Math.min(cur + inc, target);
     el.textContent = Math.round(cur).toLocaleString('en-US') + suffix;
     if (i >= steps) clearInterval(timer);
   }, dur / steps);
 }
 
-// ── Animated progress bars ───────────────────────────────────
+// -- Animated progress bars --
 function animateProgress() {
-  document.querySelectorAll('.progress-bar[data-width]').forEach(bar => {
-    setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 100);
-  });
+  var bars = document.querySelectorAll('.progress-bar[data-width]');
+  for (var k = 0; k < bars.length; k++) {
+    (function(bar) {
+      setTimeout(function() { bar.style.width = bar.dataset.width + '%'; }, 100);
+    })(bars[k]);
+  }
+}
+
+// ── Generic Modal ─────────────────────────────────────────────
+function showModal(id, title, content) {
+  closeModal(id); // remove if already open
+  var overlay = document.createElement('div');
+  overlay.id = 'modal-overlay-' + id;
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#1e293b;padding:24px;border-radius:12px;min-width:340px;max-width:520px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.5);border:1px solid #334155;font-family:Cairo,sans-serif;direction:rtl;';
+  box.innerHTML = '<div style="font-size:1.1rem;font-weight:bold;color:#fff;margin-bottom:16px;border-bottom:1px solid #334155;padding-bottom:12px;">' + title + '</div>' + content;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function closeModal(id) {
+  var el = document.getElementById('modal-overlay-' + id);
+  if (el) el.remove();
 }

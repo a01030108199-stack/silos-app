@@ -7,28 +7,58 @@
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-  .gate-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; flex-wrap: wrap; }
-  .gate-tab { padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; background: rgba(255,255,255,0.05); color: var(--text-sec); border: 1px solid var(--border); transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
-  .gate-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-  
-  /* Color coding tabs */
-  .gate-tab[data-tab="local-in"].active { background: #3b82f6; border-color: #3b82f6; }
-  .gate-tab[data-tab="import-in"].active { background: #06b6d4; border-color: #06b6d4; }
-  .gate-tab[data-tab="local-out"].active { background: #f59e0b; border-color: #f59e0b; }
-  .gate-tab[data-tab="import-out"].active { background: #eab308; border-color: #eab308; }
+  .gate-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .gate-tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-sec);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .gate-tab:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .gate-tab[data-tab="local-in"].active  { background: #3b82f6; color:#fff; border-color:#3b82f6; }
+  .gate-tab[data-tab="import-in"].active { background: #06b6d4; color:#fff; border-color:#06b6d4; }
+  .gate-tab[data-tab="local-out"].active { background: #f59e0b; color:#000; border-color:#f59e0b; }
+  .gate-tab[data-tab="import-out"].active{ background: #eab308; color:#000; border-color:#eab308; }
 
   .gate-panel { display: none; }
   .gate-panel.active { display: block; }
-  
-  .entry-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+
+  .entry-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .entry-form label { display:block; font-size:0.82rem; color:var(--text-sec); margin-bottom:4px; }
   .deficit-alert { color: #ef4444; font-weight: bold; }
-  
+  .stricken-row { opacity:0.5; text-decoration: line-through; }
+  .pending-row  { opacity:0.7; background: rgba(234,179,8,0.08) !important; }
+
   @media print {
     .gate-tabs, .entry-form, .card-header { display: none !important; }
     .data-table th:last-child, .data-table td:last-child { display: none !important; }
-    .card { border: none !important; background: transparent !important; box-shadow: none !important; }
-    body, .main-content { background: #fff !important; }
-    input[type="date"] { border: none; background: transparent; appearance: none; color: #000; font-weight: bold; }
+    .card { border:none!important; background:transparent!important; box-shadow:none!important; }
+    body, .main-content { background:#fff!important; }
+    input[type="date"] { border:none; background:transparent; appearance:none; color:#000; font-weight:bold; }
   }
 </style>
 </head>
@@ -43,36 +73,64 @@
       </div>
       <div class="header-actions">
         <div class="header-date" id="clockEl"></div>
-        <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الدفتر</button>
+        <button class="btn btn-outline" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> طباعة الدفتر
+        </button>
       </div>
     </header>
 
     <div class="page-content">
+
+      <!-- Tabs -->
       <div class="gate-tabs">
-        <div class="gate-tab active" data-tab="local-in" onclick="switchTab('local-in')"><i class="fa-solid fa-arrow-down"></i> وارد محلي</div>
-        <div class="gate-tab" data-tab="import-in" onclick="switchTab('import-in')"><i class="fa-solid fa-ship"></i> وارد مستورد</div>
-        <div class="gate-tab" data-tab="local-out" onclick="switchTab('local-out')"><i class="fa-solid fa-arrow-up"></i> صرف محلي</div>
-        <div class="gate-tab" data-tab="import-out" onclick="switchTab('import-out')"><i class="fa-solid fa-truck-fast"></i> صرف مستورد</div>
+        <div class="gate-tab active" data-tab="local-in" onclick="switchTab('local-in')">
+          <i class="fa-solid fa-arrow-down"></i> وارد محلي
+        </div>
+        <div class="gate-tab" data-tab="import-in" onclick="switchTab('import-in')">
+          <i class="fa-solid fa-ship"></i> وارد مستورد
+        </div>
+        <div class="gate-tab" data-tab="local-out" onclick="switchTab('local-out')">
+          <i class="fa-solid fa-arrow-up"></i> صرف محلي
+        </div>
+        <div class="gate-tab" data-tab="import-out" onclick="switchTab('import-out')">
+          <i class="fa-solid fa-truck"></i> صرف مستورد
+        </div>
       </div>
 
       <!-- 1) Local Incoming -->
       <div id="panel-local-in" class="gate-panel active">
         <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - وارد محلي</div></div>
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - وارد محلي</div>
+          </div>
           <div class="entry-form">
-            <div><label>رقم السيارة *</label><input type="text" id="li_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
-            <div><label>اسم السائق *</label><input type="text" id="li_driver" class="inp" placeholder="الاسم الثلاثي"></div>
-            <div><label>جهة الوارد *</label><input type="text" id="li_supplier" class="inp" placeholder="الجمعية أو المورد"></div>
-            <div><label>الدرجة (النوع)</label>
+            <div>
+              <label>رقم السيارة *</label>
+              <input type="text" id="li_plate" class="inp" placeholder="مثال: د ج ص 1234">
+            </div>
+            <div>
+              <label>اسم السائق *</label>
+              <input type="text" id="li_driver" class="inp" placeholder="الاسم الثلاثي">
+            </div>
+            <div>
+              <label>جهة الوارد *</label>
+              <input type="text" id="li_supplier" class="inp" placeholder="المحافظة أو المورد">
+            </div>
+            <div>
+              <label>الدرجة (النوع)</label>
               <select id="li_grade" class="inp">
                 <option value="23.5">23.5 قيراط</option>
-                <option value="23">23 قيراط</option>
-                <option value="22.5">22.5 قيراط</option>
+                <option value="24">24 قيراط</option>
+                <option value="22">22 قيراط</option>
               </select>
             </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
-              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-in')"><i class="fa-solid fa-eraser"></i> مسح</button>
-              <button class="btn btn-primary" style="flex:3" onclick="registerGateIn('محلي', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-in')">
+                <i class="fa-solid fa-eraser"></i> مسح
+              </button>
+              <button class="btn btn-primary" style="flex:3" onclick="registerGateIn('محلي','وارد')">
+                <i class="fa-solid fa-check"></i> تسجيل دخول
+              </button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -80,7 +138,11 @@
             <input type="date" id="li_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>جهة الوارد</th><th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr>
+              <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>جهة الوارد</th>
+              <th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
+            </tr></thead>
             <tbody id="li_tbody"></tbody>
           </table></div>
         </div>
@@ -89,11 +151,20 @@
       <!-- 2) Imported Incoming -->
       <div id="panel-import-in" class="gate-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - وارد مستورد</div></div>
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-ship"></i> دخول سيارة - وارد مستورد</div>
+          </div>
           <div class="entry-form">
-            <div><label>رقم السيارة *</label><input type="text" id="ii_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
-            <div><label>اسم السائق *</label><input type="text" id="ii_driver" class="inp" placeholder="الاسم الثلاثي"></div>
-            <div><label>الميناء الشاحن *</label>
+            <div>
+              <label>رقم السيارة *</label>
+              <input type="text" id="ii_plate" class="inp" placeholder="مثال: د ج ص 1234">
+            </div>
+            <div>
+              <label>اسم السائق *</label>
+              <input type="text" id="ii_driver" class="inp" placeholder="الاسم الثلاثي">
+            </div>
+            <div>
+              <label>الميناء الشاحن *</label>
               <input type="text" id="ii_supplier" class="inp" placeholder="اسم الميناء" list="ports_list">
               <datalist id="ports_list">
                 <option value="الاسكندرية"></option>
@@ -103,16 +174,29 @@
                 <option value="سفاجا"></option>
               </datalist>
             </div>
-            <div><label>نوع القمح</label>
+            <div>
+              <label>نوع القمح</label>
               <select id="ii_wheat" class="inp">
-                <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
+                <option value="روسي">روسي</option>
+                <option value="أوكراني">أوكراني</option>
+                <option value="روماني">روماني</option>
+                <option value="فرنسي">فرنسي</option>
+                <option value="أسترالي">أسترالي</option>
+                <option value="أمريكي">أمريكي</option>
               </select>
             </div>
-            <div><label>رقم كارتة المشحون *</label><input type="text" id="ii_ticket_num" class="inp" placeholder="رقم بوليصة الشحن"></div>
-            <div><label>تاريخ الشحن *</label><input type="date" id="ii_ship_date" class="inp"></div>
-            <div><label>الشركة الناقلة *</label>
-              <input type="text" id="ii_transport" class="inp" placeholder="اسم الشركة" list="transport_companies_list">
-              <datalist id="transport_companies_list">
+            <div>
+              <label>رقم كارتة المشحون *</label>
+              <input type="text" id="ii_ticket_num" class="inp" placeholder="رقم الكارتة">
+            </div>
+            <div>
+              <label>تاريخ الشحن *</label>
+              <input type="date" id="ii_ship_date" class="inp">
+            </div>
+            <div>
+              <label>الشركة الناقلة *</label>
+              <input type="text" id="ii_transport" class="inp" placeholder="اسم الشركة" list="transport_list">
+              <datalist id="transport_list">
                 <option value="الجمعية التعاونية لنقل البضائع"></option>
                 <option value="النيل للنقل"></option>
                 <option value="أمان للنقل"></option>
@@ -120,8 +204,12 @@
               </datalist>
             </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
-              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-in')"><i class="fa-solid fa-eraser"></i> مسح</button>
-              <button class="btn btn-primary" style="flex:3" onclick="registerGateIn('مستورد', 'وارد')"><i class="fa-solid fa-check"></i> تسجيل دخول</button>
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-in')">
+                <i class="fa-solid fa-eraser"></i> مسح
+              </button>
+              <button class="btn btn-primary" style="flex:3" onclick="registerGateIn('مستورد','وارد')">
+                <i class="fa-solid fa-check"></i> تسجيل دخول
+              </button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -129,7 +217,12 @@
             <input type="date" id="ii_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الشركة الناقلة</th><th>الميناء</th><th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>رقم الكارتة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>العجز (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr>
+              <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الشركة الناقلة</th><th>الميناء</th>
+              <th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>رقم الكارتة</th>
+              <th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th>
+              <th>حالة الميزان</th><th>إجراءات</th>
+            </tr></thead>
             <tbody id="ii_tbody"></tbody>
           </table></div>
         </div>
@@ -138,19 +231,37 @@
       <!-- 3) Local Outgoing -->
       <div id="panel-local-out" class="gate-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - صرف محلي</div></div>
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-arrow-right-from-bracket"></i> صرف سيارة - محلي</div>
+          </div>
           <div class="entry-form">
-            <div><label>رقم السيارة *</label><input type="text" id="lo_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
-            <div><label>اسم السائق *</label><input type="text" id="lo_driver" class="inp" placeholder="الاسم الثلاثي"></div>
-            <div><label>المطحن / جهة الصرف *</label><input type="text" id="lo_dest" class="inp" placeholder="اسم المطحن"></div>
-            <div><label>الدرجة المنصرفة</label>
+            <div>
+              <label>رقم السيارة *</label>
+              <input type="text" id="lo_plate" class="inp" placeholder="مثال: د ج ص 1234">
+            </div>
+            <div>
+              <label>اسم السائق *</label>
+              <input type="text" id="lo_driver" class="inp" placeholder="الاسم الثلاثي">
+            </div>
+            <div>
+              <label>الجهة / المحل المنصرف *</label>
+              <input type="text" id="lo_dest" class="inp" placeholder="اسم الجهة">
+            </div>
+            <div>
+              <label>الدرجة (النوع)</label>
               <select id="lo_grade" class="inp">
-                <option value="23.5">23.5 قيراط</option><option value="23">23 قيراط</option><option value="22.5">22.5 قيراط</option>
+                <option value="23.5">23.5 قيراط</option>
+                <option value="24">24 قيراط</option>
+                <option value="22">22 قيراط</option>
               </select>
             </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
-              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-out')"><i class="fa-solid fa-eraser"></i> مسح</button>
-              <button class="btn btn-warning" style="flex:3; color:#000" onclick="registerGateIn('محلي', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-out')">
+                <i class="fa-solid fa-eraser"></i> مسح
+              </button>
+              <button class="btn btn-warning" style="flex:3; color:#000" onclick="registerGateIn('محلي','صرف')">
+                <i class="fa-solid fa-check"></i> تسجيل صرف
+              </button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -158,7 +269,11 @@
             <input type="date" id="lo_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المطحن</th><th>الدرجة</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr>
+              <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الجهة المنصرف</th>
+              <th>الدرجة</th><th>وقت الدخول</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
+            </tr></thead>
             <tbody id="lo_tbody"></tbody>
           </table></div>
         </div>
@@ -167,20 +282,44 @@
       <!-- 4) Imported Outgoing -->
       <div id="panel-import-out" class="gate-panel">
         <div class="card">
-          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-right-to-bracket"></i> دخول سيارة - صرف مستورد</div></div>
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-truck"></i> صرف سيارة - مستورد</div>
+          </div>
           <div class="entry-form">
-            <div><label>رقم السيارة *</label><input type="text" id="io_plate" class="inp" placeholder="مثال: د ج ص 1234"></div>
-            <div><label>اسم السائق *</label><input type="text" id="io_driver" class="inp" placeholder="الاسم الثلاثي"></div>
-            <div><label>المطحن / جهة الصرف *</label><input type="text" id="io_dest" class="inp" placeholder="اسم المطحن"></div>
-            <div><label>من رصيد ميناء</label><input type="text" id="io_supplier" class="inp" placeholder="اسم الميناء"></div>
-            <div><label>نوع القمح</label>
+            <div>
+              <label>رقم السيارة *</label>
+              <input type="text" id="io_plate" class="inp" placeholder="مثال: د ج ص 1234">
+            </div>
+            <div>
+              <label>اسم السائق *</label>
+              <input type="text" id="io_driver" class="inp" placeholder="الاسم الثلاثي">
+            </div>
+            <div>
+              <label>الجهة / المحل المنصرف *</label>
+              <input type="text" id="io_dest" class="inp" placeholder="اسم الجهة">
+            </div>
+            <div>
+              <label>الميناء / المورد</label>
+              <input type="text" id="io_supplier" class="inp" placeholder="الميناء الأصلي">
+            </div>
+            <div>
+              <label>نوع القمح</label>
               <select id="io_wheat" class="inp">
-                <option value="روسي">روسي</option><option value="أوكراني">أوكراني</option><option value="روماني">روماني</option><option value="فرنسي">فرنسي</option><option value="أسترالي">أسترالي</option><option value="أمريكي">أمريكي</option>
+                <option value="روسي">روسي</option>
+                <option value="أوكراني">أوكراني</option>
+                <option value="روماني">روماني</option>
+                <option value="فرنسي">فرنسي</option>
+                <option value="أسترالي">أسترالي</option>
+                <option value="أمريكي">أمريكي</option>
               </select>
             </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
-              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-out')"><i class="fa-solid fa-eraser"></i> مسح</button>
-              <button class="btn btn-warning" style="flex:3; color:#000" onclick="registerGateIn('مستورد', 'صرف')"><i class="fa-solid fa-check"></i> تسجيل دخول للتحميل</button>
+              <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-out')">
+                <i class="fa-solid fa-eraser"></i> مسح
+              </button>
+              <button class="btn btn-warning" style="flex:3; color:#000" onclick="registerGateIn('مستورد','صرف')">
+                <i class="fa-solid fa-check"></i> تسجيل صرف
+              </button>
             </div>
           </div>
           <div class="table-header mt-4">
@@ -188,13 +327,17 @@
             <input type="date" id="io_date" class="inp inp-sm" style="width:150px" onchange="renderGateTables()">
           </div>
           <div style="overflow-x:auto"><table class="data-table">
-            <thead><tr><th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>المطحن</th><th>الميناء / النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th></tr></thead>
+            <thead><tr>
+              <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الجهة المنصرف</th>
+              <th>الميناء/النوع</th><th>وقت الدخول</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
+            </tr></thead>
             <tbody id="io_tbody"></tbody>
           </table></div>
         </div>
       </div>
 
-    </div>
+    </div><!-- /page-content -->
   </main>
 </div>
 
@@ -204,303 +347,335 @@
 <script src="../js/data.js"></script>
 <script src="../js/app.js"></script>
 <script>
-  const user = Auth.require(['security', 'manager', 'general_admin']);
+  var user = Auth.require(['security', 'manager', 'general_admin']);
   buildSidebar('gate');
   initClock(document.getElementById('clockEl'));
 
+  // Set today's date on all date filters
+  var tStr = new Date().toISOString().split('T')[0];
+  document.getElementById('li_date').value = tStr;
+  document.getElementById('ii_date').value = tStr;
+  document.getElementById('lo_date').value = tStr;
+  document.getElementById('io_date').value = tStr;
+
+  // ---- Tab switching ----
   function switchTab(tab) {
-    document.querySelectorAll('.gate-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.gate-panel').forEach(p => p.classList.remove('active'));
-    document.querySelector(`.gate-tab[data-tab="${tab}"]`).classList.add('active');
-    document.getElementById(`panel-${tab}`).classList.add('active');
+    var tabs   = document.querySelectorAll('.gate-tab');
+    var panels = document.querySelectorAll('.gate-panel');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.remove('active');
+      if (tabs[i].getAttribute('data-tab') === tab) tabs[i].classList.add('active');
+    }
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].classList.remove('active');
+      if (panels[j].id === 'panel-' + tab) panels[j].classList.add('active');
+    }
   }
 
-  // Set default dates
-  const today = new Date();
-  const tStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-  ['li_date', 'ii_date', 'lo_date', 'io_date'].forEach(id => {
-    document.getElementById(id).value = tStr;
-  });
-
+  // ---- ID Generator ----
   function generateTicketId() {
-    let lastId = parseInt(localStorage.getItem('LAST_TICKET_ID') || '1000');
-    lastId++;
-    localStorage.setItem('LAST_TICKET_ID', lastId.toString());
-    return 'CRT-' + lastId;
+    return 'T-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
   }
 
+  // ---- Clear form ----
+  function clearForm(panelId) {
+    var panel = document.getElementById(panelId);
+    if (!panel) return;
+    var inputs = panel.querySelectorAll('input');
+    for (var k = 0; k < inputs.length; k++) {
+      var inp = inputs[k];
+      if (inp.type === 'text' || inp.type === 'number') inp.value = '';
+    }
+    showToast('تم مسح الحقول بنجاح', 'success');
+  }
+
+  // ---- Register gate in ----
   function registerGateIn(grainType, opType) {
-    let plate, driver, supplier='', dest='', grade='', wheatType='', shippedWeight=0;
-    
+    var plate = '', driver = '', supplier = '', dest = '', grade = '', wheatType = '', ticketNum = '', shipDate = '', transport = '';
+
     if (opType === 'وارد' && grainType === 'محلي') {
-      plate = document.getElementById('li_plate').value.trim();
-      driver = document.getElementById('li_driver').value.trim();
+      plate    = document.getElementById('li_plate').value.trim();
+      driver   = document.getElementById('li_driver').value.trim();
       supplier = document.getElementById('li_supplier').value.trim();
-      grade = document.getElementById('li_grade').value;
-      if(!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول', 'error');
-      
+      grade    = document.getElementById('li_grade').value;
+      if (!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
+
     } else if (opType === 'وارد' && grainType === 'مستورد') {
-      plate = document.getElementById('ii_plate').value.trim();
-      driver = document.getElementById('ii_driver').value.trim();
-      supplier = document.getElementById('ii_supplier').value.trim();
+      plate     = document.getElementById('ii_plate').value.trim();
+      driver    = document.getElementById('ii_driver').value.trim();
+      supplier  = document.getElementById('ii_supplier').value.trim();
       wheatType = document.getElementById('ii_wheat').value;
-      let ticketNum = document.getElementById('ii_ticket_num').value.trim();
-      let shipDate = document.getElementById('ii_ship_date').value;
-      let transport = document.getElementById('ii_transport').value.trim();
-      if(!plate || !driver || !supplier || !ticketNum || !shipDate || !transport) return showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
-      
+      ticketNum = document.getElementById('ii_ticket_num').value.trim();
+      shipDate  = document.getElementById('ii_ship_date').value;
+      transport = document.getElementById('ii_transport').value.trim();
+      if (!plate || !driver || !supplier || !ticketNum || !shipDate || !transport) return showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+
     } else if (opType === 'صرف' && grainType === 'محلي') {
-      plate = document.getElementById('lo_plate').value.trim();
+      plate  = document.getElementById('lo_plate').value.trim();
       driver = document.getElementById('lo_driver').value.trim();
-      dest = document.getElementById('lo_dest').value.trim();
-      grade = document.getElementById('lo_grade').value;
-      if(!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول', 'error');
-      
+      dest   = document.getElementById('lo_dest').value.trim();
+      grade  = document.getElementById('lo_grade').value;
+      if (!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
+
     } else if (opType === 'صرف' && grainType === 'مستورد') {
-      plate = document.getElementById('io_plate').value.trim();
-      driver = document.getElementById('io_driver').value.trim();
-      dest = document.getElementById('io_dest').value.trim();
-      supplier = document.getElementById('io_supplier').value.trim();
+      plate     = document.getElementById('io_plate').value.trim();
+      driver    = document.getElementById('io_driver').value.trim();
+      dest      = document.getElementById('io_dest').value.trim();
+      supplier  = document.getElementById('io_supplier').value.trim();
       wheatType = document.getElementById('io_wheat').value;
-      if(!plate || !driver || !dest || !supplier) return showToast('يرجى تعبئة جميع الحقول', 'error');
+      if (!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
     }
 
-    const t = {
-      id: generateTicketId(),
-      silo_id: user.silo_id,
-      opType: opType,
+    var t = {
+      id:        generateTicketId(),
+      silo_id:   user.silo_id,
+      opType:    opType,
       grainType: grainType,
-      plate: plate,
-      driver: driver,
-      status: 'gate_in',
+      plate:     plate,
+      driver:    driver,
+      status:    'gate_in',
       timestamp: new Date().toLocaleString('ar-EG'),
-      dateStr: tStr,
-      gross: 0,
-      tare: 0,
-      net: 0,
+      dateStr:   tStr,
+      gross: 0, tare: 0, net: 0
     };
-    if (opType === 'وارد' && grainType === 'مستورد') {
-      t.shippingDate = document.getElementById('ii_ship_date').value;
-      t.ticketNum = document.getElementById('ii_ticket_num').value;
+
+    if (opType === 'وارد' && grainType === 'محلي') {
+      t.supplierName = supplier; t.grade = grade;
+    } else if (opType === 'وارد' && grainType === 'مستورد') {
+      t.supplierName     = supplier;
+      t.wheatType        = wheatType;
+      t.ticketNum        = ticketNum;
+      t.shippingDate     = shipDate;
+      t.transportCompany = transport;
+    } else if (opType === 'صرف' && grainType === 'محلي') {
+      t.destination = dest; t.grade = grade;
+    } else if (opType === 'صرف' && grainType === 'مستورد') {
+      t.destination = dest; t.supplierName = supplier; t.wheatType = wheatType;
     }
 
-    if (opType === 'وارد') {
-      if (grainType === 'مستورد') {
-        t.supplierName = supplier; t.wheatType = wheatType; t.transportCompany = document.getElementById('ii_transport').value.trim();
-      } else {
-        t.supplierName = supplier; t.grade = grade;
-      }
-    } else { // صرف
-      t.destination = dest;
-      if (grainType === 'محلي') {
-        t.grade = grade;
-      } else {
-        t.wheatType = wheatType; t.supplierName = supplier; 
-      }
-    }
-
-    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
     tickets.unshift(t);
     localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
-    
     showToast('تم تسجيل دخول السيارة بنجاح وتوجيهها للميزان', 'success');
     renderGateTables();
   }
 
+  // ---- Register gate out ----
   function registerGateOut(id) {
-    showConfirm('هل أنت متأكد من تسجيل خروج هذه السيارة من البوابة النهائية؟', () => {
-      const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-      const idx = tickets.findIndex(x => x.id === id);
+    showConfirm('هل أنت متأكد من تسجيل خروج هذه السيارة من البوابة النهائية؟', function() {
+      var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+      var idx = -1;
+      for (var i = 0; i < tickets.length; i++) {
+        if (tickets[i].id === id) { idx = i; break; }
+      }
       if (idx > -1) {
         if (tickets[idx].status !== 'completed') {
-          return showToast('لا يمكن خروج السيارة قبل اكتمال أوزانها في الميزان!', 'error');
+          return showToast('لا يمكن تسجيل الخروج إلا للسيارات المكتملة الوزن!', 'error');
         }
-        
-        let t = tickets[idx];
-        }
-
-        tickets[idx].status = 'gate_out'; 
+        tickets[idx].status = 'gate_out';
         tickets[idx].exitTimestamp = new Date().toLocaleString('ar-EG');
         localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
-        showToast('تم إثبات خروج السيارة بسلام', 'success');
+        showToast('تم تسجيل خروج السيارة بنجاح', 'success');
         renderGateTables();
       }
     });
   }
 
+  // ---- Request delete/edit (requires manager approval) ----
+  function openRequestModal(type, ticketId) {
+    window.currentRequestType     = type;
+    window.currentRequestTicketId = ticketId;
+    var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    var t = null;
+    for (var i = 0; i < tickets.length; i++) {
+      if (tickets[i].id === ticketId) { t = tickets[i]; break; }
+    }
+    if (!t) return;
+
+    var reasonLabel = type === 'delete' ? 'سبب الشطب (يظهر للمدير) *' : 'سبب التعديل (يظهر للمدير) *';
+    var titleText   = type === 'delete' ? 'طلب شطب سجل بوابة' : 'طلب تعديل سجل بوابة';
+
+    var content = '<div class="mb-3" style="color:var(--text-sec)">' +
+      'السيارة: <b>' + t.plate + '</b> &nbsp;|&nbsp; السائق: <b>' + t.driver + '</b>' +
+    '</div>';
+
+    if (type === 'edit') {
+      content += '<div class="mb-3"><label>التعديلات المطلوبة بوضوح *</label>' +
+        '<textarea id="edit_requested_changes" class="inp" rows="3" style="width:100%;resize:vertical" ' +
+        'placeholder="مثال: تعديل رقم السيارة من 1234 إلى 4321"></textarea></div>';
+    }
+
+    content += '<div class="mb-3"><label>' + reasonLabel + '</label>' +
+      '<input type="text" id="request_reason" class="inp" style="width:100%" placeholder="اكتب السبب بوضوح...">' +
+    '</div>' +
+    '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">' +
+      '<button class="btn btn-outline" onclick="closeModal(\'requestModal\')">إلغاء</button>' +
+      '<button class="btn btn-primary" onclick="submitRequest()">إرسال الطلب للمدير</button>' +
+    '</div>';
+
+    showModal('requestModal', titleText, content);
+  }
+
+  function submitRequest() {
+    var reason = document.getElementById('request_reason').value.trim();
+    if (!reason) return showToast('يرجى إدخال السبب', 'error');
+    var type = window.currentRequestType;
+    var tId  = window.currentRequestTicketId;
+
+    var editDesc = '';
+    if (type === 'edit') {
+      var el = document.getElementById('edit_requested_changes');
+      if (el) editDesc = el.value.trim();
+      if (!editDesc) return showToast('يرجى إدخال التعديلات المطلوبة', 'error');
+    }
+
+    var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    var idx = -1;
+    for (var i = 0; i < tickets.length; i++) {
+      if (tickets[i].id === tId) { idx = i; break; }
+    }
+    if (idx > -1) {
+      tickets[idx].status = (type === 'edit') ? 'pending_edit' : 'pending_delete';
+      var approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
+      approvals.push({
+        id:           'REQ-' + Math.floor(Math.random() * 10000),
+        ticketId:     tId,
+        type:         type,
+        silo_id:      user.silo_id,
+        plate:        tickets[idx].plate,
+        opType:       tickets[idx].opType,
+        grainType:    tickets[idx].grainType,
+        requestedBy:  user.name,
+        reason:       reason,
+        editDesc:     editDesc,
+        timestamp:    new Date().toLocaleString('ar-EG'),
+        status:       'pending'
+      });
+      localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
+      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+      renderGateTables();
+      closeModal('requestModal');
+      showToast('تم إرسال الطلب للمدير وهو قيد المراجعة', 'success');
+    }
+  }
+
+  // ---- Render tables ----
   function renderGateTables() {
-    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-    const dLi = document.getElementById('li_date').value;
-    const dIi = document.getElementById('ii_date').value;
-    const dLo = document.getElementById('lo_date').value;
-    const dIo = document.getElementById('io_date').value;
-    
-    let hLi='', hIi='', hLo='', hIo='';
-    let cLi=1, cIi=1, cLo=1, cIo=1;
+    var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    var dLi = document.getElementById('li_date').value;
+    var dIi = document.getElementById('ii_date').value;
+    var dLo = document.getElementById('lo_date').value;
+    var dIo = document.getElementById('io_date').value;
 
-    tickets.forEach(t => {
-      if (t.silo_id !== user.silo_id || t.status === 'deleted') return;
+    var hLi = '', hIi = '', hLo = '', hIo = '';
+    var cLi = 1, cIi = 1, cLo = 1, cIo = 1;
 
-      let statBadge = '';
-      let actionBtn = '';
-      let rowStyle = '';
+    for (var i = 0; i < tickets.length; i++) {
+      var t = tickets[i];
+      if (t.silo_id !== user.silo_id) continue;
 
-      if (t.status === 'gate_in') {
-        statBadge = `<span class="badge badge-warning">تنتظر الميزان (${t.opType==='صرف'?'فارغ':'قائم'})</span>`;
-      } else if (t.status === 'pending') {
-        statBadge = `<span class="badge badge-info">تنتظر الميزان (${t.opType==='صرف'?'قائم':'فارغ'})</span>`;
-      } else if (t.status === 'completed') {
-        statBadge = '<span class="badge badge-success">تم الوزن - جاهزة للخروج</span>';
-        actionBtn = `<button class="btn btn-primary btn-sm mb-1" onclick="registerGateOut('${t.id}')">تسجيل خروج</button><br>`;
-      } else if (t.status === 'gate_out') {
-        statBadge = '<span class="badge" style="background:var(--bg-dark);color:var(--text-sec)">غادرت البوابة</span>';
-        actionBtn = `<span style="font-size:0.8rem;color:var(--text-sec)">${t.exitTimestamp}</span>`;
-      } else if (t.status === 'pending_delete') {
-        statBadge = '<span class="badge badge-warning">تنتظر الموافقة (شطب)</span>';
-      } else if (t.status === 'pending_edit') {
-        statBadge = '<span class="badge badge-warning">تنتظر الموافقة (تعديل)</span>';
-      } else if (t.status === 'stricken') {
-        rowStyle = 'text-decoration: line-through; opacity: 0.6;';
-        statBadge = '<span class="badge badge-danger">مشطوبة</span>';
+      var tD = t.dateStr || '';
+      var nGross = t.gross  ? (t.gross  / 1000).toFixed(3) : '-';
+      var nTare  = t.tare   ? (t.tare   / 1000).toFixed(3) : '-';
+      var nNet   = t.net    ? (t.net    / 1000).toFixed(3) : '-';
+
+      var statBadge = '';
+      if (t.status === 'gate_in')       statBadge = '<span class="badge badge-blue">في الانتظار</span>';
+      else if (t.status === 'completed') statBadge = '<span class="badge badge-green">مكتمل</span>';
+      else if (t.status === 'gate_out')  statBadge = '<span class="badge badge-gray">خرج</span>';
+      else if (t.status === 'pending_edit')   statBadge = '<span class="badge badge-amber">قيد تعديل</span>';
+      else if (t.status === 'pending_delete') statBadge = '<span class="badge badge-red">قيد شطب</span>';
+      else if (t.status === 'stricken')       statBadge = '<span class="badge badge-red">مشطوب</span>';
+
+      var rowCls = '';
+      if (t.status === 'stricken')       rowCls = 'stricken-row';
+      if (t.status === 'pending_delete' || t.status === 'pending_edit') rowCls = 'pending-row';
+
+      var actionBtn = '';
+      if (t.status === 'completed') {
+        actionBtn = '<button class="btn btn-sm btn-primary" onclick="registerGateOut(\'' + t.id + '\')">خروج</button> ';
+      }
+      if (t.status !== 'stricken' && t.status !== 'gate_out') {
+        actionBtn += '<button class="btn btn-sm btn-outline" onclick="openRequestModal(\'edit\',\'' + t.id + '\')"><i class="fa-solid fa-pen"></i></button> ';
+        actionBtn += '<button class="btn btn-sm btn-danger" onclick="openRequestModal(\'delete\',\'' + t.id + '\')"><i class="fa-solid fa-ban"></i></button>';
       }
 
-      // Action buttons for gate_in and completed
-      if (t.status === 'gate_in' || t.status === 'completed') {
-        actionBtn += `
-          <button class="btn btn-outline btn-sm mb-1" style="color:var(--warning);border-color:var(--warning);" onclick="openRequestModal('edit', '${t.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
-          <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="openRequestModal('delete', '${t.id}')"><i class="fa-solid fa-strikethrough"></i> شطب</button>
-        `;
-      } else if (t.status === 'pending_delete' || t.status === 'pending_edit' || t.status === 'stricken') {
-        actionBtn = '-';
+      if (t.opType === 'وارد' && t.grainType === 'محلي' && tD === dLi) {
+        hLi += '<tr class="' + rowCls + '">' +
+          '<td>' + cLi++ + '</td>' +
+          '<td class="fw-bold">' + t.plate + '</td>' +
+          '<td>' + t.driver + '</td>' +
+          '<td>' + (t.supplierName || '') + '</td>' +
+          '<td>' + (t.grade ? t.grade + ' قيراط' : '') + '</td>' +
+          '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td>' + nGross + '</td><td>' + nTare + '</td>' +
+          '<td class="fw-bold text-success">' + nNet + '</td>' +
+          '<td>' + statBadge + '</td>' +
+          '<td style="white-space:nowrap">' + actionBtn + '</td>' +
+        '</tr>';
       }
 
-      // Check dates
-      const tD = t.dateStr || t.timestamp.split(',')[0].trim();
-      const nGross = t.gross ? (t.gross/1000).toFixed(3) : '-';
-      const nTare = t.tare ? (t.tare/1000).toFixed(3) : '-';
-      const nNet = t.net ? (t.net/1000).toFixed(3) : '-';
+      if (t.opType === 'وارد' && t.grainType === 'مستورد' && tD === dIi) {
+        var sDate = t.shippingDate || '-';
+        hIi += '<tr class="' + rowCls + '">' +
+          '<td>' + cIi++ + '</td>' +
+          '<td class="fw-bold">' + t.plate + '</td>' +
+          '<td>' + t.driver + '</td>' +
+          '<td>' + (t.transportCompany || '') + '</td>' +
+          '<td>' + (t.supplierName || '') + '</td>' +
+          '<td>' + (t.wheatType || '') + '</td>' +
+          '<td>' + sDate + '</td>' +
+          '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td class="text-primary">' + (t.ticketNum || '-') + '</td>' +
+          '<td>' + nGross + '</td><td>' + nTare + '</td>' +
+          '<td class="fw-bold text-success">' + nNet + '</td>' +
+          '<td>' + statBadge + '</td>' +
+          '<td style="white-space:nowrap">' + actionBtn + '</td>' +
+        '</tr>';
+      }
 
-      if (t.opType === 'وارد' && t.grainType === 'محلي' && (tD === dLi || (!t.dateStr && t.timestamp.includes(dLi.split('-')[0])))) {
-        hLi += `<tr style="${rowStyle}"><td>${cLi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.supplierName||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
+      if (t.opType === 'صرف' && t.grainType === 'محلي' && tD === dLo) {
+        hLo += '<tr class="' + rowCls + '">' +
+          '<td>' + cLo++ + '</td>' +
+          '<td class="fw-bold">' + t.plate + '</td>' +
+          '<td>' + t.driver + '</td>' +
+          '<td>' + (t.destination || '') + '</td>' +
+          '<td>' + (t.grade ? t.grade + ' قيراط' : '') + '</td>' +
+          '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td>' + nGross + '</td><td>' + nTare + '</td>' +
+          '<td class="fw-bold text-warning">' + nNet + '</td>' +
+          '<td>' + statBadge + '</td>' +
+          '<td style="white-space:nowrap">' + actionBtn + '</td>' +
+        '</tr>';
       }
-      else if (t.opType === 'وارد' && t.grainType === 'مستورد' && (tD === dIi || (!t.dateStr && t.timestamp.includes(dIi.split('-')[0])))) {
-        const ticketNumStr = t.ticketNum || '-';
-        let defStr = '-';
-        const sDate = t.shippingDate || '-';
-        hIi += `<tr style="${rowStyle}"><td>${cIi++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.transportCompany||''}</td><td>${t.supplierName||''}</td><td>${t.wheatType||''}</td><td>${sDate}</td><td style="font-size:0.85rem">${t.timestamp}</td><td class="text-primary">${ticketNumStr}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-success">${nNet}</td><td>${defStr}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
-      }
-      else if (t.opType === 'صرف' && t.grainType === 'محلي' && (tD === dLo || (!t.dateStr && t.timestamp.includes(dLo.split('-')[0])))) {
-        hLo += `<tr style="${rowStyle}"><td>${cLo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.grade?t.grade+' قيراط':''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
-      }
-      else if (t.opType === 'صرف' && t.grainType === 'مستورد' && (tD === dIo || (!t.dateStr && t.timestamp.includes(dIo.split('-')[0])))) {
-        hIo += `<tr style="${rowStyle}"><td>${cIo++}</td><td class="fw-bold">${t.plate}</td><td>${t.driver}</td><td>${t.destination||''}</td><td>${t.supplierName||''} / ${t.wheatType||''}</td><td style="font-size:0.85rem">${t.timestamp}</td><td>${nGross}</td><td>${nTare}</td><td class="fw-bold text-warning">${nNet}</td><td>${statBadge}</td><td style="white-space:nowrap">${actionBtn}</td></tr>`;
-      }
-    });
 
-    const noData = '<tr><td colspan="15" class="text-center p-3">لا توجد حركة في هذا التاريخ</td></tr>';
+      if (t.opType === 'صرف' && t.grainType === 'مستورد' && tD === dIo) {
+        hIo += '<tr class="' + rowCls + '">' +
+          '<td>' + cIo++ + '</td>' +
+          '<td class="fw-bold">' + t.plate + '</td>' +
+          '<td>' + t.driver + '</td>' +
+          '<td>' + (t.destination || '') + '</td>' +
+          '<td>' + (t.supplierName || '') + ' / ' + (t.wheatType || '') + '</td>' +
+          '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td>' + nGross + '</td><td>' + nTare + '</td>' +
+          '<td class="fw-bold text-warning">' + nNet + '</td>' +
+          '<td>' + statBadge + '</td>' +
+          '<td style="white-space:nowrap">' + actionBtn + '</td>' +
+        '</tr>';
+      }
+    }
+
+    var noData = '<tr><td colspan="15" class="text-center p-3" style="color:var(--text-sec)">لا توجد حركة في هذا التاريخ</td></tr>';
     document.getElementById('li_tbody').innerHTML = hLi || noData;
     document.getElementById('ii_tbody').innerHTML = hIi || noData;
     document.getElementById('lo_tbody').innerHTML = hLo || noData;
     document.getElementById('io_tbody').innerHTML = hIo || noData;
   }
 
-  function clearForm(panelId) {
-    const panel = document.getElementById(panelId);
-    if (!panel) return;
-    const inputs = panel.querySelectorAll('input, select');
-    inputs.forEach(inp => {
-      if (inp.type === 'text' || inp.type === 'number' || inp.type === 'date') {
-        inp.value = '';
-      }
-    });
-    showToast('تم مسح الحقول بنجاح', 'success');
-  }
-
-  function openRequestModal(type, ticketId) {
-    window.currentRequestType = type;
-    window.currentRequestTicketId = ticketId;
-    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-    const t = tickets.find(x => x.id === ticketId);
-    if (!t) return;
-    
-    let content = '';
-    if (type === 'delete') {
-      content = `
-        <div class="mb-3" style="color:var(--danger)">
-          هل أنت متأكد من طلب شطب السيارة رقم (<b>${t.plate}</b>)؟<br>
-          سيتم تعليق السيارة لحين موافقة المدير.
-        </div>
-      `;
-    } else if (type === 'edit') {
-      content = `
-        <div class="mb-3">
-          طلب تعديل بيانات السيارة رقم (<b>${t.plate}</b>).
-        </div>
-        <div class="form-group mb-3">
-          <label>التعديلات المطلوبة بوضوح *</label>
-          <textarea id="edit_requested_changes" class="form-control" rows="3" placeholder="مثال: تعديل رقم السيارة من 1234 إلى 4321"></textarea>
-        </div>
-      `;
-    }
-    
-    content += `
-      <div class="form-group mb-3">
-        <label>سبب ${type === 'edit' ? 'التعديل' : 'الشطب'} (يظهر للمدير) *</label>
-        <input type="text" id="request_reason" class="form-control" placeholder="اكتب السبب بوضوح...">
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-        <button class="btn btn-outline" onclick="closeModal('requestModal')">إلغاء</button>
-        <button class="btn btn-primary" onclick="submitRequest()">إرسال الطلب للمدير</button>
-      </div>
-    `;
-    
-    showModal('requestModal', `طلب ${type === 'edit' ? 'تعديل' : 'شطب'} بيانات سيارة`, content);
-  }
-
-  function submitRequest() {
-    const reason = document.getElementById('request_reason').value.trim();
-    if (!reason) return showToast('يرجى إدخال السبب', 'error');
-    
-    const type = window.currentRequestType;
-    const tId = window.currentRequestTicketId;
-    
-    let editDesc = '';
-    if (type === 'edit') {
-      editDesc = document.getElementById('edit_requested_changes').value.trim();
-      if (!editDesc) return showToast('يرجى إدخال التعديلات المطلوبة', 'error');
-    }
-    
-    let tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-    const idx = tickets.findIndex(x => x.id === tId);
-    if (idx > -1) {
-      tickets[idx].status = (type === 'edit') ? 'pending_edit' : 'pending_delete';
-      
-      let approvals = JSON.parse(localStorage.getItem('PENDING_APPROVALS') || '[]');
-      approvals.push({
-        id: 'REQ-' + Math.floor(Math.random() * 10000),
-        ticketId: tId,
-        type: type,
-        silo_id: user.silo_id,
-        plate: tickets[idx].plate,
-        opType: tickets[idx].opType,
-        grainType: tickets[idx].grainType,
-        requestedBy: user.name,
-        reason: reason,
-        editDesc: editDesc,
-        timestamp: new Date().toLocaleString('ar-EG'),
-        status: 'pending'
-      });
-      localStorage.setItem('PENDING_APPROVALS', JSON.stringify(approvals));
-      localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
-      renderGateTables();
-      closeModal('requestModal');
-      showToast('تم إرسال الطلب بنجاح وهو قيد مراجعة مدير الصومعة', 'success');
-    }
-  }
-
   renderGateTables();
-  window.addEventListener('firebase-data-updated', () => renderGateTables());
-  window.addEventListener('storage', (e) => {
+
+  window.addEventListener('firebase-data-updated', function() { renderGateTables(); });
+  window.addEventListener('storage', function(e) {
     if (e.key === 'WEIGHBRIDGE_TICKETS') renderGateTables();
   });
 </script>
