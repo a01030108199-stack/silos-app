@@ -545,11 +545,14 @@ function handleApproval(reqId, isApproved) {
     fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم السائق</label><input type="text" id="eq_driver" class="inp" value="' + driver + '"></div>';
     if (t.opType === 'وارد' && t.grainType === 'محلي') {
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">جهة الوارد</label><input type="text" id="eq_supplier" class="inp" value="' + supplier + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">درجة القمح</label><input type="text" id="eq_grade" class="inp" value="' + (t.grade||'') + '"></div>';
     }
     if (t.opType === 'وارد' && t.grainType === 'مستورد') {
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء الشاحن</label><input type="text" id="eq_supplier" class="inp" value="' + supplier + '"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم الكارتة</label><input type="text" id="eq_ticket" class="inp" value="' + ticketNum + '"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الشركة الناقلة</label><input type="text" id="eq_transport" class="inp" value="' + transport + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">نوع القمح (منشأ)</label><input type="text" id="eq_wheat_type" class="inp" value="' + (t.wheatType||'') + '"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">اسم الباخرة</label><input type="text" id="eq_ship_name" class="inp" value="' + (t.shipName||'') + '"></div>';
     }
     if (t.opType === 'صرف') {
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" value="' + dest + '"></div>';
@@ -597,6 +600,13 @@ function applyEditApproval() {
   if (tr && tr.value.trim()) t.transportCompany = tr.value.trim();
   if (dt && dt.value.trim()) t.destination      = dt.value.trim();
   
+  var wt = document.getElementById('eq_wheat_type');
+  var sn = document.getElementById('eq_ship_name');
+  var gd = document.getElementById('eq_grade');
+  if (wt) t.wheatType = wt.value.trim();
+  if (sn) t.shipName = sn.value.trim();
+  if (gd) t.grade = gd.value.trim();
+
   if (gr && gr.value) { t.gross = parseFloat(gr.value); }
   if (ta && ta.value) { t.tare = parseFloat(ta.value); }
   if (ce && ce.value) { t.cell = ce.value.trim(); }
