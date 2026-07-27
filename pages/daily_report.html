@@ -731,11 +731,25 @@ function renderShips(data) {
 // ═══════════════════════════════════════════════════════════════
 // UPDATE HELPERS
 // ═══════════════════════════════════════════════════════════════
-function updateCell(i, field, val) {
-  if (field === 'incoming' || field === 'outgoing' || field === 'opening') val = +val || 0;
-  currentData.cells[i][field] = val;
-  if (field === 'type') {
-    if (val !== 'مستورد') { currentData.cells[i].ship = ''; currentData.cells[i].country = ''; }
+function updateCell(idx, field, val) {
+  if (field === 'opening') {
+    currentData.cells[idx].opening = parseFloat(val) || 0;
+  } else if (field === 'notes') {
+    currentData.cells[idx].notes = val;
+  } else if (field === 'country') {
+    currentData.cells[idx].country = val;
+    currentData.cells[idx].ship = val;
+  }
+  
+  currentData.cells[idx].closing = currentData.cells[idx].opening + currentData.cells[idx].incoming - currentData.cells[idx].outgoing;
+  renderCells(currentData);
+  saveReportSilently();
+}
+
+function saveReportSilently() {
+  localStorage.setItem(\DAILY_REPORT_\_\, JSON.stringify(currentData));
+}
+
     if (val !== 'محلي')   { currentData.cells[i].grade = ''; }
   }
   renderCells(currentData);
@@ -782,38 +796,38 @@ function deleteShip(i) {
 // ═══════════════════════════════════════════════════════════════
 function loadReport() {
   currentDate = document.getElementById('reportDate').value;
-  document.getElementById('reportTitle').textContent = `بيان يوم ${fmtDate(currentDate)}`;
+  document.getElementById('reportTitle').textContent = بيان يوم ;
   let data = loadData(currentDate);
   
   if (!data) {
     data = buildEmpty(currentDate);
-  } else {
-    // Auto-sync opening balances from previous day's closing (if previous day exists)
-    const prev = getLastAvailableData(currentDate);
-    if (prev) {
-      data.cells.forEach((c, i) => {
-        const p = prev.cells[i];
+  }
+  
+  // Auto-sync opening balances from previous day's closing (if previous day exists)
+  const prev = getLastAvailableData(currentDate);
+  if (prev) {
+    data.cells.forEach((c, i) => {
+      const p = prev.cells[i];
+      if (p) {
+        c.opening = p.closing || 0;
+        if (p.type !== 'فارغة') {
+          c.type = p.type;
+          c.ship = p.ship || '';
+          c.grade = p.grade || '';
+          c.country = p.country || '';
+        }
+      }
+    });
+    // Sync ships opening balances
+    if (data.ships && prev.ships) {
+      data.ships.forEach(s => {
+        const p = prev.ships.find(x => x.name === s.name && x.ship_name === s.ship_name);
         if (p) {
-          c.opening = p.closing || 0;
-          if (p.type !== 'فارغة') {
-            c.type = p.type;
-            c.ship = p.ship || '';
-            c.grade = p.grade || '';
-            c.country = p.country || '';
-          }
+          s.opening = p.closing || 0;
+          // Also update permit remaining logically
+          s.permit = p.remaining || 0;
         }
       });
-      // Sync ships opening balances
-      if (data.ships && prev.ships) {
-        data.ships.forEach(s => {
-          const p = prev.ships.find(x => x.name === s.name && x.ship_name === s.ship_name);
-          if (p) {
-            s.opening = p.closing || 0;
-            // Also update permit remaining logically
-            s.permit = p.remaining || 0;
-          }
-        });
-      }
     }
   }
   
