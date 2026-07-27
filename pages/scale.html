@@ -920,6 +920,10 @@ function loadGateTicket(id) {
   if (t.shippedWeight && document.getElementById('s_shipped_weight')) document.getElementById('s_shipped_weight').value = t.shippedWeight;
   if (t.shipName && document.getElementById('s_ship_name')) document.getElementById('s_ship_name').value = t.shipName;
   if (t.cellNum && document.getElementById('s_cell')) document.getElementById('s_cell').value = t.cellNum;
+  if (t.orderNo && document.getElementById('s_order_no')) {
+    document.getElementById('s_order_no').value = t.orderNo;
+    loadOrderData();
+  }
   
   toggleDynamicFields();
   

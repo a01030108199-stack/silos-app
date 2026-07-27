@@ -313,6 +313,31 @@
                 <option value="أمريكي">أمريكي</option>
               </select>
             </div>
+            <div style="grid-column: 1 / -1; background: rgba(33,150,243,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(33,150,243,0.3);">
+              <div style="margin-bottom:15px; font-weight:bold; color:#90caf9;"><i class="fa-solid fa-file-invoice"></i> بيانات إذن الصرف</div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div>
+                  <label>رقم إذن الصرف *</label>
+                  <div style="display:flex; gap:10px;">
+                    <input type="text" class="inp" id="io_order_no" placeholder="أدخل رقم الإذن" list="io_order_no_list" onblur="loadOrderData('io')">
+                    <button class="btn btn-outline" style="white-space:nowrap; padding:0 10px;" onclick="saveOrderData('io')"><i class="fa-solid fa-save"></i> حفظ</button>
+                  </div>
+                  <datalist id="io_order_no_list"></datalist>
+                </div>
+                <div>
+                  <label>تاريخ الانتهاء *</label>
+                  <input type="date" class="inp" id="io_order_expiry">
+                </div>
+                <div>
+                  <label>الكمية الأساسية (بالطن) *</label>
+                  <input type="number" class="form-control inp" id="io_order_qty" placeholder="الكمية بالطن">
+                </div>
+                <div>
+                  <label>التعزيز بالطن (إن وُجد)</label>
+                  <input type="number" class="form-control inp" id="io_order_bonus" placeholder="التعزيز بالطن">
+                </div>
+              </div>
+            </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
               <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-import-out')">
                 <i class="fa-solid fa-eraser"></i> مسح
@@ -426,6 +451,11 @@
       if (!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
     }
 
+    var orderNo = '';
+    if (opType === 'صرف' && grainType === 'مستورد') {
+      orderNo = document.getElementById('io_order_no').value.trim();
+    }
+
     var t = {
       id:        generateTicketId(),
       silo_id:   user.silo_id,
@@ -450,7 +480,10 @@
     } else if (opType === 'صرف' && grainType === 'محلي') {
       t.destination = dest; t.grade = grade;
     } else if (opType === 'صرف' && grainType === 'مستورد') {
-      t.destination = dest; t.supplierName = supplier; t.wheatType = wheatType;
+      t.destination  = dest;
+      t.supplierName = supplier;
+      t.wheatType    = wheatType;
+      t.orderNo      = orderNo;
     }
 
     var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
@@ -678,6 +711,42 @@
   window.addEventListener('storage', function(e) {
     if (e.key === 'WEIGHBRIDGE_TICKETS') renderGateTables();
   });
+  // --- Permit (Order) Data logic for Gate ---
+  function getOrders() { return JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}'); }
+  function saveOrderData(prefix) {
+    const no = document.getElementById(prefix+'_order_no').value.trim();
+    if(!no) return showToast('يرجى إدخال رقم الإذن', 'error');
+    const orders = getOrders();
+    orders[no] = {
+      expiry: document.getElementById(prefix+'_order_expiry').value,
+      qty: parseFloat(document.getElementById(prefix+'_order_qty').value) || 0,
+      bonus: parseFloat(document.getElementById(prefix+'_order_bonus').value) || 0
+    };
+    localStorage.setItem('DISPENSE_ORDERS', JSON.stringify(orders));
+    showToast('تم حفظ بيانات إذن الصرف بنجاح', 'success');
+    refreshOrderList(prefix);
+  }
+  function loadOrderData(prefix) {
+    const no = document.getElementById(prefix+'_order_no').value.trim();
+    if(!no) return;
+    const orders = getOrders();
+    if (orders[no]) {
+      document.getElementById(prefix+'_order_expiry').value = orders[no].expiry || '';
+      document.getElementById(prefix+'_order_qty').value = orders[no].qty || '';
+      document.getElementById(prefix+'_order_bonus').value = orders[no].bonus || '';
+    }
+  }
+  function refreshOrderList(prefix) {
+    const list = document.getElementById(prefix+'_order_no_list');
+    if(!list) return;
+    list.innerHTML = '';
+    const orders = getOrders();
+    for (const k in orders) { list.innerHTML += `<option value="${k}">`; }
+  }
+  
+  // Initialize lists on load
+  refreshOrderList('io');
+
 </script>
 </body>
 </html>
