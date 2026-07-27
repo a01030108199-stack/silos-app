@@ -458,7 +458,7 @@ function calcOrderBalance() {
   }
   let dispensed = 0;
   getTickets().forEach(t => {
-    if (t.opType === 'صرف' && t.orderNo === no && t.status === 'completed') {
+    if (t.opType === 'صرف' && t.orderNo === no && ['completed', 'gate_out', 'pending_edit', 'pending_delete'].includes(t.status)) {
       dispensed += (t.net || 0);
     }
   });
