@@ -199,7 +199,7 @@
               <div>
                 <label>رقم إذن الصرف *</label>
                 <div style="display:flex; gap:10px;">
-                  <input type="text" class="form-control" id="s_order_no" placeholder="أدخل رقم الإذن" list="order_no_list" onblur="loadOrderData()">
+                  <input type="text" class="form-control" id="s_order_no" placeholder="رقم الإذن" list="order_no_list" onchange="loadOrderData()">
                   <button class="btn btn-outline" style="white-space:nowrap; padding:0 10px;" onclick="saveOrderData()"><i class="fa-solid fa-save"></i> حفظ</button>
                 </div>
                 <datalist id="order_no_list"></datalist>
@@ -927,6 +927,14 @@ function loadGateTicket(id) {
   if (t.orderNo && document.getElementById('s_order_no')) {
     document.getElementById('s_order_no').value = t.orderNo;
     loadOrderData();
+  } else if (!t.orderNo && t.opType === 'صرف' && t.destination && document.getElementById('s_order_no')) {
+    for (let i = 0; i < tickets.length; i++) {
+      if (tickets[i].destination === t.destination && tickets[i].orderNo) {
+        document.getElementById('s_order_no').value = tickets[i].orderNo;
+        loadOrderData();
+        break;
+      }
+    }
   }
   
   toggleDynamicFields();
