@@ -953,7 +953,7 @@ function saveSecondWeight() {
         return;
       }
       if (net > remaining) {
-        showToast(خطأ: الوزن الصافي () يتخطى الرصيد المتاح لإذن الصرف (), 'error');
+        showToast(`خطأ: الوزن الصافي (${net}) يتخطى الرصيد المتاح لإذن الصرف (${remaining})`, 'error');
         return;
       }
     }
