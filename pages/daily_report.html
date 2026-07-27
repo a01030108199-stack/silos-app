@@ -731,30 +731,32 @@ function renderShips(data) {
 // ═══════════════════════════════════════════════════════════════
 // UPDATE HELPERS
 // ═══════════════════════════════════════════════════════════════
-function updateCell(idx, field, val) {
-  if (field === 'opening') {
-    currentData.cells[idx].opening = parseFloat(val) || 0;
-  } else if (field === 'notes') {
-    currentData.cells[idx].notes = val;
-  } else if (field === 'country') {
-    currentData.cells[idx].country = val;
-    currentData.cells[idx].ship = val;
+function updateCell(i, field, val) {
+  if (field === 'opening') { 
+    currentData.cells[i].opening = parseFloat(val) || 0; 
+  }
+  else if (field === 'notes') { 
+    currentData.cells[i].notes = val; 
+  }
+  else if (field === 'country') { 
+    currentData.cells[i].country = val; 
+    currentData.cells[i].ship = val; 
+  }
+  else if (field === 'type') { 
+    currentData.cells[i].type = val; 
+    if (val !== 'مستورد') { currentData.cells[i].country = ''; currentData.cells[i].ship = ''; }
+    if (val !== 'محلي')   { currentData.cells[i].grade = ''; }
   }
   
-  currentData.cells[idx].closing = currentData.cells[idx].opening + currentData.cells[idx].incoming - currentData.cells[idx].outgoing;
+  currentData.cells[i].closing = currentData.cells[i].opening + currentData.cells[i].incoming - currentData.cells[i].outgoing;
   renderCells(currentData);
+  renderImportedFromCells();
+  renderLocalInFromCells();
   saveReportSilently();
 }
 
 function saveReportSilently() {
-  localStorage.setItem(\DAILY_REPORT_\_\, JSON.stringify(currentData));
-}
-
-    if (val !== 'محلي')   { currentData.cells[i].grade = ''; }
-  }
-  renderCells(currentData);
-  renderImportedFromCells();
-  renderLocalInFromCells();
+  localStorage.setItem(`DAILY_REPORT_${user.silo_id}_${currentDate}`, JSON.stringify(currentData));
 }
 function updateLocalOut(i, field, val) {
   if (field === 'name') currentData.localOut[i][field] = val;
