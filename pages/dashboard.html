@@ -546,12 +546,14 @@ function handleApproval(reqId, isApproved) {
     var uTrans = [...new Set(allTix.map(x => x.transportCompany).filter(Boolean))];
     var uWheat = [...new Set(allTix.map(x => x.wheatType).filter(Boolean))];
     var uDrivers = [...new Set(allTix.map(x => x.driver).filter(Boolean))];
+    var uOrders = [...new Set(allTix.map(x => x.orderNo).filter(Boolean))];
 
     var datalists = '<datalist id="dl_ships">' + uShips.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
                     '<datalist id="dl_supp">' + uSupp.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
                     '<datalist id="dl_dest">' + uDest.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
                     '<datalist id="dl_trans">' + uTrans.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
                     '<datalist id="dl_wheat">' + uWheat.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
+                    '<datalist id="dl_orders">' + uOrders.map(s => '<option value="'+s+'">').join('') + '</datalist>' +
                     '<datalist id="dl_drivers">' + uDrivers.map(s => '<option value="'+s+'">').join('') + '</datalist>';
 
     var fHtml = datalists + '<div style="background:rgba(234,179,8,0.1);border:1px solid #ca8a04;border-radius:8px;padding:10px;margin-bottom:14px;font-size:0.85rem;">' +
@@ -572,6 +574,13 @@ function handleApproval(reqId, isApproved) {
     }
     if (t.opType === 'صرف') {
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الجهة المنصرف</label><input type="text" id="eq_dest" class="inp" list="dl_dest" value="' + dest + '"></div>';
+      if (t.grainType === 'مستورد') {
+        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الميناء / المورد</label><input type="text" id="eq_supplier" class="inp" list="dl_supp" value="' + supplier + '"></div>';
+        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">نوع القمح (منشأ)</label><input type="text" id="eq_wheat_type" class="inp" list="dl_wheat" value="' + (t.wheatType||'') + '"></div>';
+        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم إذن الصرف</label><input type="text" id="eq_order_no" class="inp" list="dl_orders" value="' + (t.orderNo||'') + '"></div>';
+      } else if (t.grainType === 'محلي') {
+        fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">درجة القمح</label><input type="text" id="eq_grade" class="inp" value="' + (t.grade||'') + '"></div>';
+      }
     }
     
     // Additional weighbridge fields
@@ -619,9 +628,11 @@ function applyEditApproval() {
   var wt = document.getElementById('eq_wheat_type');
   var sn = document.getElementById('eq_ship_name');
   var gd = document.getElementById('eq_grade');
+  var on = document.getElementById('eq_order_no');
   if (wt) t.wheatType = wt.value.trim();
   if (sn) t.shipName = sn.value.trim();
   if (gd) t.grade = gd.value.trim();
+  if (on) t.orderNo = on.value.trim();
 
   if (gr && gr.value) { t.gross = parseFloat(gr.value); }
   if (ta && ta.value) { t.tare = parseFloat(ta.value); }
