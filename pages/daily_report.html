@@ -449,12 +449,10 @@ function buildEmpty(dateStr) {
 
   // Local dispatch to mills
   const localOut = prev ? (prev.localOut||[])
-    .filter(r => (r.permit||0) - (r.total||0) > 0)
     .map(r=>({ name: r.name||'', permit: (r.permit||0) - (r.total||0), d235:0, d230:0, d225:0, total:0 })) : [];
 
   // Imported mill dispatch
   const ships = prev ? (prev.ships||[])
-    .filter(s => (s.permit||0) - (s.dispatched||0) > 0)
     .map(s=>({
       name: s.name||'', 
       ship_name: s.ship_name||'',
