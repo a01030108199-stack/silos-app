@@ -190,7 +190,7 @@ function fetchTicket() {
   if(!tId) { showToast('يرجى إدخال رقم الكارتة', 'error'); return; }
   
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-  const t = tickets.find(x => x.id === tId && x.status === 'completed');
+  const t = tickets.find(x => x.id === tId && ['completed', 'gate_out'].includes(x.status));
   
   if(!t) {
     showToast('رقم الكارتة غير موجود في البسكول', 'error');

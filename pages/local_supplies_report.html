@@ -222,7 +222,7 @@ window.generateReport = function() {
   var localIncoming = [];
   for (var i = 0; i < tickets.length; i++) {
     var t = tickets[i];
-    if (t.status === 'completed' && t.silo_id === siloId && t.opType === 'وارد' && t.grainType === 'محلي' && t.net > 0) {
+    if (['completed', 'gate_out'].includes(t.status) && t.silo_id === siloId && t.opType === 'وارد' && t.grainType === 'محلي' && t.net > 0) {
       localIncoming.push(t);
     }
   }
