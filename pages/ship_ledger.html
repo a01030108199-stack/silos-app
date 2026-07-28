@@ -530,18 +530,25 @@ function syncWithTickets() {
   
   // Auto-fill header data from the first available imported ticket for this ship
   const sampleTicket = tickets.find(t => t.shipName === currentShipName && t.grainType === 'مستورد');
-  if (sampleTicket) {
-    if (!document.getElementById('h_type').value && sampleTicket.wheatType) document.getElementById('h_type').value = sampleTicket.wheatType;
-    if (sampleTicket.opType === 'وارد') {
-      if (!document.getElementById('h_port').value && sampleTicket.supplierName) document.getElementById('h_port').value = sampleTicket.supplierName;
-      if (!document.getElementById('h_voyage').value && sampleTicket.shippingDate) document.getElementById('h_voyage').value = sampleTicket.shippingDate;
-    }
+  if (sampleTicket && !document.getElementById('h_type').value && sampleTicket.wheatType) {
+    document.getElementById('h_type').value = sampleTicket.wheatType;
+  }
+  
+  // Port, voyage date, and cleanliness come specifically from incoming (وارد) tickets
+  const sampleIn = tickets.find(t => t.shipName === currentShipName && t.grainType === 'مستورد' && t.opType === 'وارد');
+  if (sampleIn) {
+    if (!document.getElementById('h_port').value && sampleIn.supplierName) document.getElementById('h_port').value = sampleIn.supplierName;
+    if (!document.getElementById('h_voyage').value && sampleIn.shippingDate) document.getElementById('h_voyage').value = sampleIn.shippingDate;
+    
+    const cleanliness = sampleIn.cleanliness || sampleIn.grade;
+    if (!document.getElementById('h_grade').value && cleanliness) document.getElementById('h_grade').value = cleanliness;
   }
 
   // Reset received and dispatched to 0 before recalculating
   ledgerRows.forEach(r => {
     r.received = 0;
     r.dispatched = 0;
+    r.shipped = 0;
   });
 
   tickets.forEach(t => {
@@ -562,6 +569,9 @@ function syncWithTickets() {
 
     if (t.opType === 'وارد') {
       row.received = (parseFloat(row.received) || 0) + netTons;
+      if (t.shippedWeight) {
+        row.shipped = (parseFloat(row.shipped) || 0) + t.shippedWeight;
+      }
     } else if (t.opType === 'صرف') {
       row.dispatched = (parseFloat(row.dispatched) || 0) + netTons;
     }

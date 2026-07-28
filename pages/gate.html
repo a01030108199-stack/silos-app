@@ -175,6 +175,10 @@
               </datalist>
             </div>
             <div>
+              <label>اسم الباخرة *</label>
+              <input type="text" id="ii_ship_name" class="inp" placeholder="اسم الباخرة" list="dl_ships">
+            </div>
+            <div>
               <label>نوع القمح</label>
               <select id="ii_wheat" class="inp">
                 <option value="روسي">روسي</option>
@@ -183,6 +187,15 @@
                 <option value="فرنسي">فرنسي</option>
                 <option value="أسترالي">أسترالي</option>
                 <option value="أمريكي">أمريكي</option>
+              </select>
+            </div>
+            <div>
+              <label>درجة النظافة</label>
+              <select id="ii_cleanliness" class="inp">
+                <option value="23.5">23.5 قيراط</option>
+                <option value="23">23 قيراط</option>
+                <option value="22.5">22.5 قيراط</option>
+                <option value="22">22 قيراط</option>
               </select>
             </div>
             <div>
@@ -432,11 +445,13 @@
       plate     = document.getElementById('ii_plate').value.trim();
       driver    = document.getElementById('ii_driver').value.trim();
       supplier  = document.getElementById('ii_supplier').value.trim();
+      shipName  = document.getElementById('ii_ship_name').value.trim();
       wheatType = document.getElementById('ii_wheat').value;
+      var cleanliness = document.getElementById('ii_cleanliness').value;
       ticketNum = document.getElementById('ii_ticket_num').value.trim();
       shipDate  = document.getElementById('ii_ship_date').value;
       transport = document.getElementById('ii_transport').value.trim();
-      if (!plate || !driver || !supplier || !ticketNum || !shipDate || !transport) return showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+      if (!plate || !driver || !supplier || !shipName || !ticketNum || !shipDate || !transport) return showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
 
     } else if (opType === 'صرف' && grainType === 'محلي') {
       plate  = document.getElementById('lo_plate').value.trim();
@@ -491,7 +506,9 @@
       t.supplierName = supplier; t.grade = grade;
     } else if (opType === 'وارد' && grainType === 'مستورد') {
       t.supplierName     = supplier;
+      t.shipName         = shipName;
       t.wheatType        = wheatType;
+      t.cleanliness      = cleanliness;
       t.ticketNum        = ticketNum;
       t.shippingDate     = shipDate;
       t.transportCompany = transport;
