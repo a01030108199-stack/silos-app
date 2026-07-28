@@ -918,7 +918,14 @@ function loadGateTicket(id) {
   document.getElementById('s_grain_type').value = t.grainType;
   
   if (t.supplierName) document.getElementById('s_supplier_name').value = t.supplierName;
-  if (t.grade || t.cleanliness) document.getElementById('s_grade').value = t.grade || t.cleanliness;
+  if (t.supplierCode && document.getElementById('s_supplier_code')) document.getElementById('s_supplier_code').value = t.supplierCode;
+  
+  if (t.grade || t.cleanliness) {
+    document.getElementById('s_grade').value = t.grade || t.cleanliness;
+  } else {
+    document.getElementById('s_grade').value = '';
+  }
+  
   if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
   if (t.destination) document.getElementById('s_destination').value = t.destination;
   if (t.shippedWeight && document.getElementById('s_shipped_weight')) document.getElementById('s_shipped_weight').value = t.shippedWeight;

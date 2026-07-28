@@ -114,15 +114,12 @@
             </div>
             <div>
               <label>جهة الوارد *</label>
-              <input type="text" id="li_supplier" class="inp" placeholder="المحافظة أو المورد">
+              <input type="text" id="li_supplier" class="inp" placeholder="المحافظة أو المورد" list="li_suppliers_list" oninput="generateSupplierCode()">
+              <datalist id="li_suppliers_list"></datalist>
             </div>
             <div>
-              <label>الدرجة (النوع)</label>
-              <select id="li_grade" class="inp">
-                <option value="23.5">23.5 قيراط</option>
-                <option value="24">24 قيراط</option>
-                <option value="22">22 قيراط</option>
-              </select>
+              <label>كود المورد</label>
+              <input type="text" id="li_supplier_code" class="inp" placeholder="يتم توليده تلقائياً" readonly style="background-color: var(--bg-hover);">
             </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
               <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-in')">
@@ -438,7 +435,7 @@
       plate    = document.getElementById('li_plate').value.trim();
       driver   = document.getElementById('li_driver').value.trim();
       supplier = document.getElementById('li_supplier').value.trim();
-      grade    = document.getElementById('li_grade').value;
+      var supplierCode = document.getElementById('li_supplier_code').value.trim();
       if (!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
 
     } else if (opType === 'وارد' && grainType === 'مستورد') {
@@ -503,7 +500,8 @@
     };
 
     if (opType === 'وارد' && grainType === 'محلي') {
-      t.supplierName = supplier; t.grade = grade;
+      t.supplierName = supplier; 
+      t.supplierCode = supplierCode;
     } else if (opType === 'وارد' && grainType === 'مستورد') {
       t.supplierName     = supplier;
       t.shipName         = shipName;
@@ -790,6 +788,38 @@
   
   // Initialize lists on load
   refreshOrderList('io');
+  populateSupplierDatalist();
+
+  function populateSupplierDatalist() {
+    const list = document.getElementById('li_suppliers_list');
+    if (!list) return;
+    list.innerHTML = '';
+    const suppliers = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+    for (const name in suppliers) {
+      list.innerHTML += `<option value="${name}">`;
+    }
+  }
+
+  function generateSupplierCode() {
+    const supplierName = document.getElementById('li_supplier').value.trim();
+    const codeInput = document.getElementById('li_supplier_code');
+    if (!supplierName) {
+      codeInput.value = '';
+      return;
+    }
+    
+    let suppliers = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+    if (suppliers[supplierName]) {
+      codeInput.value = suppliers[supplierName];
+    } else {
+      const keys = Object.keys(suppliers);
+      const newCode = 1000 + keys.length + 1;
+      suppliers[supplierName] = newCode.toString();
+      localStorage.setItem('SUPPLIERS_MAP', JSON.stringify(suppliers));
+      codeInput.value = newCode;
+      populateSupplierDatalist(); // update list in case they added a new one
+    }
+  }
 
 </script>
 </body>
