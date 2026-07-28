@@ -360,6 +360,21 @@ function init() {
   const shipsStr = localStorage.getItem('REGISTERED_SHIPS');
   if (shipsStr) registeredShips = JSON.parse(shipsStr);
   
+  // NEW AUTOMATION: Auto-detect ships from weighbridge tickets
+  const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  let addedNew = false;
+  tickets.forEach(t => {
+    if (t.silo_id === user.silo_id && t.grainType === 'مستورد' && t.shipName) {
+      if (!registeredShips.includes(t.shipName)) {
+        registeredShips.push(t.shipName);
+        addedNew = true;
+      }
+    }
+  });
+  if (addedNew) {
+    localStorage.setItem('REGISTERED_SHIPS', JSON.stringify(registeredShips));
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   let shipParam = urlParams.get('ship');
   const actionParam = urlParams.get('action');
@@ -513,6 +528,16 @@ function syncWithTickets() {
   if (!currentShipName) return;
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
   
+  // Auto-fill header data from the first available imported ticket for this ship
+  const sampleTicket = tickets.find(t => t.shipName === currentShipName && t.grainType === 'مستورد');
+  if (sampleTicket) {
+    if (!document.getElementById('h_type').value && sampleTicket.wheatType) document.getElementById('h_type').value = sampleTicket.wheatType;
+    if (sampleTicket.opType === 'وارد') {
+      if (!document.getElementById('h_port').value && sampleTicket.supplierName) document.getElementById('h_port').value = sampleTicket.supplierName;
+      if (!document.getElementById('h_voyage').value && sampleTicket.shippingDate) document.getElementById('h_voyage').value = sampleTicket.shippingDate;
+    }
+  }
+
   // Reset received and dispatched to 0 before recalculating
   ledgerRows.forEach(r => {
     r.received = 0;
@@ -520,7 +545,7 @@ function syncWithTickets() {
   });
 
   tickets.forEach(t => {
-    if (t.status !== 'completed' || t.silo_id !== user.silo_id || t.grainType !== 'مستورد' || t.shipName !== currentShipName) return;
+    if (!['completed', 'gate_out', 'pending_edit', 'pending_delete'].includes(t.status) || t.silo_id !== user.silo_id || t.grainType !== 'مستورد' || t.shipName !== currentShipName) return;
     
     let tIsoDate = t.dateStr || parseTicketDate(t.timestamp);
     if (!tIsoDate) return;
