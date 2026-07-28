@@ -118,8 +118,8 @@
               <datalist id="li_suppliers_list"></datalist>
             </div>
             <div>
-              <label>كود المورد</label>
-              <input type="text" id="li_supplier_code" class="inp" placeholder="يتم توليده تلقائياً" readonly style="background-color: var(--bg-hover);">
+              <label>كود المورد *</label>
+              <input type="text" id="li_supplier_code" class="inp" placeholder="أدخل كود المورد">
             </div>
             <div style="display:flex; align-items:flex-end; gap:10px;">
               <button class="btn btn-outline" style="flex:1" onclick="clearForm('panel-local-in')">
@@ -436,7 +436,16 @@
       driver   = document.getElementById('li_driver').value.trim();
       supplier = document.getElementById('li_supplier').value.trim();
       var supplierCode = document.getElementById('li_supplier_code').value.trim();
-      if (!plate || !driver || !supplier) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
+      if (!plate || !driver || !supplier || !supplierCode) return showToast('يرجى تعبئة جميع الحقول المطلوبة (بما في ذلك الكود)', 'error');
+      
+      // Save pairing for future auto-fill
+      let suppliersMap = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+      if (suppliersMap[supplier] !== supplierCode) {
+        suppliersMap[supplier] = supplierCode;
+        localStorage.setItem('SUPPLIERS_MAP', JSON.stringify(suppliersMap));
+        populateSupplierDatalist();
+      }
+
 
     } else if (opType === 'وارد' && grainType === 'مستورد') {
       plate     = document.getElementById('ii_plate').value.trim();
@@ -812,12 +821,7 @@
     if (suppliers[supplierName]) {
       codeInput.value = suppliers[supplierName];
     } else {
-      const keys = Object.keys(suppliers);
-      const newCode = 1000 + keys.length + 1;
-      suppliers[supplierName] = newCode.toString();
-      localStorage.setItem('SUPPLIERS_MAP', JSON.stringify(suppliers));
-      codeInput.value = newCode;
-      populateSupplierDatalist(); // update list in case they added a new one
+      codeInput.value = ''; // Let the user type it
     }
   }
 
