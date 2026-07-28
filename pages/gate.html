@@ -457,6 +457,21 @@
     var orderNo = '';
     if (opType === 'صرف' && grainType === 'مستورد') {
       orderNo = document.getElementById('io_order_no').value.trim();
+      if (!orderNo) return showToast('يرجى إدخال رقم إذن الصرف', 'error');
+
+      var orders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+      var qty = parseFloat(document.getElementById('io_order_qty').value) || 0;
+      var bonus = parseFloat(document.getElementById('io_order_bonus').value) || 0;
+      var expiry = document.getElementById('io_order_expiry').value;
+
+      if (!orders[orderNo] && qty <= 0) {
+        return showToast('هذا الإذن جديد! يرجى إدخال الكمية الأساسية وتاريخ الانتهاء له', 'error');
+      }
+
+      if (qty > 0) {
+        orders[orderNo] = { qty: qty, bonus: bonus, expiry: expiry };
+        localStorage.setItem('DISPENSE_ORDERS', JSON.stringify(orders));
+      }
     }
 
     var t = {
