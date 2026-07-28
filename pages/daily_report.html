@@ -834,7 +834,7 @@ function loadReport() {
     // Sync ships opening balances
     if (data.ships && prev.ships) {
       data.ships.forEach(s => {
-        const p = prev.ships.find(x => x.name === s.name && x.ship_name === s.ship_name);
+        const p = prev.ships.find(x => x.name === s.name);
         if (p) {
           s.opening = p.closing || 0;
           // Also update permit remaining logically
@@ -945,14 +945,19 @@ function syncWithTickets() {
     
     // 3. Update Imported Dispatch
     if (t.opType === 'صرف' && t.grainType === 'مستورد' && t.destination) {
-      let shipRow = currentData.ships.find(r => r.name === t.destination && r.ship_name === t.wheatType);
+      let shipRow = currentData.ships.find(r => r.name === t.destination);
       if (!shipRow) {
-        shipRow = { name: t.destination, ship_name: t.wheatType, permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0, orderNo: t.orderNo || '' };
+        shipRow = { name: t.destination, ship_name: t.wheatType || '', permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0, orderNo: t.orderNo || '' };
         currentData.ships.push(shipRow);
       }
       if (shipRow) {
         shipRow.dispatched += netTons;
         if (t.orderNo) shipRow.orderNo = t.orderNo;
+        if (t.wheatType && shipRow.ship_name && !shipRow.ship_name.includes(t.wheatType)) {
+          shipRow.ship_name += ' / ' + t.wheatType;
+        } else if (t.wheatType && !shipRow.ship_name) {
+          shipRow.ship_name = t.wheatType;
+        }
       }
     }
   });
