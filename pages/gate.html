@@ -255,7 +255,7 @@
             </div>
             <div>
               <label>الجهة / المحل المنصرف *</label>
-              <input type="text" id="lo_dest" class="inp" placeholder="اسم الجهة" list="dl_dest">
+              <input type="text" id="lo_dest" class="inp" placeholder="اسم الجهة" list="dl_dest" onchange="autoSelectPermit('lo', this.value)">
             </div>
             <div>
               <label>الدرجة (النوع)</label>
@@ -331,7 +331,7 @@
             </div>
             <div>
               <label>الجهة / المحل المنصرف *</label>
-              <input type="text" id="io_dest" class="inp" placeholder="اسم الجهة" list="dl_dest">
+              <input type="text" id="io_dest" class="inp" placeholder="اسم الجهة" list="dl_dest" onchange="autoSelectPermit('io', this.value)">
             </div>
             <div>
               <label>اسم الباخرة</label>
@@ -518,7 +518,7 @@
       }
 
       if (qty > 0) {
-        orders[orderNo] = { qty: qty, bonus: bonus, expiry: expiry };
+        orders[orderNo] = { qty: qty, bonus: bonus, expiry: expiry, destination: dest };
         localStorage.setItem(storageKey, JSON.stringify(orders));
       }
     }
@@ -797,11 +797,13 @@
   function saveOrderData(prefix) {
     const no = document.getElementById(prefix+'_order_no').value.trim();
     if(!no) return showToast('يرجى إدخال رقم الإذن', 'error');
+    const dest = document.getElementById(prefix+'_dest').value.trim();
     const orders = getOrders(prefix);
     orders[no] = {
       expiry: document.getElementById(prefix+'_order_expiry').value,
       qty: parseFloat(document.getElementById(prefix+'_order_qty').value) || 0,
-      bonus: parseFloat(document.getElementById(prefix+'_order_bonus').value) || 0
+      bonus: parseFloat(document.getElementById(prefix+'_order_bonus').value) || 0,
+      destination: dest
     };
     localStorage.setItem(prefix === 'lo' ? 'DISPENSE_ORDERS_LOCAL' : 'DISPENSE_ORDERS', JSON.stringify(orders));
     showToast('تم حفظ بيانات إذن الصرف بنجاح', 'success');
@@ -815,7 +817,34 @@
       document.getElementById(prefix+'_order_expiry').value = orders[no].expiry || '';
       document.getElementById(prefix+'_order_qty').value = orders[no].qty || '';
       document.getElementById(prefix+'_order_bonus').value = orders[no].bonus || '';
+      if(orders[no].destination) document.getElementById(prefix+'_dest').value = orders[no].destination;
     }
+  }
+  function autoSelectPermit(prefix, destination) {
+    if (!destination) return;
+    const orders = getOrders(prefix);
+    const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    
+    for (const [no, order] of Object.entries(orders)) {
+      if (order.destination === destination) {
+        let dispensed = 0;
+        tickets.forEach(t => {
+          if (t.opType === 'صرف' && t.orderNo === no && ['completed', 'gate_out', 'pending_edit', 'pending_delete'].includes(t.status)) {
+            dispensed += (t.net || 0);
+          }
+        });
+        const totalKg = Math.round(((order.qty || 0) + (order.bonus || 0)) * 1000);
+        const remaining = Math.max(0, totalKg - dispensed);
+        
+        if (remaining > 0) {
+          document.getElementById(prefix + '_order_no').value = no;
+          loadOrderData(prefix);
+          return;
+        }
+      }
+    }
+    document.getElementById(prefix + '_order_no').value = '';
+    loadOrderData(prefix);
   }
   function refreshOrderList(prefix) {
     const list = document.getElementById(prefix+'_order_no_list');
