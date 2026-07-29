@@ -885,8 +885,21 @@ function syncWithTickets() {
 
   // Reset all automated fields for today
   currentData.cells.forEach(c => { c.incoming = 0; c.outgoing = 0; });
-  currentData.localOut.forEach(r => { r.d235 = 0; r.d230 = 0; r.d225 = 0; });
-  currentData.ships.forEach(s => { s.dispatched = 0; });
+  const localOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL') || '{}');
+  const importedOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+
+  currentData.localOut.forEach(r => { 
+    r.d235 = 0; r.d230 = 0; r.d225 = 0; 
+    for (const [no, order] of Object.entries(localOrders)) {
+      if (order.destination === r.name) r.permit = (order.qty || 0) + (order.bonus || 0);
+    }
+  });
+  currentData.ships.forEach(s => { 
+    s.dispatched = 0; 
+    for (const [no, order] of Object.entries(importedOrders)) {
+      if (order.destination === s.name) s.permit = (order.qty || 0) + (order.bonus || 0);
+    }
+  });
 
   // Aggregate from tickets
   tickets.forEach(t => {
@@ -942,6 +955,14 @@ function syncWithTickets() {
         destRow = { name: t.destination, permit: 0, d235: 0, d230: 0, d225: 0, total: 0, remaining: 0 };
         currentData.localOut.push(destRow);
       }
+      
+      const localOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL') || '{}');
+      for (const [no, order] of Object.entries(localOrders)) {
+        if (order.destination === t.destination) {
+           destRow.permit = (order.qty || 0) + (order.bonus || 0);
+        }
+      }
+
       if (t.grade === '23.5') destRow.d235 += netTons;
       else if (t.grade === '23') destRow.d230 += netTons;
       else if (t.grade === '22.5') destRow.d225 += netTons;
@@ -955,6 +976,13 @@ function syncWithTickets() {
         currentData.ships.push(shipRow);
       }
       if (shipRow) {
+        const importedOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+        for (const [no, order] of Object.entries(importedOrders)) {
+          if (order.destination === t.destination) {
+             shipRow.permit = (order.qty || 0) + (order.bonus || 0);
+          }
+        }
+        
         shipRow.dispatched += netTons;
         if (t.orderNo) shipRow.orderNo = t.orderNo;
         if (t.wheatType && shipRow.ship_name && !shipRow.ship_name.includes(t.wheatType)) {
