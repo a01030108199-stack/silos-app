@@ -657,11 +657,40 @@ function renderLocalOut(data) {
     return;
   }
 
+  const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  const localOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL') || '{}');
+
   data.localOut.forEach((r, i) => {
     const total = (r.d235||0) + (r.d230||0) + (r.d225||0);
-    const rem   = (r.permit||0) - total;
-    data.localOut[i].total   = total;
+    
+    // Find active order for this mill
+    let activeOrderNo = null;
+    let permitQty = r.permit || 0;
+    for (const [no, order] of Object.entries(localOrders)) {
+       if (order.destination === r.name) {
+           permitQty = (order.qty || 0) + (order.bonus || 0);
+           activeOrderNo = no;
+       }
+    }
+    
+    // Calculate true remaining balance
+    let realDispensed = 0;
+    if (activeOrderNo) {
+       tickets.forEach(t => {
+          if (t.opType === 'صرف' && t.orderNo === activeOrderNo && ['completed', 'gate_out', 'pending_edit', 'pending_delete'].includes(t.status)) {
+             realDispensed += (t.net || 0);
+          }
+       });
+       realDispensed = realDispensed / 1000;
+    } else {
+       realDispensed = total;
+    }
+    
+    const rem = permitQty - realDispensed;
+    data.localOut[i].permit = permitQty;
+    data.localOut[i].total = total;
     data.localOut[i].remaining = rem;
+    
     t235+=r.d235||0; t230+=r.d230||0; t225+=r.d225||0; tTot+=total; tRem+=rem;
 
     const inp = (field, v) =>
@@ -670,12 +699,12 @@ function renderLocalOut(data) {
     tbody.innerHTML += `
       <tr>
         <td><input type="text" class="inp inp-md" value="${r.name||''}" placeholder="اسم المطحن" onchange="updateLocalOut(${i},'name',this.value)"></td>
-        <td><input type="number" class="inp" value="${r.permit||''}" placeholder="0" onchange="updateLocalOut(${i},'permit',+this.value)"></td>
+        <td><input type="number" class="inp" value="${permitQty||0}" placeholder="0" onchange="updateLocalOut(${i},'permit',+this.value)" ${activeOrderNo ? 'readonly title="مستورد آلياً من البوابة"' : ''}></td>
         <td class="val-outgoing">${fmt(r.d235)}</td>
         <td class="val-outgoing">${fmt(r.d230)}</td>
         <td class="val-outgoing">${fmt(r.d225)}</td>
         <td class="val-outgoing" style="font-weight:800">${fmt(total)}</td>
-        <td style="color:${rem<0?'#ff5252':'#ffe082'};font-weight:700">${fmt(rem)}</td>
+        <td style="color:${rem<0?'#ff5252':'#ffe082'};font-weight:700" title="تم احتساب المنصرف الفعلي طوال مدة الإذن: ${fmt(realDispensed)} طن">${fmt(rem)}</td>
         <td class="no-print"><button class="del-btn" onclick="deleteLocalOut(${i})" title="حذف"><i class="fa-solid fa-trash-can"></i></button></td>
       </tr>`;
   });
