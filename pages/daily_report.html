@@ -771,21 +771,25 @@ function updateLocalOut(i, field, val) {
   if (field === 'name') currentData.localOut[i][field] = val;
   else currentData.localOut[i][field] = +val || 0;
   renderLocalOut(currentData);
+  saveReportSilently();
 }
 function updateShip(i, field, val) {
   if (field === 'name' || field === 'ship_name') currentData.ships[i][field] = val;
   else currentData.ships[i][field] = +val || 0;
   renderShips(currentData);
+  saveReportSilently();
 }
 
 // ─── Add rows ─────────────────────────────────────────────────
 function addLocalOut() {
   currentData.localOut.push({ name:'', permit:0, d235:0, d230:0, d225:0, total:0, remaining:0 });
   renderLocalOut(currentData);
+  saveReportSilently();
 }
 function addShipRow() {
   currentData.ships.push({ name:'', permit:0, opening:0, dispatched:0, closing:0, remaining:0 });
   renderShips(currentData);
+  saveReportSilently();
 }
 
 // ─── Delete rows ──────────────────────────────────────────────
@@ -793,12 +797,14 @@ function deleteLocalOut(i) {
   if (!confirm('هل تريد حذف هذا السطر نهائياً؟')) return;
   currentData.localOut.splice(i,1);
   renderLocalOut(currentData);
+  saveReportSilently();
   showToast('تم حذف السطر', 'success');
 }
 function deleteShip(i) {
   if (!confirm('هل تريد حذف هذا السطر نهائياً؟')) return;
   currentData.ships.splice(i,1);
   renderShips(currentData);
+  saveReportSilently();
   showToast('تم حذف السطر', 'success');
 }
 
