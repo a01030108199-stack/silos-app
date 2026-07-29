@@ -663,11 +663,12 @@ function renderLocalOut(data) {
   data.localOut.forEach((r, i) => {
     const total = (r.d235||0) + (r.d230||0) + (r.d225||0);
     
+    const normStr = (s) => (s||'').trim().replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
     // Find active order for this mill
     let activeOrderNo = null;
     let permitQty = r.permit || 0;
     for (const [no, order] of Object.entries(localOrders)) {
-       if (order.destination === r.name) {
+       if (normStr(order.destination) === normStr(r.name)) {
            permitQty = (order.qty || 0) + (order.bonus || 0);
            activeOrderNo = no;
        }
