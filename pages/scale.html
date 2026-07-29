@@ -404,7 +404,10 @@ function toggleDynamicFields() {
   }
 }
 
-function getOrders() { return JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}'); }
+function getStorageKey() {
+  return document.getElementById('s_grain_type').value === 'مستورد' ? 'DISPENSE_ORDERS' : 'DISPENSE_ORDERS_LOCAL';
+}
+function getOrders() { return JSON.parse(localStorage.getItem(getStorageKey()) || '{}'); }
 function saveOrderData() {
   const no = document.getElementById('s_order_no').value.trim();
   if(!no) return;
@@ -414,7 +417,7 @@ function saveOrderData() {
     qty: parseFloat(document.getElementById('s_order_qty').value) || 0,
     bonus: parseFloat(document.getElementById('s_order_bonus').value) || 0
   };
-  localStorage.setItem('DISPENSE_ORDERS', JSON.stringify(orders));
+  localStorage.setItem(getStorageKey(), JSON.stringify(orders));
   showToast('تم حفظ بيانات إذن الصرف بنجاح', 'success');
   refreshOrderList();
   calcOrderBalance();
@@ -427,6 +430,10 @@ function loadOrderData() {
     document.getElementById('s_order_expiry').value = orders[no].expiry || '';
     document.getElementById('s_order_qty').value = orders[no].qty || '';
     document.getElementById('s_order_bonus').value = orders[no].bonus || '';
+  } else {
+    document.getElementById('s_order_expiry').value = '';
+    document.getElementById('s_order_qty').value = '';
+    document.getElementById('s_order_bonus').value = '';
   }
   calcOrderBalance();
 }
