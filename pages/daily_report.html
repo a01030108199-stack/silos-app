@@ -471,10 +471,20 @@ let currentData = null;
 let currentDate = '';
 
 // ─── Fmt ──────────────────────────────────────────────────────
+
+function normStr(str) {
+  if (!str) return '';
+  return String(str).trim()
+    .replace(/[أإآ]/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/\s+/g, ''); // ignore all internal spaces
+}
 function fmt(n) {
   if (n===null||n===undefined||isNaN(n)) return '0';
   return Number(n).toLocaleString('en-US');
 }
+
 
 // ─── Input helpers ────────────────────────────────────────────
 function mkInp(type, val, cls, style, handler) {
@@ -662,8 +672,6 @@ function renderLocalOut(data) {
 
   data.localOut.forEach((r, i) => {
     const total = (r.d235||0) + (r.d230||0) + (r.d225||0);
-    
-    const normStr = (s) => (s||'').trim().replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
     // Find active order for this mill
     let activeOrderNo = null;
     let permitQty = r.permit || 0;
@@ -868,10 +876,9 @@ function loadReport() {
     // Sync ships opening balances
     if (data.ships && prev.ships) {
       data.ships.forEach(s => {
-        const p = prev.ships.find(x => x.name === s.name);
+        const p = prev.ships.find(x => normStr(x.name) === normStr(s.name));
         if (p) {
           s.opening = p.closing || 0;
-          // Also update permit remaining logically
           s.permit = p.remaining || 0;
         }
       });
@@ -891,6 +898,8 @@ function loadReport() {
   renderLocalOut(currentData);
   renderShips(currentData);
 }
+
+
 
 function parseTicketDate(ts) {
   if (!ts) return '';
@@ -915,20 +924,11 @@ function syncWithTickets() {
 
   // Reset all automated fields for today
   currentData.cells.forEach(c => { c.incoming = 0; c.outgoing = 0; });
-  const localOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL') || '{}');
-  const importedOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
-
   currentData.localOut.forEach(r => { 
     r.d235 = 0; r.d230 = 0; r.d225 = 0; 
-    for (const [no, order] of Object.entries(localOrders)) {
-      if (order.destination === r.name) r.permit = (order.qty || 0) + (order.bonus || 0);
-    }
   });
   currentData.ships.forEach(s => { 
     s.dispatched = 0; 
-    for (const [no, order] of Object.entries(importedOrders)) {
-      if (order.destination === s.name) s.permit = (order.qty || 0) + (order.bonus || 0);
-    }
   });
 
   // Aggregate from tickets
@@ -980,17 +980,10 @@ function syncWithTickets() {
     
     // 2. Update Local Dispatch to Mills
     if (t.opType === 'صرف' && t.grainType === 'محلي' && t.destination) {
-      let destRow = currentData.localOut.find(r => r.name === t.destination);
+      let destRow = currentData.localOut.find(r => normStr(r.name) === normStr(t.destination));
       if (!destRow) {
         destRow = { name: t.destination, permit: 0, d235: 0, d230: 0, d225: 0, total: 0, remaining: 0 };
         currentData.localOut.push(destRow);
-      }
-      
-      const localOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL') || '{}');
-      for (const [no, order] of Object.entries(localOrders)) {
-        if (order.destination === t.destination) {
-           destRow.permit = (order.qty || 0) + (order.bonus || 0);
-        }
       }
 
       if (t.grade === '23.5') destRow.d235 += netTons;
