@@ -1,0 +1,19 @@
+﻿.chart-card.fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: none !important;
+  z-index: 9999 !important;
+  background: var(--bg-card) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+.chart-card.fullscreen > div[style*="height"] {
+  flex: 1 !important;
+  height: auto !important;
+}

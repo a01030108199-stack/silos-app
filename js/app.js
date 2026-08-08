@@ -360,3 +360,64 @@ function closeModal(id) {
   if (el) el.remove();
 }
 
+
+// --- Chart Fullscreen Toggle ---
+window.toggleFullscreenChart = function(btn) {
+  const card = btn.closest('.chart-card');
+  if (!card) return;
+  card.classList.toggle('fullscreen');
+  const icon = btn.querySelector('i');
+  if (card.classList.contains('fullscreen')) {
+    icon.classList.remove('fa-expand');
+    icon.classList.add('fa-compress');
+  } else {
+    icon.classList.remove('fa-compress');
+    icon.classList.add('fa-expand');
+  }
+  
+  // Find canvas and resize
+  const canvas = card.querySelector('canvas');
+  if (canvas && window.Chart) {
+    const chart = window.Chart.getChart(canvas);
+    if (chart) {
+      setTimeout(() => {
+        chart.resize();
+      }, 50);
+    }
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Inject fullscreen buttons to all chart cards
+  document.querySelectorAll('.chart-card').forEach(card => {
+    const canvas = card.querySelector('canvas');
+    if (canvas) {
+      const header = card.querySelector('.card-header');
+      if (header) {
+        let rightDiv = header.querySelector('.right-actions');
+        if (!rightDiv) {
+          rightDiv = document.createElement('div');
+          rightDiv.className = 'right-actions';
+          rightDiv.style.display = 'flex';
+          rightDiv.style.gap = '10px';
+          rightDiv.style.alignItems = 'center';
+          
+          const children = Array.from(header.children);
+          for (let i = 1; i < children.length; i++) {
+            rightDiv.appendChild(children[i]);
+          }
+          header.appendChild(rightDiv);
+        }
+        
+        const btn = document.createElement('button');
+        btn.className = 'btn-icon';
+        btn.style.cssText = 'background:transparent;border:none;color:#94a3b8;cursor:pointer;padding:5px;font-size:16px;';
+        btn.onclick = function() { window.toggleFullscreenChart(this); };
+        btn.title = 'تكبير / تصغير';
+        btn.innerHTML = '<i class="fa-solid fa-expand"></i>';
+        
+        rightDiv.appendChild(btn);
+      }
+    }
+  });
+});
