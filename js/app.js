@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // js/app.js — مكتبة مشتركة: Auth + Sidebar + Utilities
 // ============================================================
 
@@ -375,16 +375,10 @@ window.toggleFullscreenChart = function(btn) {
     icon.classList.add('fa-expand');
   }
   
-  // Find canvas and resize
-  const canvas = card.querySelector('canvas');
-  if (canvas && window.Chart) {
-    const chart = window.Chart.getChart(canvas);
-    if (chart) {
-      setTimeout(() => {
-        chart.resize();
-      }, 50);
-    }
-  }
+  // Trigger window resize event to let Chart.js naturally resize all charts
+  window.dispatchEvent(new Event('resize'));
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -421,3 +415,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+
