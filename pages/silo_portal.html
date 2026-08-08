@@ -202,30 +202,31 @@
         <h2>إعدادات كلمات المرور</h2>
       </div>
       <div style="padding:20px; text-align:right">
-        <div class="auth-form-group">
-          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور البوابة</label>
-          <input type="password" id="setPwdSecurity" class="auth-input">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="auth-form-group" style="margin-bottom:0">
+            <label style="color:#fff; margin-bottom:5px; display:block">البوابة</label>
+            <input type="password" id="setPwdSecurity" class="auth-input">
+          </div>
+          <div class="auth-form-group" style="margin-bottom:0">
+            <label style="color:#fff; margin-bottom:5px; display:block">الميزان</label>
+            <input type="password" id="setPwdScale" class="auth-input">
+          </div>
+          <div class="auth-form-group" style="margin-bottom:0">
+            <label style="color:#fff; margin-bottom:5px; display:block">الإدارة</label>
+            <input type="password" id="setPwdManager" class="auth-input">
+          </div>
+          <div class="auth-form-group" style="margin-bottom:0">
+            <label style="color:#fff; margin-bottom:5px; display:block">المالية</label>
+            <input type="password" id="setPwdFinance" class="auth-input">
+          </div>
+          <div class="auth-form-group" style="margin-bottom:0; grid-column: 1 / -1;">
+            <label style="color:#fff; margin-bottom:5px; display:block">الصيانة</label>
+            <input type="password" id="setPwdMaintenance" class="auth-input">
+          </div>
         </div>
-        <div class="auth-form-group">
-          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور الميزان</label>
-          <input type="password" id="setPwdScale" class="auth-input">
-        </div>
-        <div class="auth-form-group">
-          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور الإدارة</label>
-          <input type="password" id="setPwdManager" class="auth-input">
-        </div>
-        <div class="auth-form-group">
-          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور الشؤون المالية</label>
-          <input type="password" id="setPwdFinance" class="auth-input">
-        </div>
-        <div class="auth-form-group">
-          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور الصيانة</label>
-          <input type="password" id="setPwdMaintenance" class="auth-input">
-        </div>
-        <button type="button" class="auth-btn" style="background:#8b5cf6" onclick="saveSettings()">حفظ الإعدادات</button>
+        <button type="button" class="auth-btn" style="background:#8b5cf6; margin-top:20px;" onclick="saveSettings()">حفظ الإعدادات</button>
       </div>
     </div>
-  </div>
   </div>
 
   <!-- Auth Modal -->
