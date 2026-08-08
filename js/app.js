@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // js/app.js — مكتبة مشتركة: Auth + Sidebar + Utilities
 // ============================================================
 
@@ -365,6 +365,10 @@ function closeModal(id) {
 window.toggleFullscreenChart = function(btn) {
   const card = btn.closest('.chart-card');
   if (!card) return;
+  
+  const canvas = card.querySelector('canvas');
+  if (canvas) canvas.style.display = 'none';
+
   card.classList.toggle('fullscreen');
   const icon = btn.querySelector('i');
   if (card.classList.contains('fullscreen')) {
@@ -375,10 +379,17 @@ window.toggleFullscreenChart = function(btn) {
     icon.classList.add('fa-expand');
   }
   
-  // Trigger window resize event to let Chart.js naturally resize all charts
-  window.dispatchEvent(new Event('resize'));
-  setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
-  setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+  if (canvas) {
+    setTimeout(() => {
+      canvas.style.display = 'block';
+      if (window.Chart) {
+        const chart = window.Chart.getChart(canvas);
+        if (chart) {
+          chart.resize();
+        }
+      }
+    }, 50);
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -415,5 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
 
 
