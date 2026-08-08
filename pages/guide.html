@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منظومة الحوكمة الرقمية — الدليل الشامل</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --navy: #0d1b2a;
+    --navy-mid: #142236;
+    --navy-light: #1e3250;
+    --accent: #2a7fc1;
+    --accent-light: #4aa3e8;
+    --green: #22c55e;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --white: #ffffff;
+    --border: rgba(201,168,76,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  /* ===== TOP NAV ===== */
+  .guide-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(13,27,42,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 30px;
+    z-index: 100;
+    gap: 20px;
+  }
+  .guide-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .guide-nav-logo .logo-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--navy);
+  }
+  .guide-nav-logo .logo-text { font-size: 17px; font-weight: 700; color: var(--gold); }
+  .guide-nav-logo .logo-sub { font-size: 11px; color: var(--text-muted); }
+
+  .guide-nav-actions {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .btn-print {
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    color: var(--navy);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.3s;
+  }
+  .btn-print:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(201,168,76,0.4); }
+  .btn-back {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.1); }
+
+  /* ===== MAIN CONTENT ===== */
+  .guide-wrapper {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 100px 30px 60px;
+  }
+
+  /* ===== PAGE SECTIONS ===== */
+  .guide-page {
+    margin-bottom: 60px;
+    page-break-after: always;
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover-page {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(160deg, var(--navy-mid), var(--navy-light));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover-page::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-page::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(42,127,193,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-logo {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px; color: var(--navy);
+    margin-bottom: 32px;
+    box-shadow: 0 20px 50px rgba(201,168,76,0.3);
+  }
+  .cover-company {
+    font-size: 14px; font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .cover-title {
+    font-size: 42px; font-weight: 900;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .cover-subtitle {
+    font-size: 18px; font-weight: 300;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+  }
+  .cover-divider {
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    border-radius: 2px;
+    margin: 0 auto 40px;
+  }
+  .cover-desc {
+    font-size: 16px; font-weight: 400;
+    color: var(--text);
+    max-width: 600px;
+    line-height: 2;
+    margin-bottom: 50px;
+  }
+  .cover-meta {
+    display: flex; gap: 40px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .cover-meta-item { text-align: center; }
+  .cover-meta-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .cover-meta-value { font-size: 14px; font-weight: 700; color: var(--gold); }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-number {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    color: var(--navy);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 24px; font-weight: 800; color: var(--white); }
+  .section-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-gold {
+    border-color: var(--border);
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), rgba(13,27,42,0.9));
+  }
+
+  /* ===== COMPARISON TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  .compare-table th {
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+  }
+  .compare-table th:first-child {
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+    border-radius: 8px 0 0 0;
+  }
+  .compare-table th:last-child {
+    background: rgba(34,197,94,0.15);
+    color: #4ade80;
+    border-radius: 0 8px 0 0;
+  }
+  .compare-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
+  }
+  .compare-table td:first-child { color: #fca5a5; }
+  .compare-table td:last-child { color: #86efac; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .icon-x { color: #ef4444; margin-left: 8px; }
+  .icon-check { color: #22c55e; margin-left: 8px; }
+
+  /* ===== TECH GRID ===== */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .tech-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .tech-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .tech-icon.blue { background: rgba(42,127,193,0.15); color: var(--accent-light); }
+  .tech-icon.gold { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .tech-icon.green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .tech-icon.purple { background: rgba(139,92,246,0.15); color: #a78bfa; }
+  .tech-text-title { font-size: 14px; font-weight: 700; color: var(--white); }
+  .tech-text-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== HIERARCHY ===== */
+  .hierarchy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .hierarchy-level {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .hierarchy-box {
+    background: linear-gradient(135deg, var(--gold), #a07830);
+    color: var(--navy);
+    padding: 14px 40px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 0;
+    min-width: 220px;
+  }
+  .hierarchy-box.blue {
+    background: linear-gradient(135deg, var(--accent), #1a5a90);
+    color: white;
+  }
+  .hierarchy-box.dark {
+    background: var(--navy-light);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px; font-weight: 600;
+    min-width: 150px;
+  }
+  .hierarchy-connector {
+    width: 2px; height: 24px;
+    background: var(--border);
+    margin: 0 auto;
+  }
+  .hierarchy-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hierarchy-row-connector {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0 30px 0 30px;
+    max-width: 600px;
+    align-self: flex-start;
+    margin-top: 24px;
+  }
+
+  /* ===== ROLES GRID ===== */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .role-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .role-icon {
+    width: 50px; height: 50px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin: 0 auto 12px;
+  }
+  .role-name { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .role-perms { font-size: 12px; color: var(--text-muted); line-height: 1.8; }
+
+  /* ===== FLOW STEPS ===== */
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .flow-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .flow-step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #1a5a90);
+    color: white;
+    font-size: 16px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .flow-line {
+    width: 2px; flex: 1;
+    background: rgba(42,127,193,0.3);
+    min-height: 30px;
+    margin-top: 6px;
+  }
+  .flow-content {
+    padding: 8px 0 30px;
+    flex: 1;
+  }
+  .flow-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .flow-desc { font-size: 13px; color: var(--text-muted); }
+  .flow-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .flow-tag {
+    background: rgba(42,127,193,0.15);
+    color: var(--accent-light);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 1px solid rgba(42,127,193,0.3);
+  }
+  .flow-tag.green { background: rgba(34,197,94,0.1); color: #4ade80; border-color: rgba(34,197,94,0.3); }
+  .flow-tag.gold { background: rgba(201,168,76,0.1); color: var(--gold); border-color: var(--border); }
+
+  /* ===== SECURITY ITEMS ===== */
+  .security-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .security-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .security-item-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(239,68,68,0.1);
+    color: #f87171;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .security-item-icon.green { background: rgba(34,197,94,0.1); color: #4ade80; }
+  .security-item-icon.gold { background: rgba(201,168,76,0.1); color: var(--gold); }
+  .security-item-icon.blue { background: rgba(42,127,193,0.1); color: var(--accent-light); }
+  .security-item-icon.purple { background: rgba(139,92,246,0.1); color: #a78bfa; }
+  .security-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .security-desc { font-size: 13px; color: var(--text-muted); }
+
+  /* ===== DASHBOARD FEATURES ===== */
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .feature-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .feature-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .feature-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+  .feature-desc { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+
+  /* ===== CONCLUSION ===== */
+  .achievement-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .achievement-item {
+    background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(13,27,42,0.9));
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .achievement-icon { font-size: 28px; flex-shrink: 0; }
+  .achievement-title { font-size: 14px; font-weight: 700; color: #4ade80; margin-bottom: 4px; }
+  .achievement-desc { font-size: 12px; color: var(--text-muted); }
+
+  .future-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .future-item {
+    background: rgba(42,127,193,0.05);
+    border: 1px solid rgba(42,127,193,0.2);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .future-icon { font-size: 22px; flex-shrink: 0; color: var(--accent-light); margin-top: 2px; }
+  .future-title { font-size: 14px; font-weight: 700; color: var(--accent-light); margin-bottom: 4px; }
+  .future-desc { font-size: 12px; color: var(--text-muted); }
+
+  .signature-box {
+    text-align: center;
+    padding: 40px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.05), rgba(13,27,42,0.9));
+    margin-top: 30px;
+  }
+  .signature-title { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+  .signature-name { font-size: 20px; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+  .signature-role { font-size: 13px; color: var(--text-muted); }
+
+  /* ===== HIGHLIGHT BOX ===== */
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(42,127,193,0.05));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    .guide-nav { display: none !important; }
+    .guide-wrapper { padding-top: 20px; }
+    .guide-page { page-break-after: always; margin-bottom: 0; }
+    body { background: white; color: black; }
+    .card, .card-gold, .cover-page { background: #f8f9fa; border-color: #dee2e6; }
+    .cover-title, .section-title, .flow-title, .tech-text-title, .role-name,
+    .feature-title, .security-title, .achievement-title { color: #1a1a2e; }
+    .tech-text-sub, .flow-desc, .role-perms, .feature-desc, .security-desc,
+    .achievement-desc, .future-desc { color: #6c757d; }
+    .highlight-box { background: #f0f4ff; border-color: #c0d0f0; }
+  }
+
+  /* ===== PAGE LABEL ===== */
+  .page-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--border);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .divider-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 50px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="guide-nav">
+  <div class="guide-nav-logo">
+    <div class="logo-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+    <div>
+      <div class="logo-text">منظومة الحوكمة الرقمية</div>
+      <div class="logo-sub">الدليل الشامل للنظام</div>
+    </div>
+  </div>
+  <div class="guide-nav-actions">
+    <a href="../index.html" class="btn-back"><i class="fa-solid fa-arrow-right"></i> العودة لتسجيل الدخول</a>
+    <button class="btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة PDF</button>
+  </div>
+</nav>
+
+<div class="guide-wrapper">
+
+  <!-- ===== PAGE 1: COVER ===== -->
+  <div class="guide-page">
+    <div class="cover-page">
+      <div class="cover-logo"><i class="fa-solid fa-wheat-awn"></i></div>
+      <div class="cover-company">الشركة المصرية القابضة للصوامع والتخزين</div>
+      <div class="cover-title">منظومة الحوكمة الرقمية</div>
+      <div class="cover-subtitle">النظام الرقمي المتكامل لإدارة الصوامع والتخزين</div>
+      <div class="cover-divider"></div>
+      <div class="cover-desc">
+        منظومة رقمية متكاملة تربط جميع صوامع الشركة على مستوى الجمهورية بمركز رقابة واحد،
+        لتوفير شفافية كاملة ورقابة لحظية دقيقة على حركة القمح والمخزون في الوقت الفعلي.
+      </div>
+      <div style="font-size:14px;color:var(--gold);margin-bottom:40px;font-weight:700;">
+        مُعدّ لصالح: السيد اللواء الدكتور / أشرف صادق<br>العضو المنتدب والرئيس التنفيذي بالشركة
+      </div>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">عدد الصوامع المربوطة</div>
+          <div class="cover-meta-value">48 صومعة</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">عدد الإدارات الوظيفية</div>
+          <div class="cover-meta-value">5 إدارات</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">نوع النظام</div>
+          <div class="cover-meta-value">سحابي لحظي</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">إصدار الدليل</div>
+          <div class="cover-meta-value" id="docDate">2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 2: PROBLEM & SOLUTION ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة الثانية</div>
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <div>
+        <div class="section-title">المشكلة والحل — لماذا هذا النظام؟</div>
+        <div class="section-subtitle">مقارنة بين واقع ما قبل المنظومة وما بعدها</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      يهدف هذا النظام إلى تحقيق التحول الرقمي الكامل في منظومة إدارة الصوامع،
+      والقضاء على إشكاليات العمل الورقي التقليدي التي كانت تعرّض الشركة للخسائر وصعوبة الرقابة.
+    </div>
+
+    <div class="card">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th><i class="icon-x fa-solid fa-xmark"></i> قبل المنظومة</th>
+            <th><i class="icon-check fa-solid fa-check"></i> بعد منظومة الحوكمة الرقمية</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> بيانات ورقية عرضة للأخطاء والفقدان</td>
+            <td><i class="icon-check fa-solid fa-check"></i> تسجيل رقمي آني محمي ومدعوم بالنسخ الاحتياطي</td>
+          </tr>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> لا رقابة لحظية على الصوامع البعيدة</td>
+            <td><i class="icon-check fa-solid fa-check"></i> لوحة تحكم مركزية تعرض جميع الصوامع في وقت واحد</td>
+          </tr>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> صعوبة اكتشاف التلاعب بالسجلات</td>
+            <td><i class="icon-check fa-solid fa-check"></i> سجل كامل لكل تعديل مع اسم المستخدم ووقت التعديل</td>
+          </tr>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> الإجماليات تحتاج حسابات يدوية طويلة</td>
+            <td><i class="icon-check fa-solid fa-check"></i> إحصاءات ورسوم بيانية تتحدث فورياً دون تدخل بشري</td>
+          </tr>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> تعدد الصوامع دون تنسيق أو توحيد</td>
+            <td><i class="icon-check fa-solid fa-check"></i> ربط 48 صومعة بمركز إداري واحد عبر الإنترنت</td>
+          </tr>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> لا يمكن الاطلاع على الكميات في الوقت الفعلي</td>
+            <td><i class="icon-check fa-solid fa-check"></i> مخزون كل صومعة متاح للإدارة العامة في أي لحظة</td>
+          </tr>
+          <tr>
+            <td><i class="icon-x fa-solid fa-xmark"></i> إجراءات الشطب والتعديل غير خاضعة لرقابة</td>
+            <td><i class="icon-check fa-solid fa-check"></i> كل شطب أو تعديل يحتاج موافقة صريحة من الإدارة العليا</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 3: TECHNICAL SPECS ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة الثالثة</div>
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <div>
+        <div class="section-title">المواصفات التقنية للنظام</div>
+        <div class="section-subtitle">البنية التحتية التقنية وعوامل التفوق</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      تم تصميم منظومة الحوكمة الرقمية بأحدث التقنيات العالمية لضمان الاستمرارية والموثوقية وسهولة
+      الاستخدام على جميع الأجهزة، دون الحاجة لتثبيت أي برنامج أو تجهيز خاص.
+    </div>
+
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="tech-icon blue"><i class="fa-solid fa-cloud"></i></div>
+        <div>
+          <div class="tech-text-title">قاعدة بيانات سحابية لحظية</div>
+          <div class="tech-text-sub">Firebase Realtime Database — تزامن البيانات بين جميع الصوامع خلال أجزاء من الثانية</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon gold"><i class="fa-solid fa-globe"></i></div>
+        <div>
+          <div class="tech-text-title">منصة ويب — لا تثبيت مطلوب</div>
+          <div class="tech-text-sub">يعمل على أي متصفح وأي جهاز (كمبيوتر، تابلت، موبايل) بدون إعداد مسبق</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+          <div class="tech-text-title">حماية وتشفير كامل للبيانات</div>
+          <div class="tech-text-sub">جميع البيانات مشفرة أثناء النقل والتخزين، مع نظام مصادقة متعدد المستويات</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon purple"><i class="fa-solid fa-rotate"></i></div>
+        <div>
+          <div class="tech-text-title">نسخ احتياطي تلقائي ومستمر</div>
+          <div class="tech-text-sub">حماية البيانات تلقائياً دون تدخل المستخدم، مع إمكانية الاسترجاع في أي وقت</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon blue"><i class="fa-solid fa-users-rectangle"></i></div>
+        <div>
+          <div class="tech-text-title">عزل تام بين قواعد البيانات</div>
+          <div class="tech-text-sub">كل صومعة تعمل بقاعدة بيانات منفصلة — صومعة لا ترى بيانات أخرى</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon green"><i class="fa-solid fa-chart-line"></i></div>
+        <div>
+          <div class="tech-text-title">رسوم بيانية تفاعلية</div>
+          <div class="tech-text-sub">Chart.js لرسومات بيانية متحركة وتفاعلية مع إمكانية التكبير لملء الشاشة</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon gold"><i class="fa-solid fa-mobile-screen"></i></div>
+        <div>
+          <div class="tech-text-title">تصميم متجاوب مع جميع الشاشات</div>
+          <div class="tech-text-sub">Responsive Design — يتكيف النظام تلقائياً مع حجم الشاشة</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon purple"><i class="fa-solid fa-lock"></i></div>
+        <div>
+          <div class="tech-text-title">إدارة أرقام سرية مستقلة</div>
+          <div class="tech-text-sub">كل إدارة في كل صومعة لها رقمها السري المستقل، تتحكم فيه الإدارة العامة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 4: HIERARCHY ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة الرابعة</div>
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <div>
+        <div class="section-title">هيكل النظام وطبقات المستخدمين</div>
+        <div class="section-subtitle">التسلسل الإداري وصلاحيات كل مستوى</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px; padding:30px;">
+      <div class="hierarchy">
+        <div class="hierarchy-level">
+          <div class="hierarchy-box"><i class="fa-solid fa-building-columns" style="margin-left:10px"></i>الإدارة العامة المركزية</div>
+        </div>
+        <div class="hierarchy-connector"></div>
+        <div class="hierarchy-box blue" style="min-width:260px; text-align:center;">
+          <i class="fa-solid fa-wifi" style="margin-left:10px"></i>
+          ربط سحابي لحظي — Firebase
+        </div>
+        <div class="hierarchy-connector"></div>
+        <div class="hierarchy-row">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+            <div class="hierarchy-box dark">صومعة 1</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+            <div class="hierarchy-box dark">صومعة 2</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+            <div class="hierarchy-box dark" style="color:var(--text-muted);">. . .</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+            <div class="hierarchy-box dark">صومعة 48</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(201,168,76,0.1);color:var(--gold);"><i class="fa-solid fa-crown"></i></div>
+        <div class="role-name">الإدارة العامة</div>
+        <div class="role-perms">رؤية كاملة لجميع الصوامع<br>إقرار الشطب والتعديل<br>رقابة الأرقام السرية<br>لوحة التحكم الشاملة</div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa;"><i class="fa-solid fa-user-tie"></i></div>
+        <div class="role-name">مدير الموقع</div>
+        <div class="role-perms">إدارة صومعته فقط<br>الموافقة على الطلبات<br>تغيير الأرقام السرية<br>مراقبة المخزون</div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(42,127,193,0.1);color:var(--accent-light);"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div class="role-name">موظف الميزان</div>
+        <div class="role-perms">تسجيل الأوزان<br>إدخال بيانات السيارات<br>وارد محلي ومستورد<br>صرف محلي ومستورد</div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(34,197,94,0.1);color:#4ade80;"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="role-name">أمن البوابة</div>
+        <div class="role-perms">تسجيل دخول السيارات<br>مراجعة التصاريح<br>تتبع حركة المركبات<br>إدارة البوابة</div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(234,179,8,0.1);color:#fbbf24;"><i class="fa-solid fa-coins"></i></div>
+        <div class="role-name">الشؤون المالية</div>
+        <div class="role-perms">متابعة إذن الصرف<br>مراجعة الحركات المالية<br>تقارير مالية<br>شاشة مختصة</div>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:rgba(239,68,68,0.1);color:#f87171;"><i class="fa-solid fa-wrench"></i></div>
+        <div class="role-name">إدارة الصيانة</div>
+        <div class="role-perms">تسجيل الأعطال<br>متابعة طلبات الصيانة<br>تحديث حالة المعدات<br>الأولوية والتصنيف</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 5: GRAIN FLOW ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة الخامسة</div>
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <div>
+        <div class="section-title">دورة حركة القمح — الوارد والمنصرف</div>
+        <div class="section-subtitle">الإجراء الكامل لكل عملية من الدخول حتى الخروج</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+      <div class="card card-gold">
+        <div style="font-size:16px;font-weight:800;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+          <i class="fa-solid fa-truck-arrow-right"></i> عمليات الوارد
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:6px;">🌾 وارد محلي (من المزارعين والموردين)</div>
+          <div style="font-size:12px;color:var(--text-muted);">اسم المورد • درجة القمح • جهة الوارد • وزن قائم وفارغ</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:6px;">🚢 وارد مستورد (من الموانئ)</div>
+          <div style="font-size:12px;color:var(--text-muted);">اسم الباخرة • الميناء الشاحن • الشركة الناقلة • رقم الكارتة • نوع القمح</div>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(42,127,193,0.3);background:rgba(42,127,193,0.05);">
+        <div style="font-size:16px;font-weight:800;color:var(--accent-light);margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+          <i class="fa-solid fa-truck-ramp-box"></i> عمليات المنصرف
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:6px;">📋 صرف محلي (إلى المطاحن)</div>
+          <div style="font-size:12px;color:var(--text-muted);">إذن الصرف • تاريخ الانتهاء • الكمية الأساسية • التعزيز • الجهة المنصرف إليها</div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--white);margin-bottom:6px;">🚢 صرف مستورد</div>
+          <div style="font-size:12px;color:var(--text-muted);">نفس بيانات الوارد المستورد مع جهة الصرف ورقم الإذن</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:20px;"><i class="fa-solid fa-sitemap" style="margin-left:10px;color:var(--gold)"></i>مراحل تسجيل كل حركة</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-step-left"><div class="flow-num">1</div><div class="flow-line"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">دخول السيارة من البوابة</div>
+            <div class="flow-desc">يسجّل أمن البوابة رقم لوحة السيارة ويفتح لها تذكرة جديدة في النظام</div>
+            <div class="flow-tags"><span class="flow-tag gold">أمن البوابة</span></div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-left"><div class="flow-num">2</div><div class="flow-line"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">تسجيل الوزن القائم</div>
+            <div class="flow-desc">يقوم موظف الميزان بتسجيل الوزن القائم الكامل للسيارة مع الحمولة ويدخل بيانات الشحنة كاملة</div>
+            <div class="flow-tags"><span class="flow-tag">موظف الميزان</span></div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-left"><div class="flow-num">3</div><div class="flow-line"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">تفريغ أو تحميل الشحنة</div>
+            <div class="flow-desc">تذهب السيارة إلى الخلية المحددة لتفريغ القمح (وارد) أو تحميله (صرف)</div>
+            <div class="flow-tags"><span class="flow-tag green">داخل الصومعة</span></div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-left"><div class="flow-num">4</div><div class="flow-line"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">تسجيل الوزن الفارغ واحتساب الصافي</div>
+            <div class="flow-desc">يعود موظف الميزان لتسجيل الوزن فارغة، ويحتسب النظام صافي الحمولة تلقائياً</div>
+            <div class="flow-tags"><span class="flow-tag">موظف الميزان</span><span class="flow-tag green">احتساب آلي</span></div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-left"><div class="flow-num">5</div></div>
+          <div class="flow-content">
+            <div class="flow-title">إغلاق التذكرة والخروج</div>
+            <div class="flow-desc">تُرفع الحركة لمخزون الصومعة تلقائياً وتظهر على لوحة تحكم الإدارة العامة فوراً</div>
+            <div class="flow-tags"><span class="flow-tag gold">الإدارة العامة</span><span class="flow-tag green">تحديث فوري</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 6: SECURITY ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة السادسة</div>
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <div>
+        <div class="section-title">نظام الرقابة والحماية من التلاعب</div>
+        <div class="section-subtitle">طبقات الأمان التي تصون بيانات الشركة وتمنع أي تلاعب</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <i class="fa-solid fa-shield-halved" style="color:var(--gold);margin-left:10px;font-size:18px;"></i>
+      صُمِّمت منظومة الحوكمة الرقمية بمنطق "الصفر تسامح مع التلاعب" — كل حركة مسجّلة ومؤرّخة ومرتبطة باسم مستخدم بعينه،
+      وأي محاولة لتعديل البيانات تستلزم سلسلة موافقات لا يمكن تجاوزها.
+    </div>
+
+    <div class="security-list">
+      <div class="security-item">
+        <div class="security-item-icon green"><i class="fa-solid fa-lock"></i></div>
+        <div>
+          <div class="security-title">عزل تام بين الصوامع</div>
+          <div class="security-desc">كل صومعة تعمل ببيانات معزولة تماماً — لا يمكن لموظف أي صومعة الاطلاع على بيانات صومعة أخرى بأي حال من الأحوال. كل صومعة كأنها نظام مستقل.</div>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-item-icon blue"><i class="fa-solid fa-key"></i></div>
+        <div>
+          <div class="security-title">أرقام سرية مستقلة لكل إدارة</div>
+          <div class="security-desc">لكل إدارة (البوابة، الميزان، المدير، المالية، الصيانة) في كل صومعة رقم سري مستقل يختلف عن الإدارات الأخرى، مما يمنع أي تداخل في الصلاحيات.</div>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-item-icon" style="background:rgba(239,68,68,0.1);color:#f87171;"><i class="fa-solid fa-ban"></i></div>
+        <div>
+          <div class="security-title">لا شطب بدون موافقة رسمية</div>
+          <div class="security-desc">لا يستطيع موظف الميزان أو أي إدارة أخرى شطب أو حذف أي تذكرة وزن بمفردها. كل طلب شطب يذهب تلقائياً للموافقة من مدير الموقع أو الإدارة العامة.</div>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-item-icon gold"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="security-title">سجل تدقيق شامل (Audit Log)</div>
+          <div class="security-desc">كل تعديل أو شطب يُسجَّل تلقائياً مع: اسم المستخدم الذي نفّذ العملية، التاريخ والوقت بالدقيقة، سبب التعديل أو الشطب، والبيانات قبل وبعد التعديل.</div>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-item-icon purple"><i class="fa-solid fa-eye"></i></div>
+        <div>
+          <div class="security-title">رقابة مركزية على الأرقام السرية</div>
+          <div class="security-desc">تمتلك الإدارة العامة لوحة مراقبة خاصة بها ترى فيها الأرقام السرية لجميع الإدارات في جميع الصوامع الـ48، مع إمكانية تعديلها مركزياً في أي وقت.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 7: DASHBOARD ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة السابعة</div>
+    <div class="section-header">
+      <div class="section-number">7</div>
+      <div>
+        <div class="section-title">لوحة التحكم المركزية — الإدارة العامة</div>
+        <div class="section-subtitle">الميزات المتاحة للقيادة الإدارية العليا</div>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <i class="fa-solid fa-gauge-high" style="color:var(--accent-light);margin-left:10px;font-size:18px;"></i>
+      لوحة التحكم هي "مركز القيادة" للإدارة العامة — تجمع في صفحة واحدة كل ما يحتاجه
+      المسؤول لاتخاذ قراراته بناءً على بيانات حقيقية ومحدّثة في الوقت الفعلي.
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div>
+          <div class="feature-title">إحصاءات لحظية شاملة</div>
+          <div class="feature-desc">إجمالي المخزون على مستوى الجمهورية، عدد العمليات اليومية، حجم الوارد والمنصرف — تتحدث كلها تلقائياً</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📈</div>
+        <div>
+          <div class="feature-title">رسوم بيانية تفاعلية</div>
+          <div class="feature-desc">حركة الاستلام والصرف الأسبوعية والشهرية، توزيع القمح (محلي ومستورد)، مع ميزة التكبير لملء الشاشة بالكامل</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🗺️</div>
+        <div>
+          <div class="feature-title">توزيع المخزون جغرافياً</div>
+          <div class="feature-desc">عرض المخزون حسب المنطقة الجغرافية والمحافظة مع مقارنة الأداء بين الصوامع المختلفة</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔔</div>
+        <div>
+          <div class="feature-title">نظام التنبيهات الذكي</div>
+          <div class="feature-desc">تنبيهات فورية لكل طلب شطب أو تعديل قادم من الصوامع، مع بيان السبب وبيانات التذكرة المعنية</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">✅</div>
+        <div>
+          <div class="feature-title">إقرار الشطب والتعديل</div>
+          <div class="feature-desc">مراجعة جميع طلبات التعديل والشطب من مكان واحد مع إمكانية الموافقة أو الرفض مع سبب قابل للتسجيل</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔑</div>
+        <div>
+          <div class="feature-title">مراقبة الأرقام السرية</div>
+          <div class="feature-desc">جدول مركزي بأرقام جميع الإدارات (البوابة، الميزان، المدير، المالية، الصيانة) في جميع الصوامع الـ48</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔧</div>
+        <div>
+          <div class="feature-title">متابعة طلبات الصيانة</div>
+          <div class="feature-desc">عرض جميع طلبات الصيانة المفتوحة على مستوى الجمهورية مع الأولوية والحالة</div>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🖨️</div>
+        <div>
+          <div class="feature-title">طباعة التقارير مباشرة</div>
+          <div class="feature-desc">طباعة أي صفحة أو تقرير مباشرة من المتصفح بضغطة زر، بتنسيق احترافي مناسب للطباعة</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ===== PAGE 8: CONCLUSION ===== -->
+  <div class="guide-page">
+    <div class="page-label"><i class="fa-solid fa-file"></i> الصفحة الثامنة</div>
+    <div class="section-header">
+      <div class="section-number">8</div>
+      <div>
+        <div class="section-title">الخاتمة والتطوير المستقبلي</div>
+        <div class="section-subtitle">ما تحقق حتى الآن وأفق التطوير المستقبلي</div>
+      </div>
+    </div>
+
+    <div style="font-size:16px;font-weight:700;color:var(--gold);margin-bottom:16px;">
+      <i class="fa-solid fa-trophy" style="margin-left:10px;"></i> ما تحقق بمنظومة الحوكمة الرقمية
+    </div>
+    <div class="achievement-grid">
+      <div class="achievement-item">
+        <div class="achievement-icon">🏗️</div>
+        <div>
+          <div class="achievement-title">ربط 48 صومعة بمنظومة واحدة</div>
+          <div class="achievement-desc">جميع صوامع الشركة على مستوى الجمهورية متصلة بمركز رقابي واحد في الوقت الفعلي</div>
+        </div>
+      </div>
+      <div class="achievement-item">
+        <div class="achievement-icon">🔍</div>
+        <div>
+          <div class="achievement-title">رقابة لحظية غير مسبوقة</div>
+          <div class="achievement-desc">الإدارة العامة تعرف ما يحدث في أي صومعة في أي لحظة دون انتظار تقارير يدوية</div>
+        </div>
+      </div>
+      <div class="achievement-item">
+        <div class="achievement-icon">⚡</div>
+        <div>
+          <div class="achievement-title">تقليص الأخطاء البشرية</div>
+          <div class="achievement-desc">الاحتساب الآلي للأوزان والكميات يلغي أخطاء الحساب اليدوي بشكل كامل</div>
+        </div>
+      </div>
+      <div class="achievement-item">
+        <div class="achievement-icon">🛡️</div>
+        <div>
+          <div class="achievement-title">شفافية كاملة وصفر تلاعب</div>
+          <div class="achievement-desc">كل حركة موثّقة بالاسم والوقت — لا يمكن تعديل أي بيانات دون أثر مسجّل</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:16px;font-weight:700;color:var(--accent-light);margin-bottom:16px;margin-top:8px;">
+      <i class="fa-solid fa-rocket" style="margin-left:10px;"></i> التطوير المستقبلي المقترح
+    </div>
+    <div class="future-grid">
+      <div class="future-item">
+        <div class="future-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+        <div>
+          <div class="future-title">تقارير بريدية تلقائية</div>
+          <div class="future-desc">إرسال تقرير يومي/أسبوعي تلقائياً بالبريد الإلكتروني لرئيس الشركة والمسؤولين</div>
+        </div>
+      </div>
+      <div class="future-item">
+        <div class="future-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+        <div>
+          <div class="future-title">تطبيق موبايل (Android / iOS)</div>
+          <div class="future-desc">نسخة موبايل للإدارة والمتابعة من أي مكان دون الحاجة لكمبيوتر</div>
+        </div>
+      </div>
+      <div class="future-item">
+        <div class="future-icon"><i class="fa-solid fa-chart-column"></i></div>
+        <div>
+          <div class="future-title">ربط بالسجلات المحاسبية</div>
+          <div class="future-desc">تكامل مع برامج المحاسبة الحالية للشركة لتوحيد البيانات المالية والتشغيلية</div>
+        </div>
+      </div>
+      <div class="future-item">
+        <div class="future-icon"><i class="fa-solid fa-camera"></i></div>
+        <div>
+          <div class="future-title">ربط كاميرات المراقبة</div>
+          <div class="future-desc">ربط كاميرات البوابة بسجلات الدخول والخروج لمطابقة تلقائية للوحات السيارات</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="signature-box">
+      <div class="signature-title">أُعِدَّ هذا الدليل من قِبَل</div>
+      <div class="signature-name">الشركة المصرية القابضة للصوامع والتخزين</div>
+      <div class="signature-role">قطاع تقنية المعلومات — منظومة الحوكمة الرقمية</div>
+      <div style="margin-top:16px;font-size:12px;color:var(--text-muted);" id="sigDate"></div>
+    </div>
+  </div>
+
+</div><!-- end wrapper -->
+
+<script>
+  const now = new Date();
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const dateStr = now.toLocaleDateString('ar-EG', options);
+  document.getElementById('docDate').textContent = dateStr;
+  document.getElementById('sigDate').textContent = 'تاريخ الإصدار: ' + dateStr;
+
+  // Dynamically resolve back button path based on logged in user role
+  const userStr = localStorage.getItem('CURRENT_USER');
+  const btnBack = document.querySelector('.btn-back');
+  if (btnBack) {
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        let dest = 'dashboard.html';
+        if (user.role === 'silo') dest = 'silo_portal.html';
+        else if (user.role === 'scale') dest = 'reception.html';
+        else if (user.role === 'security') dest = 'security.html';
+        else if (user.role === 'finance') dest = 'finance.html';
+        else if (user.role === 'maintenance') dest = 'maintenance.html';
+        btnBack.setAttribute('href', dest);
+      } catch (e) {
+        btnBack.setAttribute('href', '../index.html');
+      }
+    } else {
+      btnBack.setAttribute('href', '../index.html');
+    }
+  }
+</script>
+</body>
+</html>
