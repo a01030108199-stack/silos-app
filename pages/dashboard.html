@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <script>window.onerror = function(m,u,l,c,e) { alert('Error: ' + m + '\nLine: ' + l + '\nCol: ' + c); };</script>
@@ -784,6 +784,8 @@ function openAdminPasswords() {
           <th>البوابة</th>
           <th>الميزان</th>
           <th>المدير</th>
+          <th>المالية</th>
+          <th>الصيانة</th>
         </tr>
       </thead>
       <tbody>`;
@@ -816,9 +818,11 @@ function openAdminPasswords() {
 function saveAdminPasswords() {
   const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
   SILOS.forEach(s => {
-    customPasswords[s.id + '_security'] = document.getElementById('set_' + s.id + '_security').value;
+        customPasswords[s.id + '_security'] = document.getElementById('set_' + s.id + '_security').value;
     customPasswords[s.id + '_scale'] = document.getElementById('set_' + s.id + '_scale').value;
     customPasswords[s.id + '_manager'] = document.getElementById('set_' + s.id + '_manager').value;
+    customPasswords[s.id + '_finance'] = document.getElementById('set_' + s.id + '_finance').value;
+    customPasswords[s.id + '_maintenance'] = document.getElementById('set_' + s.id + '_maintenance').value;
   });
   localStorage.setItem('SILO_PASSWORDS', JSON.stringify(customPasswords));
   showToast('تم حفظ جميع كلمات المرور بنجاح', 'success');
@@ -1073,5 +1077,6 @@ loadApprovals();
 </script>
 </body>
 </html>
+
 
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -260,9 +260,11 @@
     document.getElementById('settingsModal').classList.add('active');
     const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
     const siloId = currentUser.silo_id;
-    document.getElementById('setPwdSecurity').value = customPasswords[siloId + '_security'] || '123';
+        document.getElementById('setPwdSecurity').value = customPasswords[siloId + '_security'] || '123';
     document.getElementById('setPwdScale').value = customPasswords[siloId + '_scale'] || '123';
     document.getElementById('setPwdManager').value = customPasswords[siloId + '_manager'] || '123';
+    document.getElementById('setPwdFinance').value = customPasswords[siloId + '_finance'] || '123';
+    document.getElementById('setPwdMaintenance').value = customPasswords[siloId + '_maintenance'] || '123';
   }
 
   function closeSettings() {
@@ -272,9 +274,11 @@
   function saveSettings() {
     const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
     const siloId = currentUser.silo_id;
-    customPasswords[siloId + '_security'] = document.getElementById('setPwdSecurity').value;
+        customPasswords[siloId + '_security'] = document.getElementById('setPwdSecurity').value;
     customPasswords[siloId + '_scale'] = document.getElementById('setPwdScale').value;
     customPasswords[siloId + '_manager'] = document.getElementById('setPwdManager').value;
+    customPasswords[siloId + '_finance'] = document.getElementById('setPwdFinance').value;
+    customPasswords[siloId + '_maintenance'] = document.getElementById('setPwdMaintenance').value;
     localStorage.setItem('SILO_PASSWORDS', JSON.stringify(customPasswords));
     showToast('تم حفظ إعدادات كلمات المرور بنجاح', 'success');
     closeSettings();
@@ -342,5 +346,6 @@
 </script>
 </body>
 </html>
+
 
 
