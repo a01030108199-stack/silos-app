@@ -112,7 +112,8 @@
       </div>
       <div class="header-actions">
         <a href="reception.html" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-right"></i> عودة</a>
-        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الكشف</button>
+        <button class="btn btn-success" onclick="shareWhatsApp()" title="تصوير الكشف وإرساله للواتساب"><i class="fa-brands fa-whatsapp"></i> واتساب (صورة)</button>
+        <button class="btn btn-primary" onclick="window.print()" title="طباعة أو تصدير PDF"><i class="fa-solid fa-print"></i> طباعة الكشف</button>
       </div>
     </header>
 
@@ -188,6 +189,22 @@
             </tfoot>
           </table>
 
+          <div style="display: flex; justify-content: space-between; text-align: center; margin-top: 60px; padding: 0 40px; font-weight: bold; font-size: 16px;">
+            <div style="width: 30%;">
+              أمـيـن العـهـدة<br><br>
+              ..........................
+            </div>
+            <div style="width: 30%;">
+              المــراجـــع<br><br>
+              ..........................
+            </div>
+            <div style="width: 30%;">
+              يـعـتـمـد ،<br>
+              مـديـر الصـومـعـة<br><br>
+              ..........................
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -197,6 +214,7 @@
 
 <script src="../js/data.js?v=12"></script>
 <script src="../js/app.js?v=12"></script>
+<script src="../js/whatsapp.js?v=2"></script>
 <script>
 var user = null;
 try { user = Auth.require(); } catch(e) {}

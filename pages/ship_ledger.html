@@ -244,12 +244,13 @@
         <div class="header-title">إدارة الاستلام والتخزين</div>
         <div class="header-sub">سجل حركة الباخرة (إدخال يدوي ومصدر بيانات البواخر)</div>
       </div>
-      <div class="header-actions">
-        <button class="btn btn-danger" onclick="deleteCurrentShip()" id="btnDeleteShip"><i class="fa-solid fa-trash"></i> حذف الباخرة</button>
-        <button class="btn btn-success" onclick="saveLedger()"><i class="fa-solid fa-floppy-disk"></i> حفظ الدفتر</button>
-        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الدفتر</button>
-        <a href="reception.html" class="btn btn-outline btn-sm">عودة <i class="fa-solid fa-arrow-left"></i></a>
-      </div>
+        <div class="header-actions">
+          <button class="btn btn-danger no-print" onclick="deleteCurrentShip()" id="btnDeleteShip"><i class="fa-solid fa-trash"></i> حذف السفينة</button>
+          <button class="btn btn-success no-print" onclick="saveLedger()"><i class="fa-solid fa-floppy-disk"></i> حفظ السجل</button>
+          <button class="btn btn-success no-print" onclick="shareWhatsApp(this)" title="تصوير للواتساب"><i class="fa-brands fa-whatsapp"></i> واتساب</button>
+          <button class="btn btn-primary no-print" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة السجل</button>
+          <a href="reception.html" class="btn btn-outline btn-sm no-print">عودة <i class="fa-solid fa-arrow-left"></i></a>
+        </div>
     </header>
 
     <div class="page-content print-area">
@@ -693,6 +694,7 @@ function deleteCurrentShip() {
 
 init();
 </script>
+<script src="../js/whatsapp.js?v=2"></script>
 </body>
 </html>
 

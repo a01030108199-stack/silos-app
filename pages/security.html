@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -246,7 +246,11 @@ renderTable(incidents);
 
 function resolve(id) {
   const i = incidents.find(x=>x.id===id);
-  if (i) { i.status = 'resolved'; filterSec(); renderUrgent(); updateStats(); showToast('تم إغلاق الحادثة بنجاح', 'success'); }
+  if (i) { 
+    i.status = 'resolved'; 
+    localStorage.setItem('SECURITY', JSON.stringify(SECURITY));
+    filterSec(); renderUrgent(); updateStats(); showToast('تم إغلاق الحادثة بنجاح', 'success'); 
+  }
 }
 
 // Modal (silo options removed)
@@ -269,6 +273,8 @@ function saveIncident() {
     guard:    document.getElementById('inc_guard').value || '—',
   };
   incidents.unshift(newInc);
+  SECURITY.unshift(newInc);
+  localStorage.setItem('SECURITY', JSON.stringify(SECURITY));
   filterSec(); renderUrgent(); updateStats();
   closeIncident();
   const sev = newInc.severity;

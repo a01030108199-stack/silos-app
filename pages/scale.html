@@ -52,9 +52,9 @@
       max-width: 800px; margin: 0 auto; border: 2px solid #000;
       padding: 20px; border-radius: 12px;
     }
-    .slip-header { position: relative; display: flex; align-items: center; justify-content: center; min-height: 110px; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; }
-    .slip-logo { position: absolute; right: 0; top: 50%; transform: translateY(-50%); max-width: 180px; max-height: 110px; mix-blend-mode: multiply; }
-    .slip-header-text { text-align: center; margin: 0 auto; }
+    .slip-header { display: flex; align-items: center; justify-content: space-between; min-height: 120px; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; gap: 20px; }
+    .slip-logo { max-width: 170px; max-height: 110px; mix-blend-mode: multiply; filter: drop-shadow(4px 6px 6px rgba(0,0,0,0.4)); object-fit: contain; }
+    .slip-header-text { text-align: center; flex: 1; }
     .slip-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 4px;}
     .slip-subtitle { font-size: 1.3rem; font-weight: bold; }
     .slip-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 6px 0; font-size: 1.2rem; }
@@ -404,10 +404,10 @@ function toggleDynamicFields() {
   }
 }
 
-function getStorageKey() {
-  return document.getElementById('s_grain_type').value === 'مستورد' ? 'DISPENSE_ORDERS' : 'DISPENSE_ORDERS_LOCAL';
-}
-function getOrders() { return JSON.parse(localStorage.getItem(getStorageKey()) || '{}'); }
+function getOrdersKey() {
+    return (document.getElementById('s_grain_type').value === 'مستورد' ? 'DISPENSE_ORDERS_' : 'DISPENSE_ORDERS_LOCAL_') + user.silo_id;
+  }
+function getOrders() { return JSON.parse(localStorage.getItem(getOrdersKey()) || '{}'); }
 function saveOrderData() {
   const no = document.getElementById('s_order_no').value.trim();
   if(!no) return;
@@ -417,7 +417,7 @@ function saveOrderData() {
     qty: parseFloat(document.getElementById('s_order_qty').value) || 0,
     bonus: parseFloat(document.getElementById('s_order_bonus').value) || 0
   };
-  localStorage.setItem(getStorageKey(), JSON.stringify(orders));
+  localStorage.setItem(getOrdersKey(), JSON.stringify(orders));
   showToast('تم حفظ بيانات إذن الصرف بنجاح', 'success');
   refreshOrderList();
   calcOrderBalance();
@@ -733,9 +733,26 @@ function validateFormCommon() {
   if (!plate || !driver) return 'يرجى إدخال رقم السيارة واسم السائق';
   if (!cell) return 'يرجى اختيار رقم الخلية';
   
+  // Validate Cell Content against Operation Type
+  const liveType = getLiveCellType(cell);
+  if (opType === 'صرف' || opType === 'منصرف (شحن)') {
+    if (liveType !== grainType) {
+      return `عفواً، لا يمكن الصرف! الخلية المحددة تحتوي على (${liveType === 'فارغة' ? 'لا شيء' : liveType}) وأنت تحاول صرف قمح (${grainType}).`;
+    }
+  } else if (opType === 'وارد' || opType === 'وارد (تفريغ)') {
+    if (liveType !== 'فارغة' && liveType !== grainType) {
+      return `عفواً، لا يمكن تفريغ الحمولة في هذه الخلية لأنها تحتوي على قمح (${liveType}).`;
+    }
+  }
+  
   if (opType === 'وارد' && grainType === 'محلي') {
     if (!document.getElementById('s_supplier_name').value.trim() || !document.getElementById('s_supplier_code').value.trim())
       return 'يرجى إدخال اسم المورد وكود المورد';
+  }
+
+  if (opType === 'وارد' && grainType === 'مستورد') {
+    if (!document.getElementById('s_shipped_weight').value.trim())
+      return 'يرجى إدخال الكمية المشحونة بالبوليصة';
   }
 
   if (opType === 'صرف') {
@@ -824,7 +841,6 @@ function saveFirstWeight() {
     const idx = tickets.findIndex(t => t.id === pendingTicketId);
     if (idx !== -1) {
       ticketToSave = tickets[idx];
-      ticketToSave.dateStr = localIsoDate;
       ticketToSave.opType = opType;
       ticketToSave.grainType = document.getElementById('s_grain_type').value;
       ticketToSave.supplierName = document.getElementById('s_supplier_name').value.trim();
@@ -888,7 +904,10 @@ function loadPendingTicket(id) {
   if (t.grade) document.getElementById('s_grade').value = t.grade;
   if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
   if (t.destination) document.getElementById('s_destination').value = t.destination;
-  if (t.packaging) document.getElementById('s_packaging').value = t.packaging;
+  if (t.packaging) {
+    document.getElementById('s_packaging').value = t.packaging;
+    if (typeof toggleSacksInput === 'function') toggleSacksInput();
+  }
   if (t.sacksCount !== undefined) document.getElementById('s_sacks').value = t.sacksCount;
   if (t.orderNo && document.getElementById('s_order_no')) {
     document.getElementById('s_order_no').value = t.orderNo;
@@ -902,7 +921,7 @@ function loadPendingTicket(id) {
   calcNet();
   renderActionButtons();
   
-  ['s_plate', 's_driver', 's_op_type', 's_grain_type', 's_cell', 's_order_no', 's_order_qty', 's_order_bonus', 's_order_expiry', 's_packaging', 's_sacks'].forEach(elId => {
+  ['s_plate', 's_driver', 's_op_type', 's_grain_type', 's_cell', 's_order_no', 's_order_qty', 's_order_bonus', 's_order_expiry', 's_packaging', 's_sacks', 's_supplier_name', 's_supplier_code', 's_grade', 's_wheat_type', 's_destination', 's_ship_name', 's_shipped_weight'].forEach(elId => {
     const el = document.getElementById(elId);
     if (el) el.disabled = true;
   });
@@ -975,10 +994,17 @@ function saveSecondWeight() {
   const net = calcNet();
   const cell = document.getElementById('s_cell').value;
   const shipName = document.getElementById('s_ship_name').value.trim();
+  const shippedWeight = document.getElementById('s_shipped_weight').value.trim();
 
-  if (opType === 'وارد' && grainType === 'مستورد' && !shipName) {
-    showToast('يرجى إدخال اسم الباخرة', 'error');
-    return;
+  if (opType === 'وارد' && grainType === 'مستورد') {
+    if (!shipName) {
+      showToast('يرجى إدخال اسم الباخرة', 'error');
+      return;
+    }
+    if (!shippedWeight) {
+      showToast('يرجى إدخال الكمية المشحونة بالبوليصة', 'error');
+      return;
+    }
   }
   if (!cell) { showToast('يرجى اختيار رقم الخلية', 'error'); return; }
 
@@ -1045,6 +1071,8 @@ function printSlip(t, isFirst) {
   if (t.opType === 'وارد') {
     if (t.grainType === 'مستورد') {
       detailsHtml += `<div class="slip-row"><span>الميناء الشاحن:</span> <strong>${t.supplierName || 'مستورد'}</strong></div>`;
+      detailsHtml += `<div class="slip-row"><span>اسم الباخرة:</span> <strong>${t.shipName || 'غير محدد'}</strong></div>`;
+      detailsHtml += `<div class="slip-row"><span>الكمية بالبوليصة:</span> <strong>${t.shippedWeight ? t.shippedWeight.toLocaleString('ar-EG') + ' طن' : ''}</strong></div>`;
       detailsHtml += `<div class="slip-row"><span>نوع القمح:</span> <strong>${t.wheatType || ''}</strong></div>`;
     } else {
       detailsHtml += `<div class="slip-row"><span>اسم المورد:</span> <strong>${t.supplierName || ''}</strong></div>`;
@@ -1067,7 +1095,7 @@ function printSlip(t, isFirst) {
       </div>
       
       <div style="display:flex; justify-content:space-between; margin-bottom: 25px;">
-        <div style="font-size:1.5rem">رقم التذكرة: <strong>${t.id}</strong></div>
+        <div style="font-size:1.5rem">${t.opType === 'وارد' ? 'رقم كارتة الاستلام' : 'رقم كارتة الصرف'}: <strong>${t.id}</strong></div>
         <div style="font-size:1.3rem; color:#444;">${isFirst ? t.timestamp : t.timestamp2}</div>
       </div>
 

@@ -160,12 +160,18 @@ for (const silo of SILOS) {
   silo.stock = silo.wheat + silo.corn + silo.barley;
 }
 
-const SECURITY = [
+const SECURITY_DEFAULT = [
   { id:'SEC-003', silo_id: 1, date:'2026-07-18 16:30', type:'إنذار سيبراني', desc:'محاولة ولوج غير معتادة للنظام، تم حجب الـ IP تلقائياً وإرسال إشعار عاجل للإدارة العامة للتحقيق والمتابعة.', severity:'critical', status:'open', reporter:'نظام الأمن السيبراني', guard:'وحدة المراقبة الآلية' },
   { id:'SEC-004', silo_id: 8, date:'2026-07-18 18:05', type:'تكدس مروري للشاحنات', desc:'تكدس مفاجئ لسيارات التوريد خارج أسوار صومعة أبو المطامير؛ يُرجى من الإدارة العامة توجيه السائقين لصوامع بديلة.', severity:'high', status:'open', reporter:'أمن البوابات', guard:'سيد متولي' },
   { id:'SEC-001', silo_id: 2, date:'2026-07-12 08:30', type:'محاولة دخول غير مصرح', desc:'شخص حاول الدخول من البوابة الخلفية وتم منعه', severity:'high', status:'resolved', reporter:'الأمن', guard:'نبيل عبدالله' },
   { id:'SEC-002', silo_id: 15, date:'2026-07-18 10:15', type:'تعطل بوابة رئيسية', desc:'البوابة الرئيسية عالقة', severity:'medium', status:'investigating', reporter:'الأمن', guard:'حسام علي' },
 ];
+let SECURITY = [];
+try {
+  SECURITY = JSON.parse(localStorage.getItem('SECURITY')) || SECURITY_DEFAULT;
+} catch (e) {
+  SECURITY = SECURITY_DEFAULT;
+}
 
 const MAINTENANCE = [
   { id:'MNT-001', silo_id: 2, date:'2026-07-12', equip:'ناقل حبوب', problem:'قطع في السير بطامية', priority:'critical', status:'in_progress', req_by:'الصيانة', assigned:'شركة خارجية', cost:8500 },
@@ -256,8 +262,8 @@ if (typeof window !== 'undefined') {
   localStorage.setItem('USERS', JSON.stringify(USERS));
 
   // تهيئة الإشعارات والأعطال
-  if (!localStorage.getItem('ALERTS')) {
-    localStorage.setItem('ALERTS', JSON.stringify(SECURITY));
+  if (!localStorage.getItem('SECURITY')) {
+    localStorage.setItem('SECURITY', JSON.stringify(SECURITY));
     localStorage.setItem('MAINTENANCE', JSON.stringify(MAINTENANCE));
     localStorage.setItem('FINANCE', JSON.stringify(FINANCE));
 

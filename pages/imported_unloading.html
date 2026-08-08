@@ -157,8 +157,9 @@
         <div class="header-sub">كشف تفريغ المستورد المؤتمت</div>
       </div>
       <div class="header-actions" style="display: flex; align-items: center; gap: 10px;">
-        <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الكشف</button>
-        <a href="reception.html" class="btn btn-outline btn-sm">عودة <i class="fa-solid fa-arrow-left"></i></a>
+        <button class="btn btn-success no-print" onclick="shareWhatsApp(this)" title="تصوير للواتساب"><i class="fa-brands fa-whatsapp"></i> واتساب</button>
+        <button class="btn btn-primary no-print" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة الكشف</button>
+        <a href="reception.html" class="btn btn-outline btn-sm no-print">عودة <i class="fa-solid fa-arrow-left"></i></a>
       </div>
     </header>
 
@@ -409,5 +410,6 @@ function loadReport() {
 
 init();
 </script>
+<script src="../js/whatsapp.js?v=2"></script>
 </body>
 </html>

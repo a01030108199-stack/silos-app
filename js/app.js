@@ -308,9 +308,17 @@ function animateCount(el, target, suffix) {
   if (!suffix) suffix = '';
   var dur = 1200, steps = 40, inc = target / steps;
   var cur = 0, i = 0;
+  var isFloat = target % 1 !== 0;
   var timer = setInterval(function() {
     i++; cur = Math.min(cur + inc, target);
-    el.textContent = Math.round(cur).toLocaleString('en-US') + suffix;
+    if (i >= steps) cur = target; // Ensure exact final value
+    
+    if (isFloat) {
+      el.textContent = cur.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + suffix;
+    } else {
+      el.textContent = Math.round(cur).toLocaleString('en-US') + suffix;
+    }
+    
     if (i >= steps) clearInterval(timer);
   }, dur / steps);
 }

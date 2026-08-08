@@ -39,9 +39,9 @@ window.onerror = function(msg, url, line, col, err) {
   }
   .report-table tr:hover td { background: rgba(255,255,255,0.04); }
   .inp {
-    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
-    color: #fff; border-radius: 5px; padding: 5px 6px;
-    width: 90px; text-align: center; font-size: 0.83rem;
+    background: #020617; border: 1px solid rgba(255,255,255,0.25);
+    color: #ffffff; border-radius: 5px; padding: 6px;
+    width: 90px; text-align: center; font-size: 0.9rem; font-weight: bold;
   }
   .inp:focus { outline:none; border-color:var(--primary); background:rgba(99,102,241,0.15); }
   .inp-sm { width:75px; }
@@ -96,6 +96,7 @@ window.onerror = function(msg, url, line, col, err) {
       </div>
       <div class="header-actions">
         <div class="header-date" id="clockEl"></div>
+        <button class="btn btn-success btn-sm no-print" onclick="shareWhatsApp(this)" title="تصوير للواتساب"><i class="fa-brands fa-whatsapp"></i> واتساب</button>
         <button class="btn btn-outline btn-sm no-print" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة</button>
         <button class="btn btn-primary btn-sm no-print" onclick="saveReport()"><i class="fa-solid fa-floppy-disk"></i> حفظ البيان</button>
         <a href="reception.html" class="btn btn-outline btn-sm no-print"><i class="fa-solid fa-arrow-right"></i> عودة</a>
@@ -549,7 +550,7 @@ function renderCells(data) {
         <td><span class="val-outgoing">${fmt(c.outgoing)}</span></td>
         <td style="${closingStyle}"><input type="text" class="inp ${inDanger?'over-capacity':''}" value="${fmt(closing)}" readonly style="cursor:default;${inDanger?'color:#ff5252;font-weight:bold;':''}">${closingLabel}</td>
         <td style="background-color: rgba(6, 182, 212, 0.1); color:${availColor}">${availText}</td>
-        <td style="background-color: rgba(245, 158, 11, 0.1);"><input type="text" class="inp" value="${c.notes||''}" placeholder="اكتب ملاحظة..." onchange="updateCell(${i},'notes',this.value)" style="background: rgba(0,0,0,0.2);"></td>
+        <td style="background-color: rgba(245, 158, 11, 0.1);"><input type="text" class="inp" value="${c.notes||''}" placeholder="اكتب ملاحظة..." onchange="updateCell(${i},'notes',this.value)"></td>
       </tr>`;
   });
 
@@ -623,11 +624,23 @@ function renderLocalInFromCells() {
 
   currentData.cells.forEach(c => {
     if (c.type === 'محلي' && c.grade && gMap[c.grade]) {
+      // ONLY Opening balance from cells (preserves historical cell inventory shift logic)
       gMap[c.grade].opening += c.opening;
-      gMap[c.grade].incoming += c.incoming;
-      gMap[c.grade].outgoing += c.outgoing;
-      gMap[c.grade].closing += c.closing;
     }
+  });
+
+  if (currentData.localGradeStats) {
+    Object.keys(currentData.localGradeStats).forEach(g => {
+      if (gMap[g]) {
+        gMap[g].incoming = currentData.localGradeStats[g].incoming;
+        gMap[g].outgoing = currentData.localGradeStats[g].outgoing;
+      }
+    });
+  }
+
+  // Calculate closing balance properly for grades
+  Object.keys(gMap).forEach(g => {
+    gMap[g].closing = gMap[g].opening + gMap[g].incoming - gMap[g].outgoing;
   });
 
   let tO=0, tI=0, tOu=0, tC=0;
@@ -668,7 +681,9 @@ function renderLocalOut(data) {
   }
 
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-  const localOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL') || '{}');
+  const targetSilosL = (typeof selectedSilo !== 'undefined' && selectedSilo) ? [selectedSilo] : (user.role === 'general_admin' ? SILOS.map(s=>s.id) : [user.silo_id]);
+  const localOrders = {};
+  targetSilosL.forEach(sid => Object.assign(localOrders, JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL_' + sid) || '{}')));
 
   data.localOut.forEach((r, i) => {
     const total = (r.d235||0) + (r.d230||0) + (r.d225||0);
@@ -743,7 +758,9 @@ function renderShips(data) {
 
   data.ships.forEach((s, i) => {
     if (s.orderNo) {
-       var ordersDb = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+         const targetSilos = (typeof selectedSilo !== 'undefined' && selectedSilo) ? [selectedSilo] : (user.role === 'general_admin' ? SILOS.map(sl=>sl.id) : [user.silo_id]);
+         var ordersDb = {};
+         targetSilos.forEach(sid => Object.assign(ordersDb, JSON.parse(localStorage.getItem('DISPENSE_ORDERS_' + sid) || '{}')));
        if (ordersDb[s.orderNo]) {
            s.permit = (parseFloat(ordersDb[s.orderNo].qty) || 0) + (parseFloat(ordersDb[s.orderNo].bonus) || 0);
        }
@@ -930,6 +947,12 @@ function syncWithTickets() {
   currentData.ships.forEach(s => { 
     s.dispatched = 0; 
   });
+  
+  currentData.localGradeStats = {
+    '23.5': { incoming: 0, outgoing: 0 },
+    '23': { incoming: 0, outgoing: 0 },
+    '22.5': { incoming: 0, outgoing: 0 }
+  };
 
   // Aggregate from tickets
   tickets.forEach(t => {
@@ -978,6 +1001,12 @@ function syncWithTickets() {
       }
     }
     
+    // 1.5 Track Ticket-Level Local Grades
+    if (t.grainType === 'محلي' && t.grade && currentData.localGradeStats[t.grade]) {
+      if (t.opType === 'وارد') currentData.localGradeStats[t.grade].incoming += netTons;
+      else if (t.opType === 'صرف') currentData.localGradeStats[t.grade].outgoing += netTons;
+    }
+    
     // 2. Update Local Dispatch to Mills
     if (t.opType === 'صرف' && t.grainType === 'محلي' && t.destination) {
       let destRow = currentData.localOut.find(r => normStr(r.name) === normStr(t.destination));
@@ -998,8 +1027,10 @@ function syncWithTickets() {
         shipRow = { name: t.destination, ship_name: t.wheatType || '', permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0, orderNo: t.orderNo || '' };
         currentData.ships.push(shipRow);
       }
-      if (shipRow) {
-        const importedOrders = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
+        if (shipRow) {
+          const targetSilos = (typeof selectedSilo !== 'undefined' && selectedSilo) ? [selectedSilo] : (user.role === 'general_admin' ? SILOS.map(sl=>sl.id) : [user.silo_id]);
+          const importedOrders = {};
+          targetSilos.forEach(sid => Object.assign(importedOrders, JSON.parse(localStorage.getItem('DISPENSE_ORDERS_' + sid) || '{}')));
         for (const [no, order] of Object.entries(importedOrders)) {
           if (order.destination === t.destination) {
              shipRow.permit = (order.qty || 0) + (order.bonus || 0);
@@ -1053,6 +1084,7 @@ window.addEventListener('storage', (e) => {
   if (e.key === 'WEIGHBRIDGE_TICKETS') loadReport();
 });
 </script>
+<script src="../js/whatsapp.js?v=2"></script>
 </body>
 </html>
 

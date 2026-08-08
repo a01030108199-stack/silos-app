@@ -247,16 +247,16 @@
 <script src="js/data.js?v=23"></script>
 <script src="js/app.js?v=23"></script>
 <script>
-  // Auto-redirect
-  if (Auth.current()) {
-    const r = Auth.current().role;
-    if (r === 'silo') window.location.href = 'pages/silo_portal.html?v=23';
-    else if (r === 'scale') window.location.href = 'pages/reception.html?v=23';
-    else if (r === 'security') window.location.href = 'pages/security.html?v=23';
-    else if (r === 'finance') window.location.href = 'pages/finance.html?v=23';
-    else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=23';
-    else window.location.href = 'pages/dashboard.html?v=23';
-  }
+  // Auto-redirect disabled as per user request
+  // if (Auth.current()) {
+  //   const r = Auth.current().role;
+  //   if (r === 'silo') window.location.href = 'pages/dashboard.html?v=23';
+  //   else if (r === 'scale') window.location.href = 'pages/reception.html?v=23';
+  //   else if (r === 'security') window.location.href = 'pages/security.html?v=23';
+  //   else if (r === 'finance') window.location.href = 'pages/finance.html?v=23';
+  //   else if (r === 'maintenance') window.location.href = 'pages/maintenance.html?v=23';
+  //   else window.location.href = 'pages/dashboard.html?v=23';
+  // }
 
   const select = document.getElementById('branchSelect');
   const storedUsers = JSON.parse(localStorage.getItem('USERS') || '[]');

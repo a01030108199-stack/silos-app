@@ -1,248 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<script>window.onerror = function(m,u,l,c,e) { alert('Error: ' + m + '\nLine: ' + l + '\nCol: ' + c); };</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة التحكم الرئيسية — نظام إدارة الصوامع</title>
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="../js/firebase-db.js"></script></head>
-<body>
-<div class="app-layout">
-  <aside class="sidebar" id="app-sidebar"></aside>
-
-  <main class="main-content">
-    <!-- Header -->
-    <header class="top-header">
-      <div>
-        <div class="header-title" id="pageTitle">لوحة التحكم الرئيسية</div>
-        <div class="header-sub" id="pageDate"></div>
-      </div>
-      <div class="header-actions">
-        <div class="header-date" id="clockEl"></div>
-        <div class="btn-icon" title="تنبيهات" onclick="scrollToAlerts()">
-          <i class="fa-solid fa-bell"></i>
-          <span class="badge" id="alertBadge">4</span>
-        </div>
-        <div class="btn-icon" title="طباعة" onclick="window.print()">
-          <i class="fa-solid fa-print"></i>
-        </div>
-      </div>
-    </header>
-
-    <!-- Page Content -->
-    <div class="page-content">
-
-      <!-- Stats Cards -->
-      <div class="stats-grid" id="statsGrid"></div>
-
-      <!-- Charts Row -->
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">حركة الاستلام والصرف الأسبوعية</div>
-              <div class="card-sub">بالطن — آخر 7 أيام</div>
-            </div>
-            <select class="filter-select" style="width:auto">
-              <option>هذا الأسبوع</option>
-              <option>الشهر الحالي</option>
-            </select>
-          </div>
-          <div style="position: relative; height: 300px; width: 100%;">
-            <canvas id="weeklyChart"></canvas>
-          </div>
-        </div>
-
-        <div class="chart-card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">توزيع القمح (محلي + مستورد)</div>
-              <div class="card-sub">المخزون الكلي — حسب الدرجة والمنشأ</div>
-            </div>
-          </div>
-          <div style="position: relative; height: 280px; width: 100%; display: flex; justify-content: center;">
-            <canvas id="grainChart"></canvas>
-          </div>
-          <!-- ملخص سريع محلي / مستورد -->
-          <div id="wheatSummaryBar" style="display:flex;gap:10px;margin:10px 0;padding:0 8px"></div>
-          <div id="grainLegend" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;"></div>
-        </div>
-      </div>
-
-      <!-- Regions Row -->
-      <div class="chart-card mb-24">
-        <div class="card-header">
-          <div>
-            <div class="card-title">المخزون حسب المنطقة الجغرافية</div>
-            <div class="card-sub">إجمالي المخزون بالطن في كل منطقة</div>
-          </div>
-        </div>
-        <div class="regions-grid" id="regionsGrid" style="margin-bottom:16px"></div>
-        <div style="position: relative; height: 250px; width: 100%;">
-          <canvas id="regionChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Suppliers & Mills Row -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
-        <div class="chart-card" style="margin:0">
-          <div class="card-header">
-            <div>
-              <div class="card-title">أكبر الموردين (وارد محلي)</div>
-              <div class="card-sub">ترتيب الموردين بحسب الدرجات المتنوعة للقمح المحلي</div>
-            </div>
-          </div>
-          <div style="position: relative; height: 300px; width: 100%;">
-            <canvas id="suppliersChart"></canvas>
-          </div>
-        </div>
-
-        <div class="chart-card" style="margin:0">
-          <div class="card-header">
-            <div>
-              <div class="card-title">أكبر المطاحن (منصرف محلي)</div>
-              <div class="card-sub">ترتيب المطاحن والجهات بحسب درجات الصرف للقمح المحلي</div>
-            </div>
-          </div>
-          <div style="position: relative; height: 300px; width: 100%;">
-            <canvas id="millsChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Imported Row -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
-        <div class="chart-card" style="margin:0">
-          <div class="card-header">
-            <div>
-              <div class="card-title">حركة البواخر (وارد مستورد)</div>
-              <div class="card-sub">إجمالي الوارد من البواخر بحسب نوع القمح</div>
-            </div>
-          </div>
-          <div style="position: relative; height: 300px; width: 100%;">
-            <canvas id="importedInChart"></canvas>
-          </div>
-        </div>
-
-        <div class="chart-card" style="margin:0">
-          <div class="card-header">
-            <div>
-              <div class="card-title">أكبر المطاحن (منصرف مستورد)</div>
-              <div class="card-sub">ترتيب المطاحن والجهات بحسب الباخرة المنصرف منها</div>
-            </div>
-          </div>
-          <div style="position: relative; height: 300px; width: 100%;">
-            <canvas id="importedOutChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Two columns: Alerts + Recent Ops -->
-      <div style="display:grid; grid-template-columns:1fr 1.6fr; gap:16px; margin-bottom:24px;">
-
-        <!-- Alerts -->
-        <div class="chart-card" id="alertsSection">
-          <div class="card-header">
-            <div>
-              <div class="card-title"><i class="fa-solid fa-triangle-exclamation text-warning"></i> التنبيهات العاجلة</div>
-              <div class="card-sub">تحتاج إلى متابعة فورية</div>
-            </div>
-          </div>
-          <div class="alert-list" id="alertsList"></div>
-        </div>
-
-        <!-- Recent Operations -->
-        <div class="table-card" style="margin:0">
-          <div class="table-header">
-            <div>
-              <div class="card-title">آخر عمليات الاستلام والصرف</div>
-              <div class="card-sub">على مستوى جميع الصوامع</div>
-            </div>
-            <a href="reception.html" class="btn btn-outline btn-sm">عرض الكل</a>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>رقم العملية</th>
-                  <th>الصومعة</th>
-                  <th>النوع</th>
-                  <th>الحبوب</th>
-                  <th>الوزن (طن)</th>
-                  <th>الجودة</th>
-                  <th>التاريخ</th>
-                </tr>
-              </thead>
-              <tbody id="recentOpsBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Maintenance Alerts -->
-      <div class="table-card">
-        <div class="table-header">
-          <div>
-            <div class="card-title"><i class="fa-solid fa-wrench text-warning"></i> طلبات الصيانة المعلقة والحرجة</div>
-          </div>
-          <a href="maintenance.html" class="btn btn-outline btn-sm">إدارة الصيانة</a>
-        </div>
-        <div style="overflow-x:auto">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>رقم الطلب</th>
-                <th>الصومعة</th>
-                <th>المعدة</th>
-                <th>الأولوية</th>
-                <th>الحالة</th>
-                <th>التاريخ</th>
-              </tr>
-            </thead>
-            <tbody id="maintBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      </div>
-
-      <!-- Approvals Section -->
-      <div class="row mt-4">
-        <div class="card w-100 border-warning">
-          <div class="card-header border-warning" style="background: rgba(245,158,11,0.1);">
-            <div class="card-title text-warning"><i class="fa-solid fa-code-pull-request"></i> طلبات التعديل والشطب المعلقة</div>
-          </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>رقم الطلب</th>
-                <th>رقم السيارة</th>
-                <th>نوع الطلب</th>
-                <th>مقدم الطلب</th>
-                <th>السبب / التفاصيل</th>
-                <th>الوقت</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody id="approvalsBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div><!-- /page-content -->
-  </main>
-</div>
-
-<script src="../js/data.js?v=12"></script>
-<script src="../js/app.js?v=12"></script>
-<script>
+﻿
 // ── Init ────────────────────────────────────────────────────
-const user = Auth.require(['manager', 'general_admin', 'silo']);
+const user = Auth.require(['manager', 'general_admin']);
 buildSidebar('dashboard');
 document.getElementById('pageDate').textContent = todayDate();
 initClock(document.getElementById('clockEl'));
@@ -270,28 +28,16 @@ let tStock = 0, tCap = 0, tRec = 0, tDisp = 0;
 let localStock = 0, importedStock = 0;
 let monthlyRec = 0;
 
-filteredSilos.forEach(s => {
-  tStock += s.stock || 0;
-  localStock += (s.local_235 + s.local_230 + s.local_225) || 0;
-  importedStock += (s.imp_russia + s.imp_ukraine + s.imp_france + s.imp_usa + s.imp_australia + s.imp_romania) || 0;
-});
-
 let liveTickets = [];
 try {
   liveTickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
-  if (!Array.isArray(liveTickets)) liveTickets = [];
-} catch(e) {
-  liveTickets = [];
-}
-const completedTickets = liveTickets.filter(t => 
-  (t.status === 'completed' || t.status === 'gate_out') && 
-  (isGeneral || t.silo_id === user.silo_id)
-);
+} catch(e) {}
+const completedTickets = liveTickets.filter(t => t.status === 'completed');
 
-const currentDate = new Date();
-const yyyy = currentDate.getFullYear();
-const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-const dd = String(currentDate.getDate()).padStart(2, '0');
+const now = new Date();
+const yyyy = now.getFullYear();
+const mm = String(now.getMonth() + 1).padStart(2, '0');
+const dd = String(now.getDate()).padStart(2, '0');
 const todayIso = `${yyyy}-${mm}-${dd}`;
 const currentMonthStr = `${yyyy}-${mm}`;
 
@@ -328,14 +74,14 @@ importedStock = Math.max(0, importedStock);
 
 const stockPct = Math.round((tStock / tCap) * 100) || 0;
 const statsData = [
-  { icon:'fa-wheat-awn',    cls:'ic-gold',   label:'إجمالي المخزون الحالي',     val:tStock,     unit:'طن', change:'', dir:'up' },
-  { icon:'fa-building',     cls:'ic-blue',   label: isGeneral ? 'الصوامع النشطة' : 'سعة الصومعة', val: isGeneral ? DAILY_STATS.active_silos : tCap, unit: isGeneral ? '' : 'طن', change:'', dir:'up' },
-  { icon:'fa-arrow-down',   cls:'ic-green',  label:'الاستلام اليومي',            val:tRec,  unit:'طن', change:'', dir:'up' },
-  { icon:'fa-arrow-up',     cls:'ic-purple', label:'الصرف اليومي',               val:tDisp, unit:'طن', change:'', dir:'down' },
+  { icon:'fa-wheat-awn',    cls:'ic-gold',   label:'إجمالي المخزون الحالي',     val:Math.round(tStock),     unit:'طن', change:'', dir:'up' },
+  { icon:'fa-building',     cls:'ic-blue',   label: isGeneral ? 'الصوامع النشطة' : 'سعة الصومعة', val: isGeneral ? DAILY_STATS.active_silos : Math.round(tCap), unit: isGeneral ? '' : 'طن', change:'', dir:'up' },
+  { icon:'fa-arrow-down',   cls:'ic-green',  label:'الاستلام اليومي',            val:Math.round(tRec),  unit:'طن', change:'', dir:'up' },
+  { icon:'fa-arrow-up',     cls:'ic-purple', label:'الصرف اليومي',               val:Math.round(tDisp), unit:'طن', change:'', dir:'down' },
   { icon:'fa-gauge',        cls:'ic-amber',  label:'نسبة الامتلاء',             val:stockPct, unit:'%',  change:'', dir:'up' },
   { icon:'fa-triangle-exclamation', cls:'ic-red', label:'تنبيهات مفتوحة',      val:openAlerts.length, unit:'', change:'', dir:'down' },
   { icon:'fa-wrench',       cls:'ic-cyan',   label:'صيانة جارية',               val:openMaint.length, unit:'', change:'', dir:'down' },
-  { icon:'fa-chart-line',   cls:'ic-gold',   label:'الاستلام الشهري (تقريبي)',  val: monthlyRec, unit:'طن', change:'', dir:'up' },
+  { icon:'fa-chart-line',   cls:'ic-gold',   label:'الاستلام الشهري (تقريبي)',  val: Math.round(monthlyRec), unit:'طن', change:'', dir:'up' },
 ];
 
 const grid = document.getElementById('statsGrid');
@@ -376,8 +122,8 @@ for (let i = 6; i >= 0; i--) {
   const dayRec = completedTickets.filter(t => t.dateStr === dayIso && (t.opType === 'وارد' || t.opType === 'وارد (تفريغ)')).reduce((sum, t) => sum + ((t.net||0)/1000), 0);
   const dayDisp = completedTickets.filter(t => t.dateStr === dayIso && (t.opType === 'صرف' || t.opType === 'منصرف (شحن)')).reduce((sum, t) => sum + ((t.net||0)/1000), 0);
   
-  realWeeklyRec.push(dayRec);
-  realWeeklyDisp.push(dayDisp);
+  realWeeklyRec.push(Math.round(dayRec));
+  realWeeklyDisp.push(Math.round(dayDisp));
 }
 
 new Chart(document.getElementById('weeklyChart'), {
@@ -402,7 +148,7 @@ new Chart(document.getElementById('weeklyChart'), {
 
 // ── Grain Donut Chart ─────────────────────────────────────────
 const realGrainLabels = ['قمح محلي', 'قمح مستورد', 'ذرة'];
-const realGrainData = [localStock, importedStock, 0];
+const realGrainData = [Math.round(localStock), Math.round(importedStock), 0];
 const realGrainColors = ['#fde047', '#3b82f6', '#22c55e'];
 
 new Chart(document.getElementById('grainChart'), {
@@ -427,12 +173,12 @@ const iPct = 100 - lPct;
 wb.innerHTML = `
   <div style="flex:1;background:rgba(253,224,71,0.1);border:1px solid rgba(253,224,71,0.3);border-radius:8px;padding:8px;text-align:center">
     <div style="font-size:0.7rem;color:#fde047">قمح محلي</div>
-    <div style="font-size:1.1rem;font-weight:800;color:#fde047">${localStock >= 1000 ? (localStock/1000).toFixed(1) + 'K' : localStock.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3})} طن</div>
+    <div style="font-size:1.1rem;font-weight:800;color:#fde047">${localStock >= 1000 ? (localStock/1000).toFixed(1) + 'K' : Math.round(localStock)} طن</div>
     <div style="font-size:0.7rem;color:#aaa">${lPct}%</div>
   </div>
   <div style="flex:1;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:8px;text-align:center">
     <div style="font-size:0.7rem;color:#60a5fa">قمح مستورد</div>
-    <div style="font-size:1.1rem;font-weight:800;color:#60a5fa">${importedStock >= 1000 ? (importedStock/1000).toFixed(1) + 'K' : importedStock.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3})} طن</div>
+    <div style="font-size:1.1rem;font-weight:800;color:#60a5fa">${importedStock >= 1000 ? (importedStock/1000).toFixed(1) + 'K' : Math.round(importedStock)} طن</div>
     <div style="font-size:0.7rem;color:#aaa">${iPct}%</div>
   </div>
   <div style="flex:1;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:8px;text-align:center">
@@ -448,7 +194,7 @@ realGrainLabels.forEach((l,i) => {
   if (realGrainData[i] === 0) return;
   leg.innerHTML += `<div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#7a8ba8">
     <span style="width:9px;height:9px;border-radius:50%;background:${realGrainColors[i]};display:inline-block;flex-shrink:0"></span>
-    ${l}: <strong style="color:#e8eaf0">${realGrainData[i] >= 1000 ? (realGrainData[i]/1000).toFixed(1) + 'K' : realGrainData[i].toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3})}</strong>
+    ${l}: <strong style="color:#e8eaf0">${realGrainData[i] >= 1000 ? (realGrainData[i]/1000).toFixed(1) + 'K' : Math.round(realGrainData[i])}</strong>
   </div>`;
 });
 
@@ -485,222 +231,6 @@ new Chart(document.getElementById('regionChart'), {
       x:{ grid:{color:'#1a2d50'}, ticks:{color:'#7a8ba8', font:{family:'Cairo'},
           callback: v => (v/1000).toFixed(0)+'K'} },
       y:{ grid:{color:'transparent'}, ticks:{color:'#e8eaf0', font:{family:'Cairo',size:12}} }
-    }
-  }
-});
-
-// ── Top Suppliers Chart ───────────────────────────────────────
-const suppMap = {};
-completedTickets.forEach(t => {
-  if ((t.opType === 'وارد' || t.opType === 'وارد (تفريغ)') && t.grainType === 'محلي' && t.supplierName) {
-    const code = t.supplierCode ? t.supplierCode.trim() : 'بدون كود';
-    const cleanName = t.supplierName.trim();
-    const key = code; // Group by code to avoid duplicate bars for typos
-    
-    if (!suppMap[key]) suppMap[key] = { name: cleanName, code: code, '23.5': 0, '23': 0, '22.5': 0, total: 0 };
-    
-    const net = (t.net || 0) / 1000;
-    if (t.grade === '23.5' || String(t.grade).includes('23.5')) suppMap[key]['23.5'] += net;
-    else if (t.grade === '23' || String(t.grade).includes('23')) suppMap[key]['23'] += net;
-    else if (t.grade === '22.5' || String(t.grade).includes('22.5')) suppMap[key]['22.5'] += net;
-    else suppMap[key]['23.5'] += net;
-    
-    suppMap[key].total += net;
-  }
-});
-
-const suppArr = Object.keys(suppMap).map(k => suppMap[k]).sort((a,b) => b.total - a.total).slice(0, 10);
-
-new Chart(document.getElementById('suppliersChart'), {
-  type: 'bar',
-  data: {
-    labels: suppArr.map(s => {
-      let n = s.name.length > 18 ? s.name.substring(0, 18) + '...' : s.name;
-      return s.code !== 'بدون كود' ? n + ' (' + s.code + ')' : n;
-    }),
-    datasets: [
-      { label: '23.5 قيراط', data: suppArr.map(s => s['23.5']), backgroundColor: 'rgba(34,197,94,0.8)', borderRadius:4 },
-      { label: '23 قيراط', data: suppArr.map(s => s['23']), backgroundColor: 'rgba(59,130,246,0.8)', borderRadius:4 },
-      { label: '22.5 قيراط', data: suppArr.map(s => s['22.5']), backgroundColor: 'rgba(245,158,11,0.8)', borderRadius:4 }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { color: '#7a8ba8', font: { family: 'Cairo' } } },
-      tooltip: {
-        callbacks: {
-          label: function(ctx) { return ' ' + ctx.dataset.label + ': ' + ctx.raw.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' طن'; }
-        }
-      }
-    },
-    scales: {
-      x: { stacked: true, grid: { color: 'transparent' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo', size: 11 } } },
-      y: { stacked: true, grid: { color: '#1a2d50' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo' } } }
-    }
-  }
-});
-
-// ── Top Mills Chart ───────────────────────────────────────────
-const millMap = {};
-completedTickets.forEach(t => {
-  if ((t.opType === 'صرف' || t.opType === 'منصرف (شحن)') && t.grainType === 'محلي' && t.destination) {
-    const cleanName = t.destination.trim();
-    if (!millMap[cleanName]) millMap[cleanName] = { name: cleanName, '23.5': 0, '23': 0, '22.5': 0, total: 0 };
-    
-    const net = (t.net || 0) / 1000;
-    if (t.grade === '23.5' || String(t.grade).includes('23.5')) millMap[cleanName]['23.5'] += net;
-    else if (t.grade === '23' || String(t.grade).includes('23')) millMap[cleanName]['23'] += net;
-    else if (t.grade === '22.5' || String(t.grade).includes('22.5')) millMap[cleanName]['22.5'] += net;
-    else millMap[cleanName]['23.5'] += net;
-    
-    millMap[cleanName].total += net;
-  }
-});
-
-const millArr = Object.keys(millMap).map(k => millMap[k]).sort((a,b) => b.total - a.total).slice(0, 10);
-
-new Chart(document.getElementById('millsChart'), {
-  type: 'bar',
-  data: {
-    labels: millArr.map(s => s.name.length > 20 ? s.name.substring(0, 20) + '...' : s.name),
-    datasets: [
-      { label: '23.5 قيراط', data: millArr.map(s => s['23.5']), backgroundColor: 'rgba(34,197,94,0.8)', borderRadius:4 },
-      { label: '23 قيراط', data: millArr.map(s => s['23']), backgroundColor: 'rgba(59,130,246,0.8)', borderRadius:4 },
-      { label: '22.5 قيراط', data: millArr.map(s => s['22.5']), backgroundColor: 'rgba(245,158,11,0.8)', borderRadius:4 }
-    ]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { color: '#7a8ba8', font: { family: 'Cairo' } } },
-      tooltip: {
-        callbacks: {
-          label: function(ctx) { return ' ' + ctx.dataset.label + ': ' + ctx.raw.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' طن'; }
-        }
-      }
-    },
-    scales: {
-      x: { stacked: true, grid: { color: 'transparent' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo', size: 11 } } },
-      y: { stacked: true, grid: { color: '#1a2d50' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo' } } }
-    }
-  }
-});
-
-// ── Imported In & Out Charts ────────────────────────────────────
-const palette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e', '#84cc16', '#06b6d4', '#6366f1'];
-
-// 1. Imported Incoming (Group by Ship+Port, Stack by WheatType)
-const impInMap = {};
-const wheatTypes = new Set();
-
-completedTickets.forEach(t => {
-  if ((t.opType === 'وارد' || t.opType === 'وارد (تفريغ)') && t.grainType === 'مستورد' && t.shipName) {
-    const ship = t.shipName.trim();
-    const port = (t.supplierName || '').trim();
-    const wType = (t.wheatType || 'غير محدد').trim();
-    const key = ship;
-    
-    wheatTypes.add(wType);
-    
-    if (!impInMap[key]) impInMap[key] = { ship: ship, port: port, total: 0 };
-    if (!impInMap[key][wType]) impInMap[key][wType] = 0;
-    
-    const net = (t.net || 0) / 1000;
-    impInMap[key][wType] += net;
-    impInMap[key].total += net;
-  }
-});
-
-const impInArr = Object.keys(impInMap).map(k => impInMap[k]).sort((a,b) => b.total - a.total).slice(0, 10);
-const wTypesArr = Array.from(wheatTypes);
-
-const inDatasets = wTypesArr.map((wt, i) => {
-  return {
-    label: wt,
-    data: impInArr.map(s => s[wt] || 0),
-    backgroundColor: palette[i % palette.length],
-    borderRadius: 4
-  };
-});
-
-new Chart(document.getElementById('importedInChart'), {
-  type: 'bar',
-  data: {
-    labels: impInArr.map(s => {
-      let l = s.ship.length > 15 ? s.ship.substring(0, 15) + '...' : s.ship;
-      return s.port ? l + ' (' + s.port + ')' : l;
-    }),
-    datasets: inDatasets
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { color: '#7a8ba8', font: { family: 'Cairo' } } },
-      tooltip: {
-        callbacks: {
-          label: function(ctx) { return ' ' + ctx.dataset.label + ': ' + ctx.raw.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' طن'; }
-        }
-      }
-    },
-    scales: {
-      x: { stacked: true, grid: { color: 'transparent' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo', size: 11 } } },
-      y: { stacked: true, grid: { color: '#1a2d50' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo' } } }
-    }
-  }
-});
-
-// 2. Imported Outgoing (Group by Mill, Stack by ShipName)
-const impOutMap = {};
-const shipNames = new Set();
-
-completedTickets.forEach(t => {
-  if ((t.opType === 'صرف' || t.opType === 'منصرف (شحن)') && t.grainType === 'مستورد' && t.destination) {
-    const dest = t.destination.trim();
-    const ship = (t.shipName || 'غير محدد').trim();
-    
-    shipNames.add(ship);
-    
-    if (!impOutMap[dest]) impOutMap[dest] = { name: dest, total: 0 };
-    if (!impOutMap[dest][ship]) impOutMap[dest][ship] = 0;
-    
-    const net = (t.net || 0) / 1000;
-    impOutMap[dest][ship] += net;
-    impOutMap[dest].total += net;
-  }
-});
-
-const impOutArr = Object.keys(impOutMap).map(k => impOutMap[k]).sort((a,b) => b.total - a.total).slice(0, 10);
-const sNamesArr = Array.from(shipNames);
-
-const outDatasets = sNamesArr.map((sn, i) => {
-  return {
-    label: sn,
-    data: impOutArr.map(s => s[sn] || 0),
-    backgroundColor: palette[(i + 5) % palette.length], // Shift palette start for variety
-    borderRadius: 4
-  };
-});
-
-new Chart(document.getElementById('importedOutChart'), {
-  type: 'bar',
-  data: {
-    labels: impOutArr.map(s => s.name.length > 20 ? s.name.substring(0, 20) + '...' : s.name),
-    datasets: outDatasets
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-      legend: { labels: { color: '#7a8ba8', font: { family: 'Cairo' } } },
-      tooltip: {
-        callbacks: {
-          label: function(ctx) { return ' ' + ctx.dataset.label + ': ' + ctx.raw.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' طن'; }
-        }
-      }
-    },
-    scales: {
-      x: { stacked: true, grid: { color: 'transparent' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo', size: 11 } } },
-      y: { stacked: true, grid: { color: '#1a2d50' }, ticks: { color: '#7a8ba8', font: { family: 'Cairo' } } }
     }
   }
 });
@@ -911,14 +441,14 @@ function handleApproval(reqId, isApproved) {
         fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">درجة القمح</label><input type="text" id="eq_grade" class="inp" value="' + (t.grade||'') + '"></div>';
       }
       
-      var ordersDbKey = (t.grainType === 'مستورد' ? 'DISPENSE_ORDERS_' : 'DISPENSE_ORDERS_LOCAL_') + t.silo_id; var ordersDb = JSON.parse(localStorage.getItem(ordersDbKey) || '{}');
+      var ordersDb = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
       var oData = t.orderNo ? (ordersDb[t.orderNo] || {}) : {};
       
       fHtml += '<div style="grid-column: 1 / -1; background: rgba(33,150,243,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(33,150,243,0.3); margin-top: 10px;">';
       fHtml += '<div style="margin-bottom:15px; font-weight:bold; color:#90caf9;"><i class="fa-solid fa-file-invoice"></i> بيانات إذن الصرف</div>';
       fHtml += '<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">';
       
-      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم إذن الصرف</label><input type="text" id="eq_order_no" class="inp" list="dl_orders" value="' + (t.orderNo||'') + '" onblur="if(this.value){var dbKey = (t.grainType === \'مستورد\' ? \'DISPENSE_ORDERS_\' : \'DISPENSE_ORDERS_LOCAL_\') + t.silo_id; var db=JSON.parse(localStorage.getItem(dbKey)||\'{}\');var d=db[this.value];if(d){var _ex=document.getElementById(\'eq_order_expiry\');if(_ex)_ex.value=d.expiry||\'\';var _q=document.getElementById(\'eq_order_qty\');if(_q)_q.value=d.qty||\'\';var _b=document.getElementById(\'eq_order_bonus\');if(_b)_b.value=d.bonus||\'\';}}"></div>';
+      fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">رقم إذن الصرف</label><input type="text" id="eq_order_no" class="inp" list="dl_orders" value="' + (t.orderNo||'') + '" onblur="if(this.value){var db=JSON.parse(localStorage.getItem(\'DISPENSE_ORDERS\')||\'{}\');var d=db[this.value];if(d){var _ex=document.getElementById(\'eq_order_expiry\');if(_ex)_ex.value=d.expiry||\'\';var _q=document.getElementById(\'eq_order_qty\');if(_q)_q.value=d.qty||\'\';var _b=document.getElementById(\'eq_order_bonus\');if(_b)_b.value=d.bonus||\'\';}}"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">تاريخ الانتهاء</label><input type="date" id="eq_order_expiry" class="inp" value="' + (oData.expiry||'') + '"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">الكمية الأساسية (بالطن)</label><input type="number" id="eq_order_qty" class="inp" value="' + (oData.qty||'') + '"></div>';
       fHtml += '<div><label style="font-size:0.82rem;color:#94a3b8;display:block;margin-bottom:4px;">التعزيز بالطن (إن وُجد)</label><input type="number" id="eq_order_bonus" class="inp" value="' + (oData.bonus||'') + '"></div>';
@@ -978,13 +508,13 @@ function applyEditApproval() {
   if (on) {
     t.orderNo = on.value.trim();
     if (t.orderNo) {
-      var ordersDbKey = (t.grainType === 'مستورد' ? 'DISPENSE_ORDERS_' : 'DISPENSE_ORDERS_LOCAL_') + t.silo_id; var ordersDb = JSON.parse(localStorage.getItem(ordersDbKey) || '{}');
+      var ordersDb = JSON.parse(localStorage.getItem('DISPENSE_ORDERS') || '{}');
       ordersDb[t.orderNo] = {
         expiry: document.getElementById('eq_order_expiry') ? document.getElementById('eq_order_expiry').value : '',
         qty: parseFloat(document.getElementById('eq_order_qty') ? document.getElementById('eq_order_qty').value : 0) || 0,
         bonus: parseFloat(document.getElementById('eq_order_bonus') ? document.getElementById('eq_order_bonus').value : 0) || 0
       };
-      localStorage.setItem(ordersDbKey, JSON.stringify(ordersDb));
+      localStorage.setItem('DISPENSE_ORDERS', JSON.stringify(ordersDb));
     }
   }
 
@@ -1013,8 +543,4 @@ function applyEditApproval() {
 }
 
 loadApprovals();
-</script>
-</body>
-</html>
-
 

@@ -114,7 +114,10 @@
             </div>
             <div>
               <label>جهة الوارد *</label>
-              <input type="text" id="li_supplier" class="inp" placeholder="المحافظة أو المورد" list="li_suppliers_list" oninput="generateSupplierCode()">
+              <div style="display:flex; gap:5px;">
+                <input type="text" id="li_supplier" class="inp" placeholder="الشركة أو المطحن" list="li_suppliers_list" oninput="generateSupplierCode()" style="flex:1">
+                <button class="btn" style="padding:0 12px; background:rgba(239,83,80,0.15); color:#ef5350; border:1px solid rgba(239,83,80,0.4);" onclick="deleteSupplier()" title="حذف جهة الوارد من الذاكرة"><i class="fa-solid fa-trash-xmark"></i></button>
+              </div>
               <datalist id="li_suppliers_list"></datalist>
             </div>
             <div>
@@ -137,7 +140,7 @@
           <div style="overflow-x:auto"><table class="data-table">
             <thead><tr>
               <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>جهة الوارد</th>
-              <th>النوع</th><th>دخول البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>دخول البوابة</th><th>خروج البوابة</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
               <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
             </tr></thead>
             <tbody id="li_tbody"></tbody>
@@ -186,15 +189,7 @@
                 <option value="أمريكي">أمريكي</option>
               </select>
             </div>
-            <div>
-              <label>درجة النظافة</label>
-              <select id="ii_cleanliness" class="inp">
-                <option value="23.5">23.5 قيراط</option>
-                <option value="23">23 قيراط</option>
-                <option value="22.5">22.5 قيراط</option>
-                <option value="22">22 قيراط</option>
-              </select>
-            </div>
+
             <div>
               <label>رقم كارتة المشحون *</label>
               <input type="text" id="ii_ticket_num" class="inp" placeholder="رقم الكارتة">
@@ -229,7 +224,7 @@
           <div style="overflow-x:auto"><table class="data-table">
             <thead><tr>
               <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الشركة الناقلة</th><th>الميناء</th>
-              <th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>رقم الكارتة</th>
+              <th>النوع</th><th>تاريخ الشحن</th><th>دخول البوابة</th><th>خروج البوابة</th><th>رقم الكارتة</th>
               <th>الوزن القائم</th><th>الوزن الفارغ</th><th>الصافي (طن)</th>
               <th>حالة الميزان</th><th>إجراءات</th>
             </tr></thead>
@@ -257,22 +252,14 @@
               <label>الجهة / المحل المنصرف *</label>
               <input type="text" id="lo_dest" class="inp" placeholder="اسم الجهة" list="dl_dest" onchange="autoSelectPermit('lo', this.value)">
             </div>
-            <div>
-              <label>الدرجة (النوع)</label>
-              <select id="lo_grade" class="inp">
-                <option value="23.5">23.5 قيراط</option>
-                <option value="24">24 قيراط</option>
-                <option value="22">22 قيراط</option>
-              </select>
-            </div>
             <div style="grid-column: 1 / -1; background: rgba(33,150,243,0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(33,150,243,0.3);">
               <div style="margin-bottom:15px; font-weight:bold; color:#90caf9;"><i class="fa-solid fa-file-invoice"></i> بيانات إذن الصرف</div>
               <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                 <div>
                   <label>رقم إذن الصرف *</label>
-                  <div style="display:flex; gap:10px;">
-                    <input type="text" class="inp" id="lo_order_no" placeholder="أدخل رقم الإذن" list="lo_order_no_list" onblur="loadOrderData('lo')">
-                    <button class="btn btn-outline" style="white-space:nowrap; padding:0 10px;" onclick="saveOrderData('lo')"><i class="fa-solid fa-save"></i> حفظ</button>
+                  <div style="display:flex; gap:6px;">
+                    <input type="text" class="inp" id="lo_order_no" placeholder="أدخل رقم الإذن" list="lo_order_no_list" oninput="loadOrderData('lo')" onchange="loadOrderData('lo')" onblur="loadOrderData('lo')" style="flex:1">
+                    <button class="btn" style="white-space:nowrap; padding:0 12px; background:rgba(239,83,80,0.15); color:#ef5350; border:1px solid rgba(239,83,80,0.4);" onclick="clearOrderData('lo')" title="مسح الإذن من القائمة وكل بياناته"><i class="fa-solid fa-trash-xmark"></i> مسح الإذن</button>
                   </div>
                   <datalist id="lo_order_no_list"></datalist>
                 </div>
@@ -306,7 +293,7 @@
           <div style="overflow-x:auto"><table class="data-table">
             <thead><tr>
               <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الجهة المنصرف</th>
-              <th>الدرجة</th><th>وقت الدخول</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>وقت الدخول</th><th>وقت الخروج</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
               <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
             </tr></thead>
             <tbody id="lo_tbody"></tbody>
@@ -353,9 +340,9 @@
               <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                 <div>
                   <label>رقم إذن الصرف *</label>
-                  <div style="display:flex; gap:10px;">
-                    <input type="text" class="inp" id="io_order_no" placeholder="أدخل رقم الإذن" list="io_order_no_list" onblur="loadOrderData('io')">
-                    <button class="btn btn-outline" style="white-space:nowrap; padding:0 10px;" onclick="saveOrderData('io')"><i class="fa-solid fa-save"></i> حفظ</button>
+                  <div style="display:flex; gap:6px;">
+                    <input type="text" class="inp" id="io_order_no" placeholder="أدخل رقم الإذن" list="io_order_no_list" oninput="loadOrderData('io')" onchange="loadOrderData('io')" onblur="loadOrderData('io')" style="flex:1">
+                    <button class="btn" style="white-space:nowrap; padding:0 12px; background:rgba(239,83,80,0.15); color:#ef5350; border:1px solid rgba(239,83,80,0.4);" onclick="clearOrderData('io')" title="مسح الإذن من القائمة وكل بياناته"><i class="fa-solid fa-trash-xmark"></i> مسح الإذن</button>
                   </div>
                   <datalist id="io_order_no_list"></datalist>
                 </div>
@@ -389,7 +376,7 @@
           <div style="overflow-x:auto"><table class="data-table">
             <thead><tr>
               <th>م</th><th>رقم السيارة</th><th>اسم السائق</th><th>الجهة المنصرف</th>
-              <th>الباخرة/النوع</th><th>وقت الدخول</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
+              <th>الباخرة/النوع</th><th>وقت الدخول</th><th>وقت الخروج</th><th>الوزن القائم</th><th>الوزن الفارغ</th>
               <th>الصافي (طن)</th><th>حالة الميزان</th><th>إجراءات</th>
             </tr></thead>
             <tbody id="io_tbody"></tbody>
@@ -454,7 +441,7 @@
 
   // ---- Register gate in ----
   function registerGateIn(grainType, opType) {
-    var plate = '', driver = '', supplier = '', dest = '', grade = '', wheatType = '', ticketNum = '', shipDate = '', transport = '';
+    var plate = '', driver = '', supplier = '', dest = '', wheatType = '', ticketNum = '', shipDate = '', transport = '';
 
     if (opType === 'وارد' && grainType === 'محلي') {
       plate    = document.getElementById('li_plate').value.trim();
@@ -464,10 +451,11 @@
       if (!plate || !driver || !supplier || !supplierCode) return showToast('يرجى تعبئة جميع الحقول المطلوبة (بما في ذلك الكود)', 'error');
       
       // Save pairing for future auto-fill
-      let suppliersMap = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+      const mapKey = 'SUPPLIERS_MAP_' + user.silo_id;
+      let suppliersMap = JSON.parse(localStorage.getItem(mapKey) || '{}');
       if (suppliersMap[supplier] !== supplierCode) {
         suppliersMap[supplier] = supplierCode;
-        localStorage.setItem('SUPPLIERS_MAP', JSON.stringify(suppliersMap));
+        localStorage.setItem(mapKey, JSON.stringify(suppliersMap));
         populateSupplierDatalist();
       }
 
@@ -478,7 +466,6 @@
       supplier  = document.getElementById('ii_supplier').value.trim();
       shipName  = document.getElementById('ii_ship_name').value.trim();
       wheatType = document.getElementById('ii_wheat').value;
-      var cleanliness = document.getElementById('ii_cleanliness').value;
       ticketNum = document.getElementById('ii_ticket_num').value.trim();
       shipDate  = document.getElementById('ii_ship_date').value;
       transport = document.getElementById('ii_transport').value.trim();
@@ -488,7 +475,6 @@
       plate  = document.getElementById('lo_plate').value.trim();
       driver = document.getElementById('lo_driver').value.trim();
       dest   = document.getElementById('lo_dest').value.trim();
-      grade  = document.getElementById('lo_grade').value;
       if (!plate || !driver || !dest) return showToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
 
     } else if (opType === 'صرف' && grainType === 'مستورد') {
@@ -503,7 +489,7 @@
     var orderNo = '';
     if (opType === 'صرف') {
       var prefix = grainType === 'مستورد' ? 'io' : 'lo';
-      var storageKey = grainType === 'مستورد' ? 'DISPENSE_ORDERS' : 'DISPENSE_ORDERS_LOCAL';
+      var storageKey = (grainType === 'مستورد' ? 'DISPENSE_ORDERS_' : 'DISPENSE_ORDERS_LOCAL_') + user.silo_id;
 
       orderNo = document.getElementById(prefix+'_order_no').value.trim();
       if (!orderNo) return showToast('يرجى إدخال رقم إذن الصرف', 'error');
@@ -543,12 +529,11 @@
       t.supplierName     = supplier;
       t.shipName         = shipName;
       t.wheatType        = wheatType;
-      t.cleanliness      = cleanliness;
       t.ticketNum        = ticketNum;
       t.shippingDate     = shipDate;
       t.transportCompany = transport;
     } else if (opType === 'صرف' && grainType === 'محلي') {
-      t.destination = dest; t.grade = grade; t.orderNo = orderNo;
+      t.destination = dest; t.orderNo = orderNo;
     } else if (opType === 'صرف' && grainType === 'مستورد') {
       t.destination  = dest;
       t.shipName     = shipName;
@@ -557,9 +542,29 @@
     }
 
     var tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+    
+    // Check for duplicates
+    // Removed duplicate car check as requested by the user
+    
     tickets.unshift(t);
     localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
     showToast('تم تسجيل دخول السيارة بنجاح وتوجيهها للميزان', 'success');
+    
+    // Clear the form after successful registration
+    var pId = '';
+    if (opType === 'وارد' && grainType === 'محلي') pId = 'panel-local-in';
+    else if (opType === 'صرف' && grainType === 'محلي') pId = 'panel-local-out';
+    else if (opType === 'وارد' && grainType === 'مستورد') pId = 'panel-import-in';
+    else if (opType === 'صرف' && grainType === 'مستورد') pId = 'panel-import-out';
+    
+    if (pId) {
+      var panel = document.getElementById(pId);
+      if (panel) {
+        var inputs = panel.querySelectorAll('input');
+        inputs.forEach(inp => { if (inp.type === 'text' || inp.type === 'number') inp.value = ''; });
+      }
+    }
+    
     renderGateTables();
   }
 
@@ -709,8 +714,9 @@
           '<td class="fw-bold">' + t.plate + '</td>' +
           '<td>' + t.driver + '</td>' +
           '<td>' + (t.supplierName || '') + '</td>' +
-          '<td>' + (t.grade ? t.grade + ' قيراط' : '') + '</td>' +
+          
           '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td style="font-size:0.85rem; color:#888">' + (t.exitTimestamp || '-') + '</td>' +
           '<td>' + nGross + '</td><td>' + nTare + '</td>' +
           '<td class="fw-bold text-success">' + nNet + '</td>' +
           '<td>' + statBadge + '</td>' +
@@ -729,6 +735,7 @@
           '<td>' + (t.wheatType || '') + '</td>' +
           '<td>' + sDate + '</td>' +
           '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td style="font-size:0.85rem; color:#888">' + (t.exitTimestamp || '-') + '</td>' +
           '<td class="text-primary">' + (t.ticketNum || '-') + '</td>' +
           '<td>' + nGross + '</td><td>' + nTare + '</td>' +
           '<td class="fw-bold text-success">' + nNet + '</td>' +
@@ -743,8 +750,9 @@
           '<td class="fw-bold">' + t.plate + '</td>' +
           '<td>' + t.driver + '</td>' +
           '<td>' + (t.destination || '') + '</td>' +
-          '<td>' + (t.grade ? t.grade + ' قيراط' : '') + '</td>' +
+          
           '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td style="font-size:0.85rem; color:#888">' + (t.exitTimestamp || '-') + '</td>' +
           '<td>' + nGross + '</td><td>' + nTare + '</td>' +
           '<td class="fw-bold text-warning">' + nNet + '</td>' +
           '<td>' + statBadge + '</td>' +
@@ -760,6 +768,7 @@
           '<td>' + (t.destination || '') + '</td>' +
           '<td>' + (t.shipName || '') + ' / ' + (t.wheatType || '') + '</td>' +
           '<td style="font-size:0.85rem">' + t.timestamp + '</td>' +
+          '<td style="font-size:0.85rem; color:#888">' + (t.exitTimestamp || '-') + '</td>' +
           '<td>' + nGross + '</td><td>' + nTare + '</td>' +
           '<td class="fw-bold text-warning">' + nNet + '</td>' +
           '<td>' + statBadge + '</td>' +
@@ -774,8 +783,9 @@
     document.getElementById('lo_tbody').innerHTML = hLo || noData;
     document.getElementById('io_tbody').innerHTML = hIo || noData;
 
-    var uDest = [...new Set(tickets.map(function(x) { return x.destination; }).filter(Boolean))];
-    var uShips = [...new Set(tickets.map(function(x) { return x.shipName; }).filter(Boolean))];
+    var myTix = tickets.filter(function(t) { return t.silo_id === user.silo_id; });
+    var uDest = [...new Set(myTix.map(function(x) { return x.destination; }).filter(Boolean))];
+    var uShips = [...new Set(myTix.map(function(x) { return x.shipName; }).filter(Boolean))];
     if (document.getElementById('dl_dest')) {
        document.getElementById('dl_dest').innerHTML = uDest.map(function(m) { return '<option value="' + m + '">'; }).join('');
     }
@@ -791,13 +801,15 @@
     if (e.key === 'WEIGHBRIDGE_TICKETS') renderGateTables();
   });
   // --- Permit (Order) Data logic for Gate ---
-  function getOrders(prefix) { 
-    return JSON.parse(localStorage.getItem(prefix === 'lo' ? 'DISPENSE_ORDERS_LOCAL' : 'DISPENSE_ORDERS') || '{}'); 
-  }
+    function getOrders(prefix) { 
+      const key = (prefix === 'lo' ? 'DISPENSE_ORDERS_LOCAL_' : 'DISPENSE_ORDERS_') + user.silo_id;
+      return JSON.parse(localStorage.getItem(key) || '{}'); 
+    }
   function saveOrderData(prefix) {
     const no = document.getElementById(prefix+'_order_no').value.trim();
     if(!no) return showToast('يرجى إدخال رقم الإذن', 'error');
     const dest = document.getElementById(prefix+'_dest').value.trim();
+    if(!dest) return showToast('يرجى إدخال الجهة (المطحن/الباخرة) أولاً لربط الإذن بها', 'error');
     const orders = getOrders(prefix);
     orders[no] = {
       expiry: document.getElementById(prefix+'_order_expiry').value,
@@ -805,7 +817,8 @@
       bonus: parseFloat(document.getElementById(prefix+'_order_bonus').value) || 0,
       destination: dest
     };
-    localStorage.setItem(prefix === 'lo' ? 'DISPENSE_ORDERS_LOCAL' : 'DISPENSE_ORDERS', JSON.stringify(orders));
+      const key = (prefix === 'lo' ? 'DISPENSE_ORDERS_LOCAL_' : 'DISPENSE_ORDERS_') + user.silo_id;
+      localStorage.setItem(key, JSON.stringify(orders));
     showToast('تم حفظ بيانات إذن الصرف بنجاح', 'success');
     refreshOrderList(prefix);
   }
@@ -819,6 +832,26 @@
       document.getElementById(prefix+'_order_bonus').value = orders[no].bonus || '';
       if(orders[no].destination) document.getElementById(prefix+'_dest').value = orders[no].destination;
     }
+  }
+  function clearOrderData(prefix) {
+    const no = document.getElementById(prefix+'_order_no').value.trim();
+    const msg = no
+      ? `هل تريد حذف إذن الصرف رقم "${no}" نهائياً من القائمة؟\nلا يمكن التراجع عن هذا الإجراء.`
+      : 'لم يتم تحديد رقم إذن. هل تريد مسح الحقول فقط؟';
+    if(!confirm(msg)) return;
+    if (no) {
+        const storageKey = (prefix === 'lo' ? 'DISPENSE_ORDERS_LOCAL_' : 'DISPENSE_ORDERS_') + user.silo_id;
+      const orders = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      delete orders[no];
+      localStorage.setItem(storageKey, JSON.stringify(orders));
+      refreshOrderList(prefix);
+    }
+    document.getElementById(prefix+'_order_no').value    = '';
+    document.getElementById(prefix+'_order_expiry').value = '';
+    document.getElementById(prefix+'_order_qty').value   = '';
+    document.getElementById(prefix+'_order_bonus').value = '';
+    document.getElementById(prefix+'_dest').value        = '';
+    showToast(no ? `تم حذف الإذن "${no}" نهائياً` : 'تم مسح الحقول', 'success');
   }
   function autoSelectPermit(prefix, destination) {
     if (!destination) return;
@@ -863,11 +896,32 @@
     const list = document.getElementById('li_suppliers_list');
     if (!list) return;
     list.innerHTML = '';
-    const suppliers = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+    const mapKey = 'SUPPLIERS_MAP_' + user.silo_id;
+    const suppliers = JSON.parse(localStorage.getItem(mapKey) || '{}');
     for (const name in suppliers) {
       list.innerHTML += `<option value="${name}">`;
     }
   }
+  
+  window.deleteSupplier = function() {
+    const suppInput = document.getElementById('li_supplier');
+    const suppCodeInput = document.getElementById('li_supplier_code');
+    const name = suppInput.value.trim();
+    if (!name) return alert('الرجاء اختيار أو كتابة اسم الجهة المراد حذفها أولاً.');
+    
+    let suppliersMap = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+    if (suppliersMap[name]) {
+      if (confirm(`هل أنت متأكد من حذف جهة الوارد "${name}" من الذاكرة؟`)) {
+        delete suppliersMap[name];
+        localStorage.setItem('SUPPLIERS_MAP', JSON.stringify(suppliersMap));
+        populateSupplierDatalist();
+        suppInput.value = '';
+        suppCodeInput.value = '';
+      }
+    } else {
+      alert('هذه الجهة غير محفوظة مسبقاً في الذاكرة.');
+    }
+  };
 
   function generateSupplierCode() {
     const supplierName = document.getElementById('li_supplier').value.trim();
@@ -877,7 +931,8 @@
       return;
     }
     
-    let suppliers = JSON.parse(localStorage.getItem('SUPPLIERS_MAP') || '{}');
+    const mapKey = 'SUPPLIERS_MAP_' + user.silo_id;
+    let suppliers = JSON.parse(localStorage.getItem(mapKey) || '{}');
     if (suppliers[supplierName]) {
       codeInput.value = suppliers[supplierName];
     } else {

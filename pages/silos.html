@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -80,17 +80,67 @@ Auth.require();
 buildSidebar('silos');
 initClock(document.getElementById('clockEl'));
 
+// ══════════════════════════════════════════════════════════════════
+// قراءة أرقام المخزون الحقيقية من البيانات اليومية
+// DAILY_REPORT_{siloId}_{date}  ← مصدر الأرقام الحقيقية
+// ══════════════════════════════════════════════════════════════════
+function getRealStock(siloId) {
+  const today = new Date().toISOString().split('T')[0];
+  // نجرب تاريخ اليوم أولاً ثم الأمس كاحتياط
+  const dates = [today];
+  const yest = new Date(); yest.setDate(yest.getDate()-1);
+  dates.push(yest.toISOString().split('T')[0]);
+
+  for (const d of dates) {
+    const key = `DAILY_REPORT_${siloId}_${d}`;
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const report = JSON.parse(raw);
+      // إجمالي رصيد آخر المدة من كل الخلايا
+      if (report && report.cells && report.cells.length > 0) {
+        const totalClose = report.cells.reduce((s, c) => s + (c.closing || 0), 0);
+        const totalIn    = report.cells.reduce((s, c) => s + (c.incoming || 0), 0);
+        const totalOut   = report.cells.reduce((s, c) => s + (c.outgoing || 0), 0);
+        if (totalClose > 0 || totalIn > 0) {
+          return { stock: totalClose, incoming: totalIn, outgoing: totalOut, fromReport: true };
+        }
+      }
+    } catch(e) {}
+  }
+  return null; // لا توجد بيانات حقيقية
+}
+
+// تطبيق الأرقام الحقيقية على SILOS (التي تمثل الصومعة الحالية فقط)
+SILOS.forEach(s => {
+  const real = getRealStock(s.id);
+  if (real) {
+    s.stock = real.stock;
+    s._real = true; // علامة تشير أن الرقم حقيقي
+    s._todayIn  = real.incoming;
+    s._todayOut = real.outgoing;
+  }
+});
+
+// Populate region filter
+REGIONS.forEach(r => {
+  document.getElementById('regionFilter').innerHTML +=
+    `<option value="${r.id}">${r.name}</option>`;
+});
+
 // Summary cards
-const actives = SILOS.filter(s=>s.status==='active').length;
-const maint   = SILOS.filter(s=>s.status==='maintenance').length;
-const totalStk= SILOS.reduce((a,s)=>a+s.stock,0);
-const totalCap= SILOS.reduce((a,s)=>a+s.cap,0);
+const actives  = SILOS.filter(s=>s.status==='active').length;
+const maint    = SILOS.filter(s=>s.status==='maintenance').length;
+const totalStk = SILOS.reduce((a,s)=>a+s.stock,0);
+const totalCap = SILOS.reduce((a,s)=>a+s.cap,0);
+const realCount= SILOS.filter(s=>s._real).length;
+
 const summary = [
-  { icon:'fa-building-wheat', cls:'ic-gold',  label:'إجمالي الصوامع',   val:48, unit:'' },
-  { icon:'fa-circle-check',   cls:'ic-green', label:'صوامع نشطة',        val:actives, unit:'' },
-  { icon:'fa-tools',          cls:'ic-amber', label:'صوامع في صيانة',    val:maint, unit:'' },
-  { icon:'fa-box',            cls:'ic-blue',  label:'إجمالي المخزون',    val:Math.round(totalStk/1000), unit:'ألف طن' },
-  { icon:'fa-gauge',          cls:'ic-purple',label:'نسبة الامتلاء',      val:Math.round((totalStk/totalCap)*100), unit:'%' },
+  { icon:'fa-building-wheat', cls:'ic-gold',   label:'إجمالي الصوامع',    val:48, unit:'' },
+  { icon:'fa-circle-check',   cls:'ic-green',  label:'صوامع نشطة',         val:actives, unit:'' },
+  { icon:'fa-tools',          cls:'ic-amber',  label:'صوامع في صيانة',     val:maint, unit:'' },
+  { icon:'fa-box',            cls:'ic-blue',   label:'إجمالي المخزون',     val:Math.round(totalStk/1000), unit:'ألف طن' },
+  { icon:'fa-gauge',          cls:'ic-purple', label:'نسبة الامتلاء',      val:Math.round((totalStk/totalCap)*100), unit:'%' },
 ];
 const sg = document.getElementById('siloSummary');
 summary.forEach(s => {
@@ -102,11 +152,15 @@ summary.forEach(s => {
     </div></div>`;
 });
 
-// Populate region filter
-REGIONS.forEach(r => {
-  document.getElementById('regionFilter').innerHTML +=
-    `<option value="${r.id}">${r.name}</option>`;
-});
+// شارة "بيانات حقيقية" إذا وجدت
+if (realCount > 0) {
+  sg.innerHTML += `<div class="stat-card" style="border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.05)">
+    <div class="stat-icon ic-green"><i class="fa-solid fa-satellite-dish"></i></div>
+    <div class="stat-body">
+      <div class="stat-value" style="font-size:1rem;color:#22c55e">بيانات حقيقية</div>
+      <div class="stat-label">مُحدَّثة من البيان اليومي 🔴</div>
+    </div></div>`;
+}
 
 function renderSilos(list) {
   const grid = document.getElementById('silosGrid');
@@ -122,11 +176,12 @@ function renderSilos(list) {
     const p = pct(s.stock, s.cap);
     const col = pctColor(p);
     const region = REGIONS.find(r=>r.id===s.rid);
+    const isReal = s._real;
     grid.innerHTML += `
-      <div class="silo-card ${s.status}" onclick="showSilo(${s.id})">
+      <div class="silo-card ${s.status}" onclick="showSilo(${s.id})" style="${isReal ? 'border-color:rgba(34,197,94,0.3)' : ''}">
         <div class="silo-card-header">
           <div>
-            <div class="silo-code">${s.code}</div>
+            <div class="silo-code">${s.code}${isReal ? ' <span style="color:#22c55e;font-size:0.6rem">●LIVE</span>' : ''}</div>
             <div class="silo-name">${s.name}</div>
             <div class="silo-gov"><i class="fa-solid fa-location-dot" style="font-size:0.7rem"></i> ${s.gov}</div>
           </div>
@@ -138,18 +193,25 @@ function renderSilos(list) {
         <div class="silo-stock">
           <div class="stock-numbers">
             <span class="stock-current">${formatNum(s.stock)} طن</span>
-            <span class="stock-pct" style="color:${col==='red'?'var(--danger)':col==='amber'?'var(--warning)':'var(--success)'}">${p}%</span>
+            <span class="stock-pct" style="color:${col==='red'?'var(--danger)':col==='amber'?'var(--warning)':'var(--success)'}">
+              ${p}%
+            </span>
           </div>
           <div class="progress-wrap">
             <div class="progress-bar ${col}" data-width="${p}" style="width:${p}%"></div>
           </div>
           <div class="stock-cap" style="margin-top:5px;font-size:0.71rem">من ${formatNum(s.cap)} طن طاقة كاملة</div>
         </div>
+        ${isReal ? `
+        <div style="display:flex;gap:8px;margin-top:10px;font-size:0.72rem">
+          <span style="color:#22c55e"><i class="fa-solid fa-arrow-down"></i> ${formatNum(s._todayIn)} طن</span>
+          <span style="color:#f97316"><i class="fa-solid fa-arrow-up"></i> ${formatNum(s._todayOut)} طن</span>
+        </div>` : `
         <div style="display:flex;gap:8px;margin-top:14px;font-size:0.72rem;color:var(--text-sec)">
           <span title="قمح"><i class="fa-solid fa-wheat-awn text-gold"></i> ${formatNum(s.wheat)}</span>
           <span title="ذرة"><i class="fa-solid fa-seedling text-success"></i> ${formatNum(s.corn)}</span>
           <span title="شعير"><i class="fa-solid fa-leaf text-info"></i> ${formatNum(s.barley)}</span>
-        </div>
+        </div>`}
       </div>`;
   });
 }
@@ -166,6 +228,37 @@ function filterSilos() {
 }
 
 renderSilos(SILOS);
+
+// ── تحديث حي من Firebase (للإدارة العامة) ───────────────────────
+if (window.firebaseSyncReady && window.FirebaseDB) {
+  window.firebaseSyncReady.then(connected => {
+    if (!connected) return;
+    const today = new Date().toISOString().split('T')[0];
+    // الاستماع لكل الصوامع
+    SILOS.forEach(s => {
+      window.FirebaseDB.listenSilo(String(s.id), async (siloId, data) => {
+        // ابحث عن تقرير اليوم في البيانات المستلمة
+        if (!data) return;
+        const reportKey = `DAILY_REPORT_${siloId}_${today}`;
+        const fbKey = reportKey.replace(/\./g,'__DOT__').replace(/-/g,'__DASH__').replace(/\//g,'__SLASH__');
+        const report = data[fbKey];
+        if (report && report.cells) {
+          const silo = SILOS.find(x => String(x.id) === String(siloId));
+          if (silo) {
+            const totalClose = report.cells.reduce((sum, c) => sum + (c.closing || 0), 0);
+            if (totalClose > 0) {
+              silo.stock = totalClose;
+              silo._real = true;
+              silo._todayIn  = report.cells.reduce((sum, c) => sum + (c.incoming || 0), 0);
+              silo._todayOut = report.cells.reduce((sum, c) => sum + (c.outgoing || 0), 0);
+              renderSilos(SILOS); // إعادة رسم الكروت بالأرقام الجديدة
+            }
+          }
+        }
+      });
+    });
+  });
+}
 
 // Modal
 function showSilo(id) {
@@ -198,6 +291,12 @@ function showSilo(id) {
       </div>
     </div>
 
+    ${s._real ? `<div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:0.8rem;color:#22c55e">
+      <i class="fa-solid fa-satellite-dish"></i> بيانات حقيقية من البيان اليومي
+    </div>` : `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:0.8rem;color:#f59e0b">
+      <i class="fa-solid fa-triangle-exclamation"></i> بيانات تقديرية — لم يُسجَّل بيان يومي بعد
+    </div>`}
+
     <div style="background:var(--bg-hover);border-radius:8px;padding:16px;margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;margin-bottom:10px">
         <span style="font-size:0.85rem;font-weight:700">المخزون الحالي</span>
@@ -210,21 +309,10 @@ function showSilo(id) {
         <span>${formatNum(s.stock)} طن مخزن</span>
         <span>الطاقة: ${formatNum(s.cap)} طن</span>
       </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-      <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:12px;text-align:center">
-        <div style="color:var(--gold);font-size:1.3rem;font-weight:900">${formatNum(s.wheat)}</div>
-        <div style="font-size:0.72rem;color:var(--text-sec)">قمح (طن)</div>
-      </div>
-      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:12px;text-align:center">
-        <div style="color:var(--success);font-size:1.3rem;font-weight:900">${formatNum(s.corn)}</div>
-        <div style="font-size:0.72rem;color:var(--text-sec)">ذرة (طن)</div>
-      </div>
-      <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:8px;padding:12px;text-align:center">
-        <div style="color:var(--info);font-size:1.3rem;font-weight:900">${formatNum(s.barley)}</div>
-        <div style="font-size:0.72rem;color:var(--text-sec)">شعير (طن)</div>
-      </div>
+      ${s._real ? `<div style="display:flex;gap:16px;margin-top:10px;font-size:0.8rem">
+        <span style="color:#22c55e"><i class="fa-solid fa-arrow-down"></i> وارد اليوم: ${formatNum(s._todayIn)} طن</span>
+        <span style="color:#f97316"><i class="fa-solid fa-arrow-up"></i> منصرف اليوم: ${formatNum(s._todayOut)} طن</span>
+      </div>` : ''}
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
@@ -258,5 +346,5 @@ function closeModal() {
 }
 </script>
 </body>
-</html>
+
 
