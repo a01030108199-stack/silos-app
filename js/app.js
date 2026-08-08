@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // js/app.js — مكتبة مشتركة: Auth + Sidebar + Utilities
 // ============================================================
 
@@ -29,7 +29,7 @@ const Auth = {
       if (user && expectedPassword !== password) user = null;
     } else {
       const expectedPassword = customPasswords[siloId + '_' + role] || '123';
-      user = usersToLoad.find(u => u.role === role && u.silo_id === siloId);
+      user = usersToLoad.find(u => u.role === role && u.silo_id == siloId);
       if (user && expectedPassword !== password) user = null;
     }
 
@@ -359,3 +359,4 @@ function closeModal(id) {
   var el = document.getElementById('modal-overlay-' + id);
   if (el) el.remove();
 }
+
