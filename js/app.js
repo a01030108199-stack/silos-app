@@ -6,8 +6,12 @@
 const Auth = {
   login(username, password) {
     const usersToLoad = typeof USERS !== 'undefined' ? USERS : [];
+    const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
     
-    const user = usersToLoad.find(u => u.username === username && u.password === password);
+    const user = usersToLoad.find(u => {
+      const expectedPassword = customPasswords[(u.silo_id !== null ? u.silo_id : 'null') + '_' + u.role] || u.password;
+      return u.username === username && expectedPassword === password;
+    });
     if (user) {
       localStorage.setItem('silo_user', JSON.stringify(user));
       return user;
@@ -16,12 +20,17 @@ const Auth = {
   },
   loginByRole(role, siloId, password) {
     const usersToLoad = typeof USERS !== 'undefined' ? USERS : [];
+    const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
 
     let user;
     if (role === 'general_admin') {
-      user = usersToLoad.find(u => u.role === 'general_admin' && u.password === password);
+      const expectedPassword = customPasswords['null_general_admin'] || '123';
+      user = usersToLoad.find(u => u.role === 'general_admin');
+      if (user && expectedPassword !== password) user = null;
     } else {
-      user = usersToLoad.find(u => u.role === role && u.silo_id === siloId && u.password === password);
+      const expectedPassword = customPasswords[siloId + '_' + role] || '123';
+      user = usersToLoad.find(u => u.role === role && u.silo_id === siloId);
+      if (user && expectedPassword !== password) user = null;
     }
 
     if (user) {

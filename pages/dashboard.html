@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <script>window.onerror = function(m,u,l,c,e) { alert('Error: ' + m + '\nLine: ' + l + '\nCol: ' + c); };</script>
@@ -24,6 +24,9 @@
       </div>
       <div class="header-actions">
         <div class="header-date" id="clockEl"></div>
+        <div class="btn-icon" id="btnAdminPasswords" style="display:none" title="مراقبة كلمات المرور" onclick="openAdminPasswords()">
+          <i class="fa-solid fa-key" style="color:#f59e0b"></i>
+        </div>
         <div class="btn-icon" title="تنبيهات" onclick="scrollToAlerts()">
           <i class="fa-solid fa-bell"></i>
           <span class="badge" id="alertBadge">4</span>
@@ -246,6 +249,10 @@ const user = Auth.require(['manager', 'general_admin', 'silo']);
 buildSidebar('dashboard');
 document.getElementById('pageDate').textContent = todayDate();
 initClock(document.getElementById('clockEl'));
+
+if (user && user.role === 'general_admin') {
+  document.getElementById('btnAdminPasswords').style.display = 'inline-flex';
+}
 
 const isGeneral = user.role === 'general_admin';
 if (!isGeneral) {
@@ -766,7 +773,57 @@ function scrollToAlerts() {
   document.getElementById('alertsSection').scrollIntoView({behavior:'smooth'});
 }
 
-// --- Security Alert & Maintenance Handlers ---
+// --- Password Monitoring for General Admin ---
+function openAdminPasswords() {
+  const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
+  let html = `<div style="max-height:60vh; overflow-y:auto; padding:10px;">
+    <table class="table" style="width:100%; text-align:right">
+      <thead>
+        <tr>
+          <th>الصومعة</th>
+          <th>البوابة</th>
+          <th>الميزان</th>
+          <th>المدير</th>
+        </tr>
+      </thead>
+      <tbody>`;
+  
+  // Sort silos by name
+  const sortedSilos = SILOS.slice().sort((a,b) => a.name.localeCompare(b.name));
+  
+  sortedSilos.forEach(s => {
+    const gate = customPasswords[s.id + '_security'] || '123';
+    const scale = customPasswords[s.id + '_scale'] || '123';
+    const mgr = customPasswords[s.id + '_manager'] || '123';
+    
+    html += `<tr>
+      <td style="font-weight:bold;color:#93c5fd">${s.name}</td>
+      <td><input type="text" class="inp" style="width:80px;text-align:center" value="${gate}" id="set_${s.id}_security"></td>
+      <td><input type="text" class="inp" style="width:80px;text-align:center" value="${scale}" id="set_${s.id}_scale"></td>
+      <td><input type="text" class="inp" style="width:80px;text-align:center" value="${mgr}" id="set_${s.id}_manager"></td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+    <div style="margin-top:15px; text-align:left;">
+      <button class="btn btn-primary" onclick="saveAdminPasswords()"><i class="fa-solid fa-save"></i> حفظ التعديلات</button>
+      <button class="btn btn-danger" onclick="closeModal('admin-pwds')">إغلاق</button>
+    </div>`;
+    
+  showModal('admin-pwds', 'مراقبة كلمات المرور - جميع الصوامع', html);
+}
+
+function saveAdminPasswords() {
+  const customPasswords = JSON.parse(localStorage.getItem('SILO_PASSWORDS') || '{}');
+  SILOS.forEach(s => {
+    customPasswords[s.id + '_security'] = document.getElementById('set_' + s.id + '_security').value;
+    customPasswords[s.id + '_scale'] = document.getElementById('set_' + s.id + '_scale').value;
+    customPasswords[s.id + '_manager'] = document.getElementById('set_' + s.id + '_manager').value;
+  });
+  localStorage.setItem('SILO_PASSWORDS', JSON.stringify(customPasswords));
+  showToast('تم حفظ جميع كلمات المرور بنجاح', 'success');
+  closeModal('admin-pwds');
+}
 
 // --- Approvals Logic ---
 function loadApprovals() {

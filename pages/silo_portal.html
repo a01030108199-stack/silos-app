@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -189,9 +189,38 @@
   <div class="click-area area-reception" onclick="openAuth('scale', 'إدارة الاستلام والتخزين', 'fa-scale-balanced', '#3b82f6')" title="إدارة الاستلام والتخزين"></div>
   <div class="click-area area-manager" onclick="openAuth('manager', 'مدير الموقع', 'fa-user-tie', '#8b5cf6')" title="مدير الموقع"></div>
   <div class="click-area area-maintenance" onclick="openAuth('maintenance', 'الصيانة', 'fa-wrench', '#f59e0b')" title="الصيانة"></div>
-</div>
 
-<!-- Auth Modal -->
+  <div class="settings-btn" onclick="openSettingsAuth()" style="position:fixed;bottom:20px;right:20px;background:rgba(255,255,255,0.1);color:#fff;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 4px 15px rgba(0,0,0,0.5);transition:all 0.3s;" title="إعدادات الموقع">
+    <i class="fa-solid fa-gear" style="font-size:24px;"></i>
+  </div>
+
+  <div class="auth-modal-overlay" id="settingsModal">
+    <div class="auth-modal" style="--color:#8b5cf6; --color-rgb:139,92,246">
+      <button class="close-modal" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="auth-modal-header">
+        <div class="auth-modal-icon"><i class="fa-solid fa-sliders"></i></div>
+        <h2>إعدادات كلمات المرور</h2>
+      </div>
+      <div style="padding:20px; text-align:right">
+        <div class="auth-form-group">
+          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور البوابة</label>
+          <input type="password" id="setPwdSecurity" class="auth-input">
+        </div>
+        <div class="auth-form-group">
+          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور الميزان</label>
+          <input type="password" id="setPwdScale" class="auth-input">
+        </div>
+        <div class="auth-form-group">
+          <label style="color:#fff; margin-bottom:5px; display:block">كلمة مرور الإدارة</label>
+          <input type="password" id="setPwdManager" class="auth-input">
+        </div>
+        <button type="button" class="auth-btn" style="background:#8b5cf6" onclick="saveSettings()">حفظ الإعدادات</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Auth Modal -->
 <div class="auth-modal-overlay" id="authModal">
   <div class="auth-modal" id="modalContent">
     <button class="close-modal" onclick="closeAuth()"><i class="fa-solid fa-xmark"></i></button>
@@ -262,7 +291,8 @@
         const deptUser = Auth.loginByRole(selectedRole, siloId, pwd);
         
         if (deptUser) {
-          if (selectedRole === 'scale') window.location.href = 'reception.html?v=19';
+          if (isSettingsAuth) { isSettingsAuth = false; closeAuth(); openSettingsPanel(); }
+            else if (selectedRole === 'scale') window.location.href = 'reception.html?v=19';
           else if (selectedRole === 'security') window.location.href = 'security.html?v=19';
           else if (selectedRole === 'finance') window.location.href = 'finance.html?v=19';
           else if (selectedRole === 'maintenance') window.location.href = 'maintenance.html?v=19';
@@ -282,3 +312,4 @@
 </script>
 </body>
 </html>
+
