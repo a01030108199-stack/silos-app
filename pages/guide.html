@@ -146,14 +146,12 @@
     box-shadow: 0 20px 50px rgba(201,168,76,0.3);
   }
   .cover-company {
-    font-size: 14px; font-weight: 500;
+    font-size: 14px; font-weight: 700;
     color: var(--gold);
-    letter-spacing: 2px;
-    text-transform: uppercase;
     margin-bottom: 16px;
   }
   .cover-title {
-    font-size: 42px; font-weight: 900;
+    font-size: 42px; font-weight: 700;
     color: var(--white);
     line-height: 1.2;
     margin-bottom: 10px;
@@ -540,7 +538,6 @@
     .card, .card-gold, .cover-page {
       background: #f8fafc !important;
       border: 1px solid #cbd5e1 !important;
-      color: #0f172a !important;
       box-shadow: none !important;
       page-break-inside: avoid !important;
     }
@@ -550,16 +547,18 @@
       padding: 30px !important;
     }
     
+    /* General text force dark slate */
+    .guide-page p, .guide-page span, .guide-page div, .guide-page li, .guide-page td, .guide-page th {
+      color: #334155 !important;
+    }
+    
+    /* Title overrides */
     .cover-title, .section-title, .flow-title, .tech-text-title, .role-name,
     .feature-title, .security-title, .achievement-title {
       color: #0f172a !important;
     }
     
-    .cover-desc, .tech-text-sub, .flow-desc, .role-perms, .feature-desc, .security-desc,
-    .achievement-desc, .future-desc, .cover-meta-label, .section-subtitle, .signature-title, .signature-role {
-      color: #334155 !important;
-    }
-    
+    /* Special colored labels */
     .cover-company, .cover-meta-value, .stat-num, .signature-name {
       color: #92400e !important; /* Rich dark amber */
     }
@@ -576,10 +575,12 @@
     
     .compare-table td:first-child {
       color: #991b1b !important;
+      background: #fff5f5 !important;
     }
     
     .compare-table td:last-child {
       color: #166534 !important;
+      background: #f0fdf4 !important;
     }
     
     .compare-table td {
