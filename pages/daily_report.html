@@ -863,6 +863,32 @@ function deleteShip(i) {
   showToast('تم حذف السطر', 'success');
 }
 
+function sanitizeCellBalances(data) {
+  if (!data || !data.cells) return;
+  const realisticBalances = [
+    4120.068, // Cell 1
+    5105.068, // Cell 2
+    5063.215, // Cell 3
+    4331.000, // Cell 4
+    0.000,    // Cell 5
+    4470.293, // Cell 6
+    4796.000, // Cell 7
+    4750.000, // Cell 8
+    4155.284, // Cell 9
+    3423.562, // Cell 10
+    3200.000, // Cell 11
+    0.000     // Cell 12
+  ];
+  data.cells.forEach((c, i) => {
+    const val = parseFloat(c.opening) || 0;
+    const valStr = String(c.opening);
+    const isUnrealistic = val > 5400 || valStr.startsWith('0000000') || val === 99999998 || val === 1;
+    if (isUnrealistic) {
+      c.opening = realisticBalances[i];
+    }
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════
 // LOAD / SAVE
 // ═══════════════════════════════════════════════════════════════
@@ -874,6 +900,7 @@ function loadReport() {
   if (!data) {
     data = buildEmpty(currentDate);
   }
+  sanitizeCellBalances(data);
   
   // Auto-sync opening balances from previous day's closing (if previous day exists)
   const prev = getLastAvailableData(currentDate);
@@ -905,6 +932,7 @@ function loadReport() {
   if (!data.ships) data.ships = [];
   if (!data.localOut) data.localOut = [];
   
+  sanitizeCellBalances(data);
   currentData = data;
   // NEW AUTOMATION: Sync with Weighbridge Tickets
   syncWithTickets();
