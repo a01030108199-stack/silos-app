@@ -687,17 +687,20 @@ function renderLocalOut(data) {
 
   const tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
   const targetSilosL = (typeof selectedSilo !== 'undefined' && selectedSilo) ? [selectedSilo] : (user.role === 'general_admin' ? SILOS.map(s=>s.id) : [user.silo_id]);
-  const localOrders = {};
-  targetSilosL.forEach(sid => Object.assign(localOrders, JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL_' + sid) || '{}')));
+  const allOrders = {};
+  targetSilosL.forEach(sid => {
+      Object.assign(allOrders, JSON.parse(localStorage.getItem('DISPENSE_ORDERS_LOCAL_' + sid) || '{}'));
+      Object.assign(allOrders, JSON.parse(localStorage.getItem('DISPENSE_ORDERS_' + sid) || '{}'));
+  });
 
   data.localOut.forEach((r, i) => {
     const total = (r.d235||0) + (r.d230||0) + (r.d225||0);
     // Find active order for this mill
     let activeOrderNo = null;
     let permitQty = r.permit || 0;
-    for (const [no, order] of Object.entries(localOrders)) {
+    for (const [no, order] of Object.entries(allOrders)) {
        if (normStr(order.destination) === normStr(r.name)) {
-           permitQty = (order.qty || 0) + (order.bonus || 0);
+           permitQty = (parseFloat(order.qty) || 0) + (parseFloat(order.bonus) || 0);
            activeOrderNo = no;
        }
     }
