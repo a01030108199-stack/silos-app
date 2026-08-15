@@ -913,6 +913,8 @@ function loadPendingTicket(id) {
   if (t.grade) document.getElementById('s_grade').value = t.grade;
   if (t.wheatType) document.getElementById('s_wheat_type').value = t.wheatType;
   if (t.destination) document.getElementById('s_destination').value = t.destination;
+  if (t.shipName) document.getElementById('s_ship_name').value = t.shipName;
+  if (t.shippedWeight) document.getElementById('s_shipped_weight').value = t.shippedWeight;
   if (t.packaging) {
     document.getElementById('s_packaging').value = t.packaging;
     if (typeof toggleSacksInput === 'function') toggleSacksInput();
