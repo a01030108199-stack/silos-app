@@ -338,8 +338,7 @@ select.form-input { cursor: pointer; }
   top: 0; right: 0; bottom: 0;
   z-index: 100;
   transition: var(--transition);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .sidebar-logo {
@@ -392,7 +391,12 @@ select.form-input { cursor: pointer; }
 .user-info .name { font-size: 0.78rem; font-weight: 700; line-height: 1.4; }
 .user-info .role { font-size: 0.68rem; color: var(--gold); }
 
-.sidebar-nav { flex: 1; padding: 12px 0; }
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
 .nav-section {
   padding: 8px 20px 4px;

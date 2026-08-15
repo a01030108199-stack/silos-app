@@ -95,9 +95,13 @@
               <option value="أخرى">أخرى</option>
             </select>
           </div>
-          <div class="form-group-inner" id="shipContainer">
-            <label>اسم الباخرة / رقم البوليصة</label>
+           <div class="form-group-inner" id="shipContainer">
+            <label>اسم الباخرة / رقم البوليصة *</label>
             <input type="text" class="form-control" id="w_ship" placeholder="مثال: الباخرة وادي النيل">
+          </div>
+          <div class="form-group-inner" id="billQtyContainer">
+            <label>كمية الشحن بالبوليسة (بالطن) *</label>
+            <input type="number" step="0.001" class="form-control" id="w_bill_qty" placeholder="مثال: 50.000" oninput="calcDiscrepancy()">
           </div>
           <div class="form-group-inner" id="destContainer" style="display:none">
             <label>الجهة المنصرف إليها *</label>
@@ -123,8 +127,12 @@
             <span id="c_kg">0 كجم</span>
           </div>
           <div class="calc-row calc-total text-info">
-            <span>الوزن المعادل بالطن:</span>
+            <span>الوزن المستلم بالطن:</span>
             <span id="c_ton">0.000 طن</span>
+          </div>
+          <div class="calc-row" id="discrepancyBox" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px; margin-top:10px;">
+            <span>الفارق عن وزن البوليصة (العجز/الزيادة):</span>
+            <span id="c_discrepancy" style="font-weight:bold;">—</span>
           </div>
         </div>
 
@@ -177,11 +185,15 @@ function toggleFields() {
   if (isDispatch) {
     document.getElementById('originContainer').style.display = 'none';
     document.getElementById('shipContainer').style.display = 'none';
+    document.getElementById('billQtyContainer').style.display = 'none';
     document.getElementById('destContainer').style.display = 'block';
+    document.getElementById('discrepancyBox').style.display = 'none';
   } else {
     document.getElementById('originContainer').style.display = 'block';
     document.getElementById('shipContainer').style.display = 'block';
+    document.getElementById('billQtyContainer').style.display = 'block';
     document.getElementById('destContainer').style.display = 'none';
+    document.getElementById('discrepancyBox').style.display = 'block';
   }
 }
 
@@ -208,12 +220,41 @@ function fetchTicket() {
   showToast('تم جلب الوزن الصافي من البسكول بنجاح', 'success');
 }
 
+function calcDiscrepancy() {
+  const kg = parseFloat(document.getElementById('w_weight_kg').value) || 0;
+  const ton = kg / 1000;
+  const billTon = parseFloat(document.getElementById('w_bill_qty').value) || 0;
+  
+  const diffSpan = document.getElementById('c_discrepancy');
+  if (!billTon) {
+    diffSpan.textContent = '—';
+    diffSpan.style.color = '#fff';
+    return;
+  }
+  
+  const diff = ton - billTon; // positive = excess, negative = shortage
+  const pct = (diff / billTon) * 100;
+  const absPct = Math.abs(pct).toFixed(2);
+  
+  if (diff === 0) {
+    diffSpan.textContent = 'مطابق تماماً لوزن البوليصة';
+    diffSpan.style.color = '#10b981';
+  } else if (diff > 0) {
+    diffSpan.textContent = `زيادة: +${diff.toFixed(3)} طن (+${absPct}%)`;
+    diffSpan.style.color = '#10b981';
+  } else {
+    diffSpan.textContent = `عجز: ${diff.toFixed(3)} طن (-${absPct}%)`;
+    diffSpan.style.color = '#ef4444';
+  }
+}
+
 function calc() {
   const kg = parseFloat(document.getElementById('w_weight_kg').value) || 0;
   const ton = kg / 1000;
   
   document.getElementById('c_kg').textContent = kg.toLocaleString('ar-EG') + ' كجم';
   document.getElementById('c_ton').textContent = ton.toLocaleString('ar-EG', {minimumFractionDigits:3}) + ' طن';
+  calcDiscrepancy();
 }
 
 function saveRecord() {
@@ -223,6 +264,8 @@ function saveRecord() {
   
   let targetOrOrigin = '';
   let ship = '';
+  let billQty = 0;
+  let diffTon = 0;
 
   if (isDispatch) {
     targetOrOrigin = document.getElementById('w_dest').value;
@@ -232,11 +275,24 @@ function saveRecord() {
     }
   } else {
     targetOrOrigin = document.getElementById('w_origin').value;
-    ship = document.getElementById('w_ship').value || 'غير محدد';
-    if (!kg) {
-      showToast('يرجى تحديد الوزن', 'error');
+    ship = document.getElementById('w_ship').value.trim();
+    billQty = parseFloat(document.getElementById('w_bill_qty').value);
+    
+    if (!ship) {
+      showToast('برجاء إدخال اسم الباخرة أو رقم البوليصة كحقل إجباري', 'error');
       return;
     }
+    if (!billQty || billQty <= 0) {
+      showToast('برجاء إدخال كمية البوليصة بالطن كحقل إجباري', 'error');
+      return;
+    }
+    if (!kg) {
+      showToast('يرجى تحديد الوزن عن طريق جلب كارتة البسكول', 'error');
+      return;
+    }
+    
+    const ton = kg / 1000;
+    diffTon = ton - billQty;
   }
 
   const ton = kg / 1000;
@@ -246,7 +302,7 @@ function saveRecord() {
     date: new Date().toLocaleDateString('ar-EG'),
     type,
     originOrDest: targetOrOrigin,
-    ship: ship,
+    ship: ship ? `${ship} (بوليصة: ${billQty} طن | فارق: ${diffTon.toFixed(3)} طن)` : '—',
     kg: kg,
     ton: ton.toFixed(3)
   };
@@ -269,6 +325,7 @@ function saveRecord() {
   document.getElementById('w_ticket').value = '';
   document.getElementById('ticketInfo').textContent = '';
   document.getElementById('w_ship').value = '';
+  document.getElementById('w_bill_qty').value = '';
   document.getElementById('w_dest').value = '';
   document.getElementById('w_weight_kg').value = '';
   calc();

@@ -1,4 +1,4 @@
-﻿// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // 🔥 FIREBASE REAL-TIME DATABASE SYNC — v2.0
 // نظام المزامنة الفوري مع Firebase — كل صومعة لها مسارها الخاص
 // silo_data/{silo_id}/{KEY}  ← هيكل التخزين
@@ -328,6 +328,17 @@
     try {
       _db = initFirebase();
       if (!_db) throw new Error('Firebase init failed');
+
+      // Listen for connection state changes
+      try {
+        _db.ref(".info/connected").on("value", (snap) => {
+          const isConnected = snap.val() === true;
+          window.firebaseConnected = isConnected;
+          window.dispatchEvent(new CustomEvent('firebase-connection-changed', { detail: { connected: isConnected } }));
+        });
+      } catch(err) {
+        console.warn('info/connected listen error:', err);
+      }
 
       overrideLocalStorage();
 

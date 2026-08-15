@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <script>window.onerror = function(m,u,l,c,e) { alert('Error: ' + m + '\nLine: ' + l + '\nCol: ' + c); };</script>
@@ -10,7 +10,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="../js/firebase-db.js"></script></head>
+<script src="../js/firebase-db.js"></script>
+<style>
+  @keyframes db-led-blink {
+    from { opacity: 0.3; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1.05); }
+  }
+</style>
+</head>
 <body>
 <div class="app-layout">
   <aside class="sidebar" id="app-sidebar"></aside>
@@ -23,6 +30,10 @@
         <div class="header-sub" id="pageDate"></div>
       </div>
       <div class="header-actions">
+        <div id="db-status-indicator" style="display:flex; align-items:center; gap:6px; background:rgba(239,68,68,0.05); padding:4px 10px; border-radius:20px; border:1px solid rgba(239,68,68,0.3); font-size:0.72rem; font-weight:bold; color:#e2e8f0; transition: all 0.3s; margin-left: 10px;">
+          <span id="db-status-led" style="width:8px; height:8px; border-radius:50%; background:#ef4444; display:inline-block; box-shadow: 0 0 6px #ef4444; animation: db-led-blink 1s infinite alternate;"></span>
+          <span id="db-status-text">غير متصل</span>
+        </div>
         <div class="header-date" id="clockEl"></div>
         <div class="btn-icon" id="btnAdminPasswords" style="display:none" title="مراقبة كلمات المرور" onclick="openAdminPasswords()">
           <i class="fa-solid fa-key" style="color:#f59e0b"></i>
@@ -244,6 +255,40 @@
 <script src="../js/data.js?v=24"></script>
 <script src="../js/app.js?v=27"></script>
 <script>
+// ── Firebase Connectivity Status UI ──
+function updateDbStatusLed(connected) {
+  const led = document.getElementById('db-status-led');
+  const txt = document.getElementById('db-status-text');
+  const container = document.getElementById('db-status-indicator');
+  if (!led || !txt || !container) return;
+  if (connected) {
+    led.style.background = '#10b981';
+    led.style.boxShadow = '0 0 8px #10b981';
+    led.style.animation = 'none';
+    txt.textContent = 'متصل لحظياً';
+    container.style.borderColor = 'rgba(16,185,129,0.3)';
+    container.style.background = 'rgba(16,185,129,0.05)';
+  } else {
+    led.style.background = '#ef4444';
+    led.style.boxShadow = '0 0 6px #ef4444';
+    led.style.animation = 'db-led-blink 1s infinite alternate';
+    txt.textContent = 'غير متصل';
+    container.style.borderColor = 'rgba(239,68,68,0.3)';
+    container.style.background = 'rgba(239,68,68,0.05)';
+  }
+}
+
+window.addEventListener('firebase-connection-changed', (e) => {
+  updateDbStatusLed(e.detail.connected);
+});
+
+// Initialize connection state
+if (typeof window.firebaseConnected !== 'undefined') {
+  updateDbStatusLed(window.firebaseConnected);
+} else {
+  updateDbStatusLed(false);
+}
+
 // ── Init ────────────────────────────────────────────────────
 const user = Auth.require(['manager', 'general_admin', 'silo']);
 buildSidebar('dashboard');
