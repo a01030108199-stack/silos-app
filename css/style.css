@@ -1092,3 +1092,15 @@ select.form-input { cursor: pointer; }
   flex: 1 !important;
   height: auto !important;
 }
+
+/* Hide number input spin buttons */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
