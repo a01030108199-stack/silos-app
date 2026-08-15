@@ -116,7 +116,6 @@ window.onerror = function(msg, url, line, col, err) {
           <input type="date" id="reportDate" onchange="loadReport()">
           <button onclick="changeDay(1)"><i class="fa-solid fa-chevron-left"></i></button>
         </div>
-        <button class="btn no-print" style="background:#10b981; margin-right: 15px;" onclick="setupPresentationData()" title="يمسح الأرصدة الحالية ويضع أرصدة نموذجية للعرض"><i class="fa-solid fa-magic"></i> تصفير وتجهيز للعرض</button>
       </div>
 
       <!-- Summary Cards -->
@@ -1107,41 +1106,6 @@ function changeDay(n) {
   loadReport();
 }
 
-function setupPresentationData() {
-  if (!confirm('تنبيه هام: هذا الإجراء سيمسح أرصدة اليوم الحالية ويستبدلها بأرصدة نموذجية متناسقة جاهزة للعرض على مجلس الإدارة. هل أنت متأكد؟')) return;
-  
-  const perfectBalances = [
-    5100.000, 4800.500, 5000.250, 4500.000, 0, 3500.750, // Local
-    5200.000, 4900.500, 4100.250, 0, 3800.000, 0 // Imported
-  ];
-
-  currentData.cells.forEach((c, i) => {
-    c.opening = perfectBalances[i];
-    if (i < 6) {
-      if (perfectBalances[i] === 0) { c.type = 'فارغة'; c.grade = ''; c.country = ''; }
-      else { c.type = 'محلي'; c.grade = '23.5'; c.country = ''; }
-    } else {
-      const countries = ['روسيا', 'أوكرانيا', 'رومانيا', '', 'فرنسا', ''];
-      if (perfectBalances[i] === 0) {
-        c.type = 'فارغة'; c.grade = ''; c.country = ''; c.ship = '';
-      } else {
-        c.type = 'مستورد'; c.grade = ''; c.country = countries[i-6]; c.ship = 'وادي النيل';
-      }
-    }
-  });
-
-  currentData.ships = [];
-  currentData.localOut = [];
-
-  saveReportSilently();
-  renderCells(currentData);
-  renderImportedFromCells();
-  renderLocalInFromCells();
-  renderLocalOut(currentData);
-  renderShips(currentData);
-  
-  showToast('تم تجهيز الأرقام للعرض بنجاح!', 'success');
-}
 
 // ─── Init ──────────────────────────────────────────────────────
 document.getElementById('reportDate').value = todayStr();
