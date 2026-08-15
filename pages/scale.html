@@ -734,14 +734,6 @@ function validateFormCommon() {
   if (!plate || !driver) return 'يرجى إدخال رقم السيارة واسم السائق';
   if (!cell) return 'يرجى اختيار رقم الخلية';
   
-  // enforce cell routing constraints
-  if (grainType === 'محلي' && cellNum > 6) {
-    return 'عفواً، حظر حوكمة: لا يمكن توجيه القمح المحلي إلى خلايا القمح المستورد (الخلايا 7 - 12).';
-  }
-  if (grainType === 'مستورد' && cellNum <= 6) {
-    return 'عفواً، حظر حوكمة: لا يمكن توجيه القمح المستورد إلى خلايا القمح المحلي (الخلايا 1 - 6).';
-  }
-  
   // Validate Cell Content against Operation Type
   const liveType = getLiveCellType(cell);
   if (opType === 'صرف' || opType === 'منصرف (شحن)') {
