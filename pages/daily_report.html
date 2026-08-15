@@ -923,12 +923,32 @@ function loadReport() {
       }
     });
     // Sync ships opening balances
-    if (data.ships && prev.ships) {
-      data.ships.forEach(s => {
-        const p = prev.ships.find(x => normStr(x.name) === normStr(s.name));
-        if (p) {
+    if (prev.ships) {
+      if (!data.ships) data.ships = [];
+      prev.ships.forEach(p => {
+        let s = data.ships.find(x => normStr(x.name) === normStr(p.name));
+        if (!s && (p.remaining > 0 || p.closing > 0)) {
+          s = { name: p.name, ship_name: p.ship_name || '', permit: 0, opening: 0, dispatched: 0, closing: 0, remaining: 0, orderNo: p.orderNo || '' };
+          data.ships.push(s);
+        }
+        if (s) {
           s.opening = p.closing || 0;
+          // Only overwrite permit if we rolled it over (so we don't clobber active orders unnecessarily, though syncWithTickets overrides it anyway)
           s.permit = p.remaining || 0;
+        }
+      });
+    }
+    // Sync localOut permit balances
+    if (prev.localOut) {
+      if (!data.localOut) data.localOut = [];
+      prev.localOut.forEach(p => {
+        let r = data.localOut.find(x => normStr(x.name) === normStr(p.name));
+        if (!r && p.remaining > 0) {
+          r = { name: p.name, permit: 0, d235: 0, d230: 0, d225: 0, total: 0, remaining: 0 };
+          data.localOut.push(r);
+        }
+        if (r) {
+          r.permit = p.remaining || 0;
         }
       });
     }
