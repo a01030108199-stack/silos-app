@@ -933,8 +933,7 @@ function loadReport() {
         }
         if (s) {
           s.opening = p.closing || 0;
-          // Only overwrite permit if we rolled it over (so we don't clobber active orders unnecessarily, though syncWithTickets overrides it anyway)
-          s.permit = p.remaining || 0;
+          s.permit = p.permit || 0;
         }
       });
     }
