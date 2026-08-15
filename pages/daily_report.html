@@ -490,7 +490,7 @@ function fmt(n) {
 // ─── Input helpers ────────────────────────────────────────────
 function mkInp(type, val, cls, style, handler) {
   const s = style||'';
-  return `<input type="${type}" value="${val||''}" placeholder="0" class="inp ${cls||''}" style="${s}" onchange="${handler}">`;
+  return `<input type="${type}" autocomplete="new-password" value="${val||''}" placeholder="0" class="inp ${cls||''}" style="${s}" onchange="${handler}">`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -545,12 +545,12 @@ function renderCells(data) {
         <td class="cell-num">${c.num}</td>
         <td><span style="font-weight:bold">${c.type || 'فارغة'}</span></td>
         <td>${detailHtml}</td>
-        <td style="background-color: rgba(139, 92, 246, 0.1);"><input type="number" class="inp" value="${c.opening||0}" placeholder="0" onchange="updateCell(${i},'opening',+this.value)"></td>
+        <td style="background-color: rgba(139, 92, 246, 0.1);"><input type="number" class="inp" autocomplete="new-password" value="${c.opening||0}" placeholder="0" onchange="updateCell(${i},'opening',+this.value)"></td>
         <td><span class="val-incoming">${fmt(c.incoming)}</span></td>
         <td><span class="val-outgoing">${fmt(c.outgoing)}</span></td>
         <td style="${closingStyle}"><input type="text" class="inp ${inDanger?'over-capacity':''}" value="${fmt(closing)}" readonly style="cursor:default;${inDanger?'color:#ff5252;font-weight:bold;':''}">${closingLabel}</td>
         <td style="background-color: rgba(6, 182, 212, 0.1); color:${availColor}">${availText}</td>
-        <td style="background-color: rgba(245, 158, 11, 0.1);"><input type="text" class="inp" value="${c.notes||''}" placeholder="اكتب ملاحظة..." onchange="updateCell(${i},'notes',this.value)"></td>
+        <td style="background-color: rgba(245, 158, 11, 0.1);"><input type="text" class="inp" autocomplete="new-password" value="${c.notes||''}" placeholder="اكتب ملاحظة..." onchange="updateCell(${i},'notes',this.value)"></td>
       </tr>`;
   });
 
@@ -718,12 +718,12 @@ function renderLocalOut(data) {
     t235+=r.d235||0; t230+=r.d230||0; t225+=r.d225||0; tTot+=total; tRem+=rem;
 
     const inp = (field, v) =>
-      `<input type="number" class="inp inp-sm" value="${v||''}" placeholder="0" onchange="updateLocalOut(${i},'${field}',+this.value)">`;
+      `<input type="number" class="inp inp-sm" autocomplete="new-password" value="${v||''}" placeholder="0" onchange="updateLocalOut(${i},'${field}',+this.value)">`;
 
     tbody.innerHTML += `
       <tr>
-        <td><input type="text" class="inp inp-md" value="${r.name||''}" placeholder="اسم المطحن" onchange="updateLocalOut(${i},'name',this.value)"></td>
-        <td><input type="number" class="inp" value="${permitQty||0}" placeholder="0" onchange="updateLocalOut(${i},'permit',+this.value)" ${activeOrderNo ? 'readonly title="مستورد آلياً من البوابة"' : ''}></td>
+        <td><input type="text" class="inp inp-md" autocomplete="new-password" value="${r.name||''}" placeholder="اسم المطحن" onchange="updateLocalOut(${i},'name',this.value)"></td>
+        <td><input type="number" class="inp" autocomplete="new-password" value="${permitQty||0}" placeholder="0" onchange="updateLocalOut(${i},'permit',+this.value)" ${activeOrderNo ? 'readonly title="مستورد آلياً من البوابة"' : ''}></td>
         <td class="val-outgoing">${fmt(r.d235)}</td>
         <td class="val-outgoing">${fmt(r.d230)}</td>
         <td class="val-outgoing">${fmt(r.d225)}</td>
@@ -774,10 +774,10 @@ function renderShips(data) {
     tbody.innerHTML += `
       <tr>
         <td class="cell-num">${i+1}</td>
-        <td><input type="text" class="inp inp-lg" value="${s.name||''}" placeholder="اسم المطحن" onchange="updateShip(${i},'name',this.value)"></td>
-        <td><input type="text" class="inp text-info fw-bold text-center" value="${s.ship_name||''}" placeholder="نوع القمح" onchange="updateShip(${i},'ship_name',this.value)"></td>
-        <td><input type="number" class="inp" value="${s.permit||''}" placeholder="0" onchange="updateShip(${i},'permit',+this.value)"></td>
-        <td><input type="number" class="inp" value="${s.opening||0}" placeholder="0" onchange="updateShip(${i},'opening',+this.value)"></td>
+        <td><input type="text" class="inp inp-lg" autocomplete="new-password" value="${s.name||''}" placeholder="اسم المطحن" onchange="updateShip(${i},'name',this.value)"></td>
+        <td><input type="text" class="inp text-info fw-bold text-center" autocomplete="new-password" value="${s.ship_name||''}" placeholder="نوع القمح" onchange="updateShip(${i},'ship_name',this.value)"></td>
+        <td><input type="number" class="inp" autocomplete="new-password" value="${s.permit||''}" placeholder="0" onchange="updateShip(${i},'permit',+this.value)"></td>
+        <td><input type="number" class="inp" autocomplete="new-password" value="${s.opening||0}" placeholder="0" onchange="updateShip(${i},'opening',+this.value)"></td>
         <td><span class="val-outgoing">${fmt(s.dispatched||0)}</span></td>
         <td><span class="val-closing">${fmt(closing)}</span></td>
         <td style="color:${remaining<0?'#ff5252':'#ffe082'};font-weight:700">${fmt(remaining)}</td>
