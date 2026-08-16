@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نقل ومزامنة البيانات - نظام الصوامع</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #0f1623; color: white; text-align: center; padding: 50px; }
+    .card { background: #1a2235; border: 1px solid #c9a84c; border-radius: 10px; padding: 40px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .btn { background: #c9a84c; color: #000; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; margin: 10px; display: inline-block; text-decoration: none; transition: 0.3s; }
+    .btn:hover { background: #d4b55b; transform: translateY(-2px); }
+    .btn-blue { background: #2563eb; color: #fff; border: 1px solid #3b82f6; }
+    .btn-blue:hover { background: #3b82f6; }
+    input[type="file"] { display: none; }
+    hr { border-color: #2a374f; margin: 30px 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 style="color: #c9a84c; font-size: 28px; margin-bottom: 10px;"><i class="fa-solid fa-database"></i> أداة نقل قاعدة البيانات</h2>
+    <p style="color: #94a3b8; font-size: 16px;">استخدم هذه الأداة لنقل بيانات النظام بالكامل (التذاكر، الأذونات، التقارير) من جهازك المكتبي إلى اللابتوب استعداداً للعرض.</p>
+    
+    <hr>
+    
+    <h3 style="color: #e2e8f0;">الخطوة 1: على الجهاز القديم (الذي يحتوي على البيانات)</h3>
+    <button class="btn" onclick="exportData()"><i class="fa-solid fa-download"></i> تحميل نسخة من البيانات (تصدير)</button>
+    <p style="font-size: 13px; color: #64748b; margin-top: 5px;">سيبدأ تحميل ملف صغير يحمل اسم "silos_backup_..." ضعه على فلاشة (USB).</p>
+
+    <hr>
+    
+    <h3 style="color: #e2e8f0;">الخطوة 2: على اللابتوب (الجهاز الذي ستعرض عليه)</h3>
+    <p style="font-size: 14px; color: #94a3b8; margin-bottom: 15px;">انقل الملف (من الفلاشة) للابتوب، ثم اضغط على الزر أدناه لاختيار الملف ورفع البيانات.</p>
+    <label for="importFile" class="btn btn-blue"><i class="fa-solid fa-upload"></i> رفع البيانات للابتوب (استيراد)</label>
+    <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    <div id="status" style="margin-top: 20px; font-size: 18px; font-weight: bold; color: #10b981;"></div>
+    
+    <br><br>
+    <a href="../index.html" style="color: #c9a84c; text-decoration: underline;"><i class="fa-solid fa-arrow-right"></i> العودة للشاشة الرئيسية</a>
+  </div>
+
+  <script>
+    function exportData() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+      }
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `silos_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          let count = 0;
+          for (const key in data) {
+            localStorage.setItem(key, data[key]);
+            count++;
+          }
+          const status = document.getElementById('status');
+          status.innerHTML = `<i class="fa-solid fa-circle-check"></i> ممتاز! تم نقل البيانات بنجاح.<br><span style="font-size:14px; color:#94a3b8;">جاري تحويلك للنظام بالأرقام الحقيقية...</span>`;
+          setTimeout(() => { window.location.href = '../index.html'; }, 4000);
+        } catch (err) {
+          alert('الملف غير صالح أو تالف.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
