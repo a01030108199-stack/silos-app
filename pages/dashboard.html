@@ -35,6 +35,9 @@
           <span id="db-status-text">غير متصل</span>
         </div>
         <div class="header-date" id="clockEl"></div>
+        <div class="btn-icon" id="btnInjectDemo" style="display:none; color:#10b981; border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.05);" title="ضخ بيانات تجريبية للعرض (لجميع الصوامع ما عدا طامية)" onclick="injectDemoData()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
         <div class="btn-icon" id="btnAdminPasswords" style="display:none" title="مراقبة كلمات المرور" onclick="openAdminPasswords()">
           <i class="fa-solid fa-key" style="color:#f59e0b"></i>
         </div>
@@ -1116,6 +1119,75 @@ function applyEditApproval() {
   closeModal('editApproveModal');
   showToast('تم تطبيق التعديل والموافقة بنجاح', 'success');
   loadApprovals();
+
+if (user && user.role === 'general_admin') {
+  document.getElementById('btnInjectDemo').style.display = 'inline-flex';
+}
+
+function injectDemoData() {
+  if (!confirm("هل أنت متأكد من ضخ بيانات تجريبية لباقي الصوامع (للعرض فقط)؟ اطمئن، لن يتم المساس ببيانات صومعة طامية الأصلية.")) return;
+  
+  let tickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  
+  // Remove existing demo tickets to prevent unlimited growth if clicked multiple times
+  tickets = tickets.filter(t => !t.isDemo);
+
+  // Silos 2 to 10 (random selection)
+  const silosToInject = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const suppliers = [
+    {name: "شركة الصوامع والتخزين", code: "S001"},
+    {name: "الشركة القابضة", code: "H002"},
+    {name: "مطاحن مصر العليا", code: "M003"},
+    {name: "تجار الجملة قطاع 1", code: "T004"}
+  ];
+  const destinations = ["مطحن الفردوس", "مطحن الهدى", "مطحن السلام", "مطاحن مصر الوسطى", "صوامع الإسكندرية"];
+  
+  const currentDate = new Date();
+  
+  // Inject 400 fake tickets spanning the last 15 days
+  for(let i=0; i<400; i++) {
+    const sid = silosToInject[Math.floor(Math.random() * silosToInject.length)];
+    const dateOffset = Math.floor(Math.random() * 15);
+    const d = new Date(currentDate.getTime() - dateOffset * 86400000);
+    // Randomize hours
+    d.setHours(Math.floor(Math.random() * 12) + 8);
+    const dateStr = d.toISOString().slice(0,10);
+    
+    const isLocal = Math.random() > 0.3;
+    const opType = Math.random() > 0.4 ? 'وارد' : 'صرف';
+    const grainType = isLocal ? 'محلي' : 'مستورد';
+    const net = Math.floor(Math.random() * 60000) + 15000; // 15 to 75 tons
+    
+    const supp = suppliers[Math.floor(Math.random() * suppliers.length)];
+    const dest = destinations[Math.floor(Math.random() * destinations.length)];
+    
+    tickets.push({
+      id: 'DEMO-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      silo_id: sid,
+      opType: opType,
+      grainType: grainType,
+      net: net,
+      gross: net + 15000,
+      tare: 15000,
+      status: 'completed',
+      dateStr: dateStr,
+      timestamp: d.toISOString(),
+      isDemo: true,
+      grade: '23.5',
+      truck_plate: 'أ ب ج ' + Math.floor(Math.random()*9000+1000),
+      supplierName: opType === 'وارد' ? supp.name : '',
+      supplierCode: opType === 'وارد' ? supp.code : '',
+      destination: opType === 'صرف' ? dest : ''
+    });
+  }
+  
+  // Sort by timestamp
+  tickets.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+  
+  localStorage.setItem('WEIGHBRIDGE_TICKETS', JSON.stringify(tickets));
+  alert('تم بنجاح ضخ 400 تذكرة تجريبية لباقي الصوامع! سيتم تحديث الصفحة الآن لتنعكس على الرسوم البيانية.');
+  window.location.reload();
+}
 }
 
 loadApprovals();
