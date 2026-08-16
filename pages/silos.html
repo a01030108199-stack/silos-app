@@ -81,44 +81,42 @@ buildSidebar('silos');
 initClock(document.getElementById('clockEl'));
 
 // ══════════════════════════════════════════════════════════════════
-// قراءة أرقام المخزون الحقيقية من البيانات اليومية
-// DAILY_REPORT_{siloId}_{date}  ← مصدر الأرقام الحقيقية
+// قراءة الأرقام الحية من حركة الميزان (لحظياً)
 // ══════════════════════════════════════════════════════════════════
-function getRealStock(siloId) {
-  const today = new Date().toISOString().split('T')[0];
-  // نجرب تاريخ اليوم أولاً ثم الأمس كاحتياط
-  const dates = [today];
-  const yest = new Date(); yest.setDate(yest.getDate()-1);
-  dates.push(yest.toISOString().split('T')[0]);
+let liveTickets = [];
+try {
+  liveTickets = JSON.parse(localStorage.getItem('WEIGHBRIDGE_TICKETS') || '[]');
+  if (!Array.isArray(liveTickets)) liveTickets = [];
+} catch(e) {}
 
-  for (const d of dates) {
-    const key = `DAILY_REPORT_${siloId}_${d}`;
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      const report = JSON.parse(raw);
-      // إجمالي رصيد آخر المدة من كل الخلايا
-      if (report && report.cells && report.cells.length > 0) {
-        const totalClose = report.cells.reduce((s, c) => s + (c.closing || 0), 0);
-        const totalIn    = report.cells.reduce((s, c) => s + (c.incoming || 0), 0);
-        const totalOut   = report.cells.reduce((s, c) => s + (c.outgoing || 0), 0);
-        if (totalClose > 0 || totalIn > 0) {
-          return { stock: totalClose, incoming: totalIn, outgoing: totalOut, fromReport: true };
-        }
-      }
-    } catch(e) {}
-  }
-  return null; // لا توجد بيانات حقيقية
-}
+const todayStr = new Date().toISOString().split('T')[0];
 
-// تطبيق الأرقام الحقيقية على SILOS (التي تمثل الصومعة الحالية فقط)
 SILOS.forEach(s => {
-  const real = getRealStock(s.id);
-  if (real) {
-    s.stock = real.stock;
-    s._real = true; // علامة تشير أن الرقم حقيقي
-    s._todayIn  = real.incoming;
-    s._todayOut = real.outgoing;
+  let sStock = s.stock || 0; // Start with static base
+  let tIn = 0;
+  let tOut = 0;
+  let hasRealActivity = false;
+
+  liveTickets.forEach(t => {
+    if (t.status !== 'completed' && t.status !== 'gate_out') return;
+    if (t.silo_id === s.id) {
+      hasRealActivity = true;
+      const net = (t.net || 0) / 1000;
+      if (t.opType === 'وارد' || t.opType === 'وارد (تفريغ)') {
+        sStock += net;
+        if (t.dateStr === todayStr) tIn += net;
+      } else if (t.opType === 'صرف' || t.opType === 'منصرف (شحن)') {
+        sStock -= net;
+        if (t.dateStr === todayStr) tOut += net;
+      }
+    }
+  });
+
+  if (hasRealActivity) {
+    s.stock = Math.max(0, sStock);
+    s._real = true;
+    s._todayIn = tIn;
+    s._todayOut = tOut;
   }
 });
 
@@ -157,8 +155,8 @@ if (realCount > 0) {
   sg.innerHTML += `<div class="stat-card" style="border-color:rgba(34,197,94,0.4);background:rgba(34,197,94,0.05)">
     <div class="stat-icon ic-green"><i class="fa-solid fa-satellite-dish"></i></div>
     <div class="stat-body">
-      <div class="stat-value" style="font-size:1rem;color:#22c55e">بيانات حقيقية</div>
-      <div class="stat-label">مُحدَّثة من البيان اليومي 🔴</div>
+      <div class="stat-value" style="font-size:1rem;color:#22c55e">بيانات حية (Live)</div>
+      <div class="stat-label">مُحدَّثة لحظياً من الموازين 🔴</div>
     </div></div>`;
 }
 
