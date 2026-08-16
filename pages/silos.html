@@ -99,15 +99,15 @@ SILOS.forEach(s => {
 
   liveTickets.forEach(t => {
     if (t.status !== 'completed' && t.status !== 'gate_out') return;
-    if (t.silo_id === s.id) {
+    if (t.silo_id == s.id) {
       hasRealActivity = true;
       const net = (t.net || 0) / 1000;
       if (t.opType === 'وارد' || t.opType === 'وارد (تفريغ)') {
         sStock += net;
-        if (t.dateStr === todayStr) tIn += net;
+        tIn += net;
       } else if (t.opType === 'صرف' || t.opType === 'منصرف (شحن)') {
         sStock -= net;
-        if (t.dateStr === todayStr) tOut += net;
+        tOut += net;
       }
     }
   });
@@ -115,8 +115,8 @@ SILOS.forEach(s => {
   if (hasRealActivity) {
     s.stock = Math.max(0, sStock);
     s._real = true;
-    s._todayIn = tIn;
-    s._todayOut = tOut;
+    s._totalIn = tIn;
+    s._totalOut = tOut;
   }
 });
 
@@ -200,16 +200,11 @@ function renderSilos(list) {
           </div>
           <div class="stock-cap" style="margin-top:5px;font-size:0.71rem">من ${formatNum(s.cap)} طن طاقة كاملة</div>
         </div>
-        ${isReal ? `
-        <div style="display:flex;gap:8px;margin-top:10px;font-size:0.72rem">
-          <span style="color:#22c55e"><i class="fa-solid fa-arrow-down"></i> ${formatNum(s._todayIn)} طن</span>
-          <span style="color:#f97316"><i class="fa-solid fa-arrow-up"></i> ${formatNum(s._todayOut)} طن</span>
-        </div>` : `
-        <div style="display:flex;gap:8px;margin-top:14px;font-size:0.72rem;color:var(--text-sec)">
-          <span title="قمح"><i class="fa-solid fa-wheat-awn text-gold"></i> ${formatNum(s.wheat)}</span>
-          <span title="ذرة"><i class="fa-solid fa-seedling text-success"></i> ${formatNum(s.corn)}</span>
-          <span title="شعير"><i class="fa-solid fa-leaf text-info"></i> ${formatNum(s.barley)}</span>
-        </div>`}
+          <div class="silo-daily" style="font-size:0.75rem; color:#7a8ba8; margin-top:8px; display:flex; gap:10px;">
+            <span title="إجمالي الوارد"><i class="fa-solid fa-arrow-down" style="color:#22c55e"></i> ${formatNum(s._totalIn||0)}</span>
+            <span title="إجمالي المنصرف"><i class="fa-solid fa-arrow-up" style="color:#f43f5e"></i> ${formatNum(s._totalOut||0)}</span>
+            <span style="margin-right:auto; color:#f59e0b" title="السعة التخزينية المتبقية"><i class="fa-solid fa-box-open"></i> ${formatNum(s.cap - s.stock)}</span>
+          </div>
       </div>`;
   });
 }
